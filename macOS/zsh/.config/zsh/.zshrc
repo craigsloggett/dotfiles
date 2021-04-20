@@ -61,8 +61,8 @@ setopt NO_CASE_GLOB
 setopt AUTO_CD 
 
 # Turn on ZSH correction.
-setopt CORRECT
-setopt CORRECT_ALL
+#setopt CORRECT
+#setopt CORRECT_ALL
 
 # Turn on partial completion suggestions.
 zstyle ':completion:*' special-dirs true
