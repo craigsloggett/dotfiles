@@ -2,6 +2,14 @@
 " VIM Configuration
 "
 
+" Plugins
+let config_dir = $XDG_CONFIG_HOME
+if empty(glob(config_dir . '/vim/autoload/plug.vim'))
+  silent !curl -fLo '.config_dir.'/vim/autoload/plug.vim --create-dirs 
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 " Environment
 set undodir=${XDG_CACHE_HOME}/vim
 set directory=${XDG_CACHE_HOME}/vim
@@ -31,4 +39,4 @@ set softtabstop=2           " number of spaces in TAB when editing
 set number                  " show line numbers
 set showcmd                 " show command in bottom bar
 set ruler                   " show ruler in bottom bar
-match ErrorMsg '\%>100v.\+' " highlight lines greater than 100 characters
+" match ErrorMsg '\%>100v.\+' " highlight lines greater than 100 characters
