@@ -52,7 +52,7 @@ GIT_PS1_SHOWCOLORHINTS=1
 export RPROMPT=$'$(__git_ps1 "%s")'
 
 # Source the alias file.
-source ~/.config/zsh/aliases
+source "${ZDOTDIR}/aliases"
 
 # Turn on case insensitive globbing.
 setopt NO_CASE_GLOB
