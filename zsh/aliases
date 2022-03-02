@@ -1,0 +1,6 @@
+#
+# $ZDOTDIR/aliases
+#
+
+# Add ZSH Aliases here.
+alias ls='ls -G'
