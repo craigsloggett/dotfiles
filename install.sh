@@ -113,7 +113,16 @@ _gnupg() {
 	fi
 }
 
-for util in zsh vim git gnupg; do
+_pass() {
+	# Migrate existing password store, otherwise setup the directory.
+	if [ -d "${HOME}/.password-store" ]; then
+		mv "${HOME}/.password-store" "${XDG_DATA_HOME}/pass"
+	else
+		mkdir -p "${XDG_DATA_HOME}/pass"
+	fi
+}
+
+for util in zsh vim git gnupg pass; do
 	if command -v "${util}" > /dev/null; then
 		"_${util}"
 	fi

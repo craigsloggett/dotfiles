@@ -16,11 +16,14 @@ export PATH="${XDG_BIN_HOME}:${PATH}"
 # $ZDOTDIR/.zsh_sessions.
 export SHELL_SESSIONS_DISABLE=1
 
+# Homebrew
+export PATH="/opt/homebrew/bin:${PATH}"
+
 # VIM
 export VIMINIT='let $MYVIMRC="${XDG_CONFIG_HOME}/vim/vimrc" | source ${MYVIMRC}'
 
 # GnuPG
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 
-# Homebrew
-export PATH="/opt/homebrew/bin:${PATH}"
+# Pass
+export PASSWORD_STORE_DIR="${XDG_DATA_HOME}/pass"
