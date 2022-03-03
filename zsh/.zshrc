@@ -4,10 +4,10 @@
 
 # Enable auto completion.
 autoload -Uz compinit
-compinit -d "${XDG_DATA_HOME:="${HOME}/.local/share"}/zsh/zcompdump"
+compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
 
 # Terminal history settings.
-HISTFILE="${XDG_DATA_HOME:="${HOME}/.local/share"}/zsh/history"
+HISTFILE="${XDG_STATE_HOME}/zsh/history"
 HISTSIZE=60000
 SAVEHIST=50000
 
@@ -59,6 +59,7 @@ setopt NO_CASE_GLOB
 setopt AUTO_CD
 
 # Turn on partial completion suggestions.
+zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}/zsh/zcompcache"
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' list-suffixes
 zstyle ':completion:*' expand prefix suffix
