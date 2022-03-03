@@ -2,17 +2,15 @@
 #
 # install dot files.
 
+# Global Variables
+: "${XDG_CONFIG_HOME:=${HOME}/.config}"
+: "${XDG_CACHE_HOME:=${HOME}/.cache}"
+: "${XDG_STATE_HOME:=${HOME}/.local/state}"
+
 _zsh() {
-	# Setup directories.
-	mkdir -p "${XDG_CONFIG_HOME:-${HOME}/.config}"
-	mkdir -p "${XDG_DATA_HOME:-${HOME}/.local/share}/zsh"
-
-	# Update permissions on existing system files.
-	chmod 755 /usr/local/share/zsh
-	chmod 755 /usr/local/share/zsh/site-functions
-
 	# Create the /etc/zshenv file to specify $ZDOTDIR.
 	printf '%s\n' "Writing to /etc/zshenv using sudo..."
+
 	cat <<- 'EOF' | sudo tee /etc/zshenv > /dev/null
 	# /etc/zshenv: system-wide .zshenv file for zsh(1).
 	#
@@ -32,13 +30,25 @@ _zsh() {
 	export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
 	EOF
 	
+	# Setup directories.
+	mkdir -p "${XDG_CONFIG_HOME}"
+	mkdir -p "${XDG_CACHE_HOME}/zsh"
+	mkdir -p "${XDG_STATE_HOME}/zsh"
+
+	# Update permissions on existing system files.
+	if [ -d /usr/local/share/zsh ]; then
+		chmod 755 /usr/local/share/zsh
+		chmod 755 /usr/local/share/zsh/site-functions
+	fi
+
 	# Get the full path of the current working directory.
 	dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
 
+	# TODO: Update the symlink if the location changed.
 	# Symlink the dotfiles source directory to $ZDOTDIR.
 	if [ ! -e "${XDG_CONFIG_HOME}/zsh" ]; then
 		if [ -d "${dirname}/zsh" ]; then
-			ln -s "${dirname}/zsh" "${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
+			ln -s "${dirname}/zsh" "${XDG_CONFIG_HOME}/zsh"
 		fi
 	fi
 
@@ -50,7 +60,7 @@ _zsh() {
 	rm -f "${HOME}/.zprofile"
 	rm -f "${HOME}/.zshrc"
 	rm -rf "${HOME}/.zsh_sessions"
-	rm -rf "${XDG_CONFIG_HOME:-${HOME}/.config}/zsh/.zsh_sessions"
+	rm -rf "${ZDOTDIR}/.zsh_sessions"
 }
 
 _zsh
