@@ -1,0 +1,21 @@
+"
+" VIM Configuration
+"
+
+" Allow Unicode characters in Vim configuration files.
+scriptencoding utf-8
+set encoding=utf-8
+
+" Load base configuration.
+source <sfile>:h/plugin/base.vim
+
+" Don't support VI.
+set nocompatible
+
+" Case insensitive search.
+set ignorecase
+
+" Make Vim read per-filetype settings from the `ftplugin` directory.
+filetype plugin on
+
+" Remaining configuration is read from the plugin directory.

@@ -1,11 +1,12 @@
 #!/bin/sh
 #
-# install dot files.
+# install dot files
 
 # Global Variables
 : "${XDG_CONFIG_HOME:=${HOME}/.config}"
 : "${XDG_CACHE_HOME:=${HOME}/.cache}"
 : "${XDG_STATE_HOME:=${HOME}/.local/state}"
+: "${XDG_DATA_HOME:=${HOME}/.local/share}"
 
 _zsh() {
 	# Create the /etc/zshenv file to specify $ZDOTDIR.
@@ -44,9 +45,10 @@ _zsh() {
 	# Get the full path of the current working directory.
 	dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
 
-	# TODO: Update the symlink if the location changed.
+	# TODO: DRY: Pull this out into a function.
 	# Symlink the dotfiles source directory to $ZDOTDIR.
 	if [ ! -e "${XDG_CONFIG_HOME}/zsh" ]; then
+		# TODO: Update the symlink if the location changed.
 		if [ -d "${dirname}/zsh" ]; then
 			ln -s "${dirname}/zsh" "${XDG_CONFIG_HOME}/zsh"
 		fi
@@ -63,4 +65,31 @@ _zsh() {
 	rm -rf "${ZDOTDIR}/.zsh_sessions"
 }
 
+_vim() {
+	# Setup directories.
+	mkdir -p "${XDG_CONFIG_HOME}"
+	mkdir -p "${XDG_STATE_HOME}/vim"
+	mkdir -p "${XDG_DATA_HOME}/vim/spell"
+	mkdir -p "${XDG_DATA_HOME}/vim/view"
+	mkdir -p "${XDG_CACHE_HOME}/vim/backup"
+	mkdir -p "${XDG_CACHE_HOME}/vim/swap"
+	mkdir -p "${XDG_CACHE_HOME}/vim/undo"
+
+	# Get the full path of the current working directory.
+	dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
+
+	# TODO: DRY: Pull this out into a function.
+	# Symlink the dotfiles source directory to $ZDOTDIR.
+	if [ ! -e "${XDG_CONFIG_HOME}/vim" ]; then
+		# TODO: Update the symlink if the location changed.
+		if [ -d "${dirname}/vim" ]; then
+			ln -s "${dirname}/vim" "${XDG_CONFIG_HOME}/vim"
+		fi
+	fi
+
+	# Cleanup
+	rm -f "${HOME}/.viminfo"
+}
+
 _zsh
+_vim
