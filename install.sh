@@ -8,6 +8,22 @@
 : "${XDG_STATE_HOME:=${HOME}/.local/state}"
 : "${XDG_DATA_HOME:=${HOME}/.local/share}"
 
+# Get the full path of the current working directory.
+readonly dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
+
+# symlink_dotfiles - symlink the dotfiles in a git repository to $HOME
+symlink_dotfiles() {
+	# A single operand is used to denote the utility to symlink.
+	util="${1}"
+
+	if [ ! -e "${XDG_CONFIG_HOME}/${util}" ]; then
+		# TODO: Update the symlink if the location changed.
+		if [ -d "${dirname}/${util}" ]; then
+			ln -s "${dirname}/${util}" "${XDG_CONFIG_HOME}/${util}"
+		fi
+	fi
+}
+
 _zsh() {
 	# Create the /etc/zshenv file to specify $ZDOTDIR.
 	printf '%s\n' "Writing to /etc/zshenv using sudo..."
@@ -42,17 +58,7 @@ _zsh() {
 		chmod 755 /usr/local/share/zsh/site-functions
 	fi
 
-	# Get the full path of the current working directory.
-	dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
-
-	# TODO: DRY: Pull this out into a function.
-	# Symlink the dotfiles source directory to $ZDOTDIR.
-	if [ ! -e "${XDG_CONFIG_HOME}/zsh" ]; then
-		# TODO: Update the symlink if the location changed.
-		if [ -d "${dirname}/zsh" ]; then
-			ln -s "${dirname}/zsh" "${XDG_CONFIG_HOME}/zsh"
-		fi
-	fi
+	symlink_dotfiles zsh
 
 	# Cleanup
 	# TODO: Preserve existing files and merge/prompt.
@@ -75,17 +81,7 @@ _vim() {
 	mkdir -p "${XDG_CACHE_HOME}/vim/swap"
 	mkdir -p "${XDG_CACHE_HOME}/vim/undo"
 
-	# Get the full path of the current working directory.
-	dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
-
-	# TODO: DRY: Pull this out into a function.
-	# Symlink the dotfiles source directory to $ZDOTDIR.
-	if [ ! -e "${XDG_CONFIG_HOME}/vim" ]; then
-		# TODO: Update the symlink if the location changed.
-		if [ -d "${dirname}/vim" ]; then
-			ln -s "${dirname}/vim" "${XDG_CONFIG_HOME}/vim"
-		fi
-	fi
+	symlink_dotfiles vim
 
 	# Cleanup
 	rm -f "${HOME}/.viminfo"
@@ -108,11 +104,7 @@ _gnupg() {
 		mkdir -p "${XDG_DATA_HOME}/gnupg"
 	fi
 
-	# Get the full path of the current working directory.
-	dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
-
-	# TODO: DRY: Pull this out into a function.
-	# Symlink the dotfiles source directory to $ZDOTDIR.
+	# GnuPG requires a special case for symlinking the dotfile.
 	if [ ! -e "${XDG_DATA_HOME}/gnupg/gpg.conf" ]; then
 		# TODO: Update the symlink if the location changed.
 		if [ -f "${dirname}/gnupg/gpg.conf" ]; then
@@ -121,7 +113,8 @@ _gnupg() {
 	fi
 }
 
-_zsh
-_vim
-_git
-_gnupg
+for util in zsh vim git gnupg; do
+	if command -v "${util}" > /dev/null; then
+		"_${util}"
+	fi
+done
