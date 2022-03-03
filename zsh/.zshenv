@@ -1,5 +1,5 @@
 #
-# $ZDOTDIR/.zprofile
+# $ZDOTDIR/.zshenv
 #
 
 # XDG Base Directory Specification variables.
