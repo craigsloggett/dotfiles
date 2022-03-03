@@ -100,6 +100,28 @@ _git() {
 	fi
 }
 
+_gnupg() {
+	# Migrate existing GnuPG keys, otherwise setup directory.
+	if [ -d "${HOME}/.gnupg" ]; then
+		mv "${HOME}/.gnupg" "${XDG_DATA_HOME}/gnupg"
+	else
+		mkdir -p "${XDG_DATA_HOME}/gnupg"
+	fi
+
+	# Get the full path of the current working directory.
+	dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
+
+	# TODO: DRY: Pull this out into a function.
+	# Symlink the dotfiles source directory to $ZDOTDIR.
+	if [ ! -e "${XDG_DATA_HOME}/gnupg/gpg.conf" ]; then
+		# TODO: Update the symlink if the location changed.
+		if [ -f "${dirname}/gnupg/gpg.conf" ]; then
+			ln -s "${dirname}/gnupg/gpg.conf" "${XDG_DATA_HOME}/gnupg/gpg.conf"
+		fi
+	fi
+}
+
 _zsh
 _vim
 _git
+_gnupg

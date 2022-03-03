@@ -18,3 +18,6 @@ export SHELL_SESSIONS_DISABLE=1
 
 # VIM
 export VIMINIT='let $MYVIMRC="${XDG_CONFIG_HOME}/vim/vimrc" | source ${MYVIMRC}'
+
+# GnuPG
+export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
