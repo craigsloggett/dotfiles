@@ -21,3 +21,6 @@ export VIMINIT='let $MYVIMRC="${XDG_CONFIG_HOME}/vim/vimrc" | source ${MYVIMRC}'
 
 # GnuPG
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
+
+# Homebrew
+export PATH="/opt/homebrew/bin:${PATH}"
