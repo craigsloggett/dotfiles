@@ -91,5 +91,15 @@ _vim() {
 	rm -f "${HOME}/.viminfo"
 }
 
+_git() {
+	# Setup directories.
+	mkdir -p "${XDG_CONFIG_HOME}/git"
+
+	if [ -f "${HOME}/.gitconfig" ]; then
+		mv "${HOME}/.gitconfig" "${XDG_CONFIG_HOME}/git/config"
+	fi
+}
+
 _zsh
 _vim
+_git
