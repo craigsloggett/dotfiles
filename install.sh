@@ -11,7 +11,6 @@
 # Get the full path of the current working directory.
 readonly dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
 
-# symlink_dotfiles - symlink the dotfiles in a git repository to $HOME
 symlink_dotfiles() {
 	# A single operand is used to denote the utility to symlink.
 	util="${1}"
@@ -58,6 +57,7 @@ _zsh() {
 		chmod 755 /usr/local/share/zsh/site-functions
 	fi
 
+	# Symlink dotfiles to the git repository.
 	symlink_dotfiles zsh
 
 	# Cleanup
@@ -81,6 +81,7 @@ _vim() {
 	mkdir -p "${XDG_CACHE_HOME}/vim/swap"
 	mkdir -p "${XDG_CACHE_HOME}/vim/undo"
 
+	# Symlink dotfiles to the git repository.
 	symlink_dotfiles vim
 
 	# Cleanup
@@ -91,6 +92,7 @@ _git() {
 	# Setup directories.
 	mkdir -p "${XDG_CONFIG_HOME}/git"
 
+	# Migrate existing git configuration.
 	if [ -f "${HOME}/.gitconfig" ]; then
 		mv "${HOME}/.gitconfig" "${XDG_CONFIG_HOME}/git/config"
 	fi
@@ -122,6 +124,7 @@ _pass() {
 	fi
 }
 
+# Configure only the utilities that have been installed.
 for util in zsh vim git gnupg pass; do
 	if command -v "${util}" > /dev/null; then
 		"_${util}"
