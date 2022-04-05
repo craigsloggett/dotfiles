@@ -124,8 +124,18 @@ _pass() {
 	fi
 }
 
+_less() {
+	# Setup directories.
+	mkdir -p "${XDG_STATE_HOME}/less"
+
+	# Preserve existing history file.
+	if [ -f "${HOME}/.lesshst" ]; then
+		mv "${HOME}/.lesshst" "${XDG_STATE_HOME}/less/lesshst"
+	fi
+}
+
 # Configure only the utilities that have been installed.
-for util in zsh vim git gnupg pass; do
+for util in zsh vim git gnupg pass less; do
 	if command -v "${util}" > /dev/null; then
 		"_${util}"
 	fi

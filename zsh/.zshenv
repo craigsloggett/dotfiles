@@ -17,12 +17,21 @@ export SHELL_SESSIONS_DISABLE=1
 typeset -U path
 path=("${XDG_BIN_HOME}" $path)
 
-# Homebrew must be sourced first to get the path.
-source "${ZDOTDIR}/.zshenv.d/brew.zsh"
-
 # Utility specific environment variables.
-for util in brew vim gpg pass; do
-	if command -v "${util}" > /dev/null; then
-		source "${ZDOTDIR}/.zshenv.d/${util}.zsh"
-	fi
-done
+if [ -d "${ZDOTDIR}/.zshenv.d" ]; then
+
+	# Homebrew is sourced first to find utilities installed by Homebrew.
+	brew_zsh="${ZDOTDIR}/.zshenv.d/brew.zsh"
+	[ -f "${brew_zsh}" ] && source "${brew_zsh}"
+
+	for file in "${ZDOTDIR}/.zshenv.d/"*.zsh; do
+		[ -f "${file}" ] || continue
+
+		basename="${file##*/}"
+		util="${basename%.zsh}"
+
+		if command -v "${util}" > /dev/null; then
+			source "${file}"
+		fi
+	done
+fi
