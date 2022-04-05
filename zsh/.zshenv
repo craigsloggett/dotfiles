@@ -19,7 +19,6 @@ path=("${XDG_BIN_HOME}" $path)
 
 # Utility specific environment variables.
 if [ -d "${ZDOTDIR}/.zshenv.d" ]; then
-
 	# Homebrew is sourced first to find utilities installed by Homebrew.
 	brew_zsh="${ZDOTDIR}/.zshenv.d/brew.zsh"
 	[ -f "${brew_zsh}" ] && source "${brew_zsh}"
