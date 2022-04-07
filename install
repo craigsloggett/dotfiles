@@ -134,8 +134,16 @@ _less() {
 	fi
 }
 
+_tmux() {
+	# Setup directories.
+	mkdir -p "${XDG_CONFIG_HOME}"
+
+	# Symlink dotfiles to the git repository.
+	symlink_dotfiles tmux
+}
+
 # Configure only the utilities that have been installed.
-for util in zsh vim git gnupg pass less; do
+for util in zsh vim git gnupg pass less tmux; do
 	if command -v "${util}" > /dev/null; then
 		"_${util}"
 	fi
