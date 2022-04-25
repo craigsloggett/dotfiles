@@ -41,7 +41,7 @@ _zsh() {
 	# output or assume the shell is attached to a tty.
 	#
 	# Global Order: zshenv, zprofile, zshrc, zlogin
-	
+
 	# Use XDG Base Directory Specification
 	export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
 	EOF
@@ -98,12 +98,13 @@ _git() {
 	fi
 }
 
-_gnupg() {
+_gpg() {
 	# Migrate existing GnuPG keys, otherwise setup directory.
 	if [ -d "${HOME}/.gnupg" ]; then
 		mv "${HOME}/.gnupg" "${XDG_DATA_HOME}/gnupg"
 	else
 		mkdir -p "${XDG_DATA_HOME}/gnupg"
+		chmod 700 "${XDG_DATA_HOME}/gnupg"
 	fi
 
 	# GnuPG requires a special case for symlinking the dotfile.
@@ -142,9 +143,48 @@ _tmux() {
 	symlink_dotfiles tmux
 }
 
+_bash() {
+	# Create the /etc/profile.d/bash_profile.sh file to specify Bash configuration for login shells.
+	printf '%s\n' "Writing to /etc/profile.d/bash_profile.sh using sudo..."
+
+	cat <<- 'EOF' | sudo tee /etc/profile.d/bash_profile.sh > /dev/null
+	# /etc/profile.d/bash_profile.sh: system-wide .profile file for the
+	# Bourne Again shell (bash(1)).
+
+	# Use XDG Base Directory Specification
+	XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+
+	if [ -f "${XDG_CONFIG_HOME}/bash/profile" ]; then
+	        . "${XDG_CONFIG_HOME}/bash/profile"
+	fi
+	EOF
+
+	# Setup directories.
+	mkdir -p "${XDG_CONFIG_HOME}"
+	mkdir -p "${XDG_STATE_HOME}/bash"
+
+	# Symlink dotfiles to the git repository.
+	symlink_dotfiles bash
+
+	# Preserve existing history file.
+	if [ -f "${HOME}/.bash_history" ]; then
+		mv "${HOME}/.bash_history" "${XDG_STATE_HOME}/bash/history"
+	fi
+
+	# Cleanup
+	# TODO: Preserve existing files and merge/prompt.
+	# TODO: Set history file to new location before deleting.
+	rm -f "${HOME}/.bash_logout"
+	rm -f "${HOME}/.bashrc"
+	rm -f "${HOME}/.profile"
+}
+
 # Configure only the utilities that have been installed.
-for util in zsh vim git gnupg pass less tmux; do
+for util in zsh bash vim git gpg pass less tmux; do
 	if command -v "${util}" > /dev/null; then
+		printf '%s\n' "Installing ${util}..."
 		"_${util}"
+	else
+		printf '%s\n' "Skipping ${util}..."
 	fi
 done
