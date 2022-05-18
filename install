@@ -51,7 +51,6 @@ _zsh() {
 	mkdir -p "${XDG_CONFIG_HOME}"
 	mkdir -p "${XDG_CACHE_HOME}/zsh"
 	mkdir -p "${XDG_STATE_HOME}/zsh"
-	mkdir -p "${XDG_DATA_HOME}/zsh"
 
 	# Update permissions on existing system files.
 	if [ -d /usr/local/share/zsh ]; then
@@ -61,14 +60,6 @@ _zsh() {
 
 	# Symlink dotfiles to the git repository.
 	symlink_dotfiles zsh
-
-	# Symlink the site-functions to the XDG_DATA_HOME directory.
-	if [ ! -e "${XDG_DATA_HOME}/zsh/site-functions" ]; then
-		if [ -d "${dirname}/zsh/site-functions" ]; then
-			ln -s "${dirname}/zsh/site-functions" \
-				"${XDG_DATA_HOME}/zsh/site-functions"
-		fi
-	fi
 
 	# Cleanup
 	# TODO: Preserve existing files and merge/prompt.
