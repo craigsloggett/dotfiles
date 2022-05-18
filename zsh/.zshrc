@@ -2,6 +2,10 @@
 # $ZDOTDIR/.zshrc
 #
 
+# Initialize completion.
+typeset -U fpath
+fpath+=("${XDG_DATA_HOME}/zsh/site-functions/")
+
 # Enable auto completion.
 autoload -Uz compinit
 compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
