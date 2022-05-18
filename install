@@ -144,7 +144,8 @@ _tmux() {
 }
 
 _bash() {
-	# Create the /etc/profile.d/bash_profile.sh file to specify Bash configuration for login shells.
+	# Create the /etc/profile.d/bash_profile.sh file to specify Bash
+	# configuration for login shells.
 	printf '%s\n' "Writing to /etc/profile.d/bash_profile.sh using sudo..."
 
 	cat <<- 'EOF' | sudo tee /etc/profile.d/bash_profile.sh > /dev/null
