@@ -9,7 +9,8 @@
 : "${XDG_DATA_HOME:=${HOME}/.local/share}"
 
 # Get the full path of the current working directory.
-readonly dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
+dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
+readonly dirname
 
 symlink_dotfiles() {
 	# A single operand is used to denote the utility to symlink.
@@ -45,7 +46,7 @@ _zsh() {
 	# Use XDG Base Directory Specification
 	export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
 	EOF
-	
+
 	# Setup directories.
 	mkdir -p "${XDG_CONFIG_HOME}"
 	mkdir -p "${XDG_CACHE_HOME}/zsh"
@@ -111,7 +112,8 @@ _gpg() {
 	if [ ! -e "${XDG_DATA_HOME}/gnupg/gpg.conf" ]; then
 		# TODO: Update the symlink if the location changed.
 		if [ -f "${dirname}/gnupg/gpg.conf" ]; then
-			ln -s "${dirname}/gnupg/gpg.conf" "${XDG_DATA_HOME}/gnupg/gpg.conf"
+			ln -s "${dirname}/gnupg/gpg.conf" \
+				"${XDG_DATA_HOME}/gnupg/gpg.conf"
 		fi
 	fi
 }
