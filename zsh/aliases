@@ -3,3 +3,5 @@
 #
 
 alias ls='ls -G'
+alias sg='cd ~/Source/GitHub'
+alias sb='cd ~/Source/Bitbucket'
