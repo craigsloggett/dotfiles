@@ -33,7 +33,7 @@ autoload -Uz promptinit
 promptinit
 
 # Configure the left prompt.
-PROMPT=' %(!.%F{red}%B.%F{green}%B)%b%f %1~ %(!.#.$) '
+PROMPT=' %(!.%F{red}%B.%F{green}%B)%b%f %~ %(!.#.$) '
 
 # Show git on the right prompt.
 setopt PROMPT_SUBST
