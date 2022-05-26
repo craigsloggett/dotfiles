@@ -17,6 +17,10 @@ export SHELL_SESSIONS_DISABLE=1
 typeset -U path
 path+=("${XDG_BIN_HOME}")
 
+# Add XDG_BIN_HOME to PATH variable.
+typeset -U cdpath
+cdpath+=("${HOME}/Source/GitHub")
+
 # Utility specific environment variables.
 if [ -d "${ZDOTDIR}/.zshenv.d" ]; then
 	# Homebrew is sourced first to find utilities installed by Homebrew.
