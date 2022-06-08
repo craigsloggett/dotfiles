@@ -8,7 +8,7 @@ set runtimepath+=$XDG_CONFIG_HOME/vim/after
 set packpath^=$XDG_DATA_HOME/vim,$XDG_CONFIG_HOME/vim
 set packpath+=$XDG_CONFIG_HOME/vim/after,$XDG_DATA_HOME/vim/after
 
-let g:netrw_home = $XDG_DATA_HOME."/vim"
+let g:netrw_home = $XDG_STATE_HOME."/vim"
 set viewdir=$XDG_DATA_HOME/vim/view
 
 set backupdir=$XDG_CACHE_HOME/vim/backup
