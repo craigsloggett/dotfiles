@@ -182,8 +182,19 @@ _bash() {
 	rm -f "${HOME}/.profile"
 }
 
+# Specify which dotfiles to install based on the OS.
+case "$(uname -s)" in
+	*Darwin*)
+		utilities="zsh vim git gpg pass less tmux"
+	;;
+
+	*)
+		utilities="bash vim git gpg pass less tmux"
+	;;
+esac
+
 # Configure only the utilities that have been installed.
-for util in zsh bash vim git gpg pass less tmux; do
+for util in ${utilities}; do
 	if command -v "${util}" > /dev/null; then
 		printf '%s\n' "Installing ${util}..."
 		"_${util}"
