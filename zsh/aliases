@@ -2,4 +2,5 @@
 # $ZDOTDIR/aliases
 #
 
+# Global Aliases
 alias ls='ls -G'
