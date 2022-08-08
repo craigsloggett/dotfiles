@@ -36,6 +36,7 @@ syntax on
 set number			" show line numbers
 set showcmd			" show command in bottom bar
 set ruler			" show ruler in bottom bar
+set cursorline			" highlight the current line
 
 " Statusline
 set laststatus=2
