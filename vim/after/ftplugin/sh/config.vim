@@ -6,3 +6,6 @@ setlocal softtabstop=8
 
 let b:is_bash = 1  " $( ... ) is POSIX compliant.
 let b:ale_linters = ['shellcheck']
+
+" highlight lines greater than 100 characters
+match ErrorMsg '\%>100v.\+'
