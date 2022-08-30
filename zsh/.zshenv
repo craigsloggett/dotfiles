@@ -29,6 +29,10 @@ if [ -d "${ZDOTDIR}/.zshenv.d" ]; then
 		basename="${file##*/}"
 		util="${basename%.zsh}"
 
+		if [ "${util}" = "rust" ] && [ -d "${XDG_DATA_HOME}/cargo/bin" ]; then
+			source "${file}"
+		fi
+
 		if command -v "${util}" > /dev/null; then
 			source "${file}"
 		fi
