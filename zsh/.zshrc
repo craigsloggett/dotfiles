@@ -79,3 +79,8 @@ zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}/zsh/zcompcache"
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' list-suffixes
 zstyle ':completion:*' expand prefix suffix
+
+# Turn on Bash like, open the current input in terminal to an editor.
+autoload edit-command-line
+zle -N edit-command-line
+bindkey '^Xe' edit-command-line
