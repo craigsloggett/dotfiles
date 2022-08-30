@@ -1,4 +1,1 @@
-vim/pack/vendor/start/ale/
-vim/pack/vendor/start/indentLine/
-vim/pack/vendor/start/vim-terraform/
-vim/pack/vendor/start/jsonc/
+vim/pack/vendor/start/**/*
