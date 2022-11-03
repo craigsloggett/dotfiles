@@ -23,6 +23,10 @@ if [ -d "${ZDOTDIR}/.zshenv.d" ]; then
 	brew_zsh="${ZDOTDIR}/.zshenv.d/brew.zsh"
 	[ -f "${brew_zsh}" ] && source "${brew_zsh}"
 
+	# Add site-functions that come with Homebrew.
+	brew_fpath="$(brew --prefix)/share/zsh/site-functions"
+	[ -d "${brew_fpath}" ] && fpath+=("${brew_fpath}")
+
 	for file in "${ZDOTDIR}/.zshenv.d/"*.zsh; do
 		[ -f "${file}" ] || continue
 
