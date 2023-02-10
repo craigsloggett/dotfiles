@@ -146,13 +146,16 @@ _tmux() {
 }
 
 _bash() {
-	# Create the /etc/profile.d/bash_profile.sh file to specify Bash
-	# configuration for login shells.
-	printf '%s\n' "Writing to /etc/profile.d/bash_profile.sh using sudo..."
+	# Create the /etc/bash.bashrc file to specify Bash
+	# configuration for interactive shells.
+	printf '%s\n' "Writing to /etc/bash.bashrc using sudo..."
 
-	cat <<- 'EOF' | sudo tee /etc/profile.d/bash_profile.sh > /dev/null
-	# /etc/profile.d/bash_profile.sh: system-wide .profile file for the
+	cat <<- 'EOF' | sudo tee /etc/bash.bashrc > /dev/null
+	# /etc/bash.bashrc: system-wide .bashrc file for the
 	# Bourne Again shell (bash(1)).
+
+	# If not running interactively, don't do anything.
+	[ -z "$PS1" ] && return
 
 	# Use XDG Base Directory Specification
 	XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
