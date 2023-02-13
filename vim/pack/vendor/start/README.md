@@ -1,6 +1,8 @@
-All packages added here are started automatically.
+# Vim Packages
 
-In order to add packages here, use git submodules which will allow me to clone
+**Note:** All packages added here are started automatically.
+
+To add packages here, use git submodules which will allow me to clone
 the repo with submodules includes:
 
 ```shell
