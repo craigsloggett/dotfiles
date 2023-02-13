@@ -9,6 +9,19 @@ the repo with submodules included:
 git clone --recurse-submodules https://github.com/craigsloggett/dotfiles
 ```
 
+## CoC
+
+The Conquer of Completion. Currently, the following tools are required to support the
+configured languages:
+
+ - terraform-ls
+
+The following command was used to add this package to the built-in package manager:
+
+```shell
+git submodule add --name coc.vim https://github.com/neoclide/coc.nvim ./coc.vim
+```
+
 ## ALE
 
 The Asynchronous Lint Engine provides linting for various languages. Currently,
