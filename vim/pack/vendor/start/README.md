@@ -9,8 +9,6 @@ the repo with submodules included:
 git clone --recurse-submodules https://github.com/craigsloggett/dotfiles
 ```
 
-The following submodules have been added to this repository:
-
 ## ALE
 
 The Asynchronous Lint Engine provides linting for various languages. Currently,
