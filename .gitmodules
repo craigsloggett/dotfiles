@@ -7,3 +7,6 @@
 [submodule "fzf.vim"]
 	path = vim/pack/vendor/start/fzf.vim
 	url = https://github.com/junegunn/fzf.vim
+[submodule "vim-terraform"]
+	path = vim/pack/vendor/start/vim-terraform
+	url = https://github.com/hashivim/vim-terraform
