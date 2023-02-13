@@ -10,6 +10,3 @@
 [submodule "fzf.vim"]
 	path = vim/pack/vendor/start/fzf.vim
 	url = https://github.com/junegunn/fzf.vim
-[submodule "coc.vim"]
-	path = vim/pack/vendor/start/coc.vim
-	url = https://github.com/neoclide/coc.nvim
