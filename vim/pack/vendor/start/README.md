@@ -51,6 +51,12 @@ The following (system) packages are required on the host in order to lint and fo
  - `shellcheck`
  - `shfmt`
 
+### YAML
+
+The following (system) packages are required on the host in order to lint `yaml` source files:
+
+ - `yamllint`
+
 ### Terraform
 
 The following (system) packages are required on the host in order to lint and format `terraform` source files:
