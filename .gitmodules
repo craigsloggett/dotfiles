@@ -10,6 +10,3 @@
 [submodule "vim-terraform"]
 	path = vim/pack/vendor/start/vim-terraform
 	url = https://github.com/hashivim/vim-terraform
-[submodule "coc.vim"]
-	path = vim/pack/vendor/start/coc.vim
-	url = https://github.com/neoclide/coc.nvim
