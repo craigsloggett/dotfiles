@@ -9,34 +9,10 @@ the repo with submodules included:
 git clone --recurse-submodules https://github.com/craigsloggett/dotfiles
 ```
 
-## CoC
+The following (system) packages are required on the host in order to fully utilize all of these 
+(vim) packages:
 
-The Conquer of Completion. Currently, the following tools are required to support the
-configured languages:
-
- - terraform-ls
-
-The following command was used to add this package to the built-in package manager:
-
-```shell
-git submodule add --name coc.vim https://github.com/neoclide/coc.nvim ./coc.vim
-```
-
-## ALE
-
-The Asynchronous Lint Engine provides linting for various languages. Currently,
-the following tools are required to support the configured linters:
-
- - terraform
- - tflint
- - shellcheck
- - shfmt
-
-The following command was used to add this package to the built-in package manager:
-
-```shell
-git submodule add --name ale https://github.com/dense-analysis/ale ./ale
-```
+ - `fzf`
 
 ## fzf
 
@@ -58,6 +34,30 @@ The following command was used to add this package to the built-in package manag
 git submodule add --name fzf-vim https://github.com/junegunn/fzf.vim ./fzf-vim
 ```
 
+## ALE
+
+The Asynchronous Lint Engine provides linting and formatting for various languages.
+
+The following command was used to add this package to the built-in package manager:
+
+```shell
+git submodule add --name ale https://github.com/dense-analysis/ale ./ale
+```
+
+### Shell
+
+The following (system) packages are required on the host in order to lint and format `sh` source files:
+
+ - `shellcheck`
+ - `shfmt`
+
+### Terraform
+
+The following (system) packages are required on the host in order to lint and format `terraform` source files:
+
+ - `terraform`
+ - `tflint`
+
 ## vim-terraform
 
 Add HCL syntax highlighting to `vim`.
@@ -67,3 +67,8 @@ The following command was used to add this package to the built-in package manag
 ```shell
 git submodule add --name vim-terraform https://github.com/hashivim/vim-terraform ./vim-terraform
 ```
+
+The following (system) packages are required on the host in order to fully utilize this 
+(vim) package:
+
+ - `terraform`
