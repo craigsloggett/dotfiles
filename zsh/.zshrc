@@ -55,19 +55,6 @@ export RPROMPT=$'$(__git_ps1 "%s")'
 # Source the alias file.
 source "${ZDOTDIR}/aliases"
 
-# Utility specific aliases.
-if [ -d "${ZDOTDIR}/aliases.d" ]; then
-	for file in "${ZDOTDIR}/aliases.d/"*; do
-		[ -f "${file}" ] || continue
-
-		util="${file##*/}"
-
-		if command -v "${util}" > /dev/null; then
-			source "${file}"
-		fi
-	done
-fi
-
 # Turn on case insensitive globbing.
 setopt NO_CASE_GLOB
 

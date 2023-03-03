@@ -4,3 +4,16 @@
 
 # Global Aliases
 alias ls='ls -G'
+
+# Utility specific aliases.
+if [ -d "${ZDOTDIR}/aliases.d" ]; then
+	for file in "${ZDOTDIR}/aliases.d/"*; do
+		[ -f "${file}" ] || continue
+
+		util="${file##*/}"
+
+		if command -v "${util}" > /dev/null; then
+			source "${file}"
+		fi
+	done
+fi
