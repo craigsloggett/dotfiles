@@ -1,0 +1,5 @@
+#
+# $ZDOTDIR/aliases.d/kubectl
+#
+
+alias kubectl='kubectl --cache-dir "${XDG_CACHE_HOME}/kube"'
