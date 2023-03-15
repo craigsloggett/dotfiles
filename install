@@ -148,6 +148,14 @@ _tmux() {
 	symlink_dotfiles tmux
 }
 
+_yamllint() {
+	# Setup directories.
+	mkdir -p "${XDG_CONFIG_HOME}"
+
+	# Symlink dotfiles to the git repository.
+	symlink_dotfiles yamllint
+}
+
 _bash() {
 	# Create the /etc/bash.bashrc file to specify Bash
 	# configuration for interactive shells.
@@ -191,11 +199,11 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
 	*Darwin*)
-		utilities="zsh vim git gpg pass less tmux"
+		utilities="zsh vim git gpg pass less tmux yamllint"
 		;;
 
 	*)
-		utilities="bash vim git gpg pass less tmux"
+		utilities="bash vim git gpg pass less tmux yamllint"
 		;;
 esac
 
