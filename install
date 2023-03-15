@@ -85,6 +85,9 @@ _vim() {
 	# Symlink dotfiles to the git repository.
 	symlink_dotfiles vim
 
+	# Install or update the vim packages.
+	git submodule update --init --recursive
+
 	# Cleanup
 	rm -f "${HOME}/.viminfo"
 }
