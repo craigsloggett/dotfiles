@@ -94,7 +94,10 @@ _vim() {
 
 _git() {
 	# Setup directories.
-	mkdir -p "${XDG_CONFIG_HOME}/git"
+	mkdir -p "${XDG_CONFIG_HOME}"
+
+	# Symlink dotfiles to the git repository.
+	symlink_dotfiles git
 
 	# Migrate existing git configuration.
 	if [ -f "${HOME}/.gitconfig" ]; then
