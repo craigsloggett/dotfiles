@@ -12,3 +12,10 @@
         new    = "!f() { git branch $1 && git push -u origin $1 && git checkout $1; }; f"
         gone   = "!f() { git fetch -p && git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads | awk '$2 == \"[gone]\" {print $1}' | xargs -r git branch -D; }; f"
 	l      = log --pretty=format:'%C(yellow)%h%C(reset)%C(auto)%d%C(reset) %s %C(cyan)[%cn]%C(reset)' --decorate --date=short --graph
+
+# The following sample config-personal file can be used:
+#
+# [user]
+# 	email = <NAME>@gmail.com
+# [includeIf "gitdir:~/Developer/GitHub/<COMPANY>/"]
+# 	path = ~/.config/git/config-work
