@@ -4,6 +4,8 @@
 	signingKey = 8CB47A3C0E6F3C1B42E44950A0BBEAA8FFD4AF87
 [commit]
 	gpgSign = true
+[pull]
+	ff = only
 [include]
 	path = ~/.config/git/config-personal
 [alias]
