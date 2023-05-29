@@ -1,11 +1,11 @@
 # vim: set syntax=gitconfig :
 [user]
 	name = Craig Sloggett
-	signingKey = 8CB47A3C0E6F3C1B42E44950A0BBEAA8FFD4AF87
+	signingKey = 24D7E38CCECE344585A0822F3D5272A2CA547996!
 [commit]
 	gpgSign = true
 [pull]
-	ff = only
+	rebase = false
 [include]
 	path = ~/.config/git/config-personal
 [alias]
