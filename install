@@ -92,6 +92,16 @@ _vim() {
 	rm -f "${HOME}/.viminfo"
 }
 
+_nvim() {
+	# Setup directories.
+	mkdir -p "${XDG_CONFIG_HOME}"
+	mkdir -p "${XDG_STATE_HOME}/nvim"
+	mkdir -p "${XDG_DATA_HOME}/nvim"
+
+	# Symlink dotfiles to the git repository.
+	symlink_dotfiles nvim
+}
+
 _git() {
 	# Setup directories.
 	mkdir -p "${XDG_CONFIG_HOME}"
@@ -202,11 +212,11 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
 	*Darwin*)
-		utilities="zsh vim git gpg pass less tmux yamllint"
+		utilities="zsh vim nvim git gpg pass less tmux yamllint"
 		;;
 
 	*)
-		utilities="bash vim git gpg pass less tmux yamllint"
+		utilities="bash vim nvim git gpg pass less tmux yamllint"
 		;;
 esac
 
