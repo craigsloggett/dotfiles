@@ -1,16 +1,16 @@
 -- Configure the Lua language server.
 require("lspconfig").lua_ls.setup {
   settings = {
-    Lua  = {
-     diagnostics = {
+    Lua = {
+      diagnostics = {
         globals = {
-	  "vim"
+          "vim"
         }
       },
       workspace = {
         library = {
-	  vim.env.VIMRUNTIME
-	}
+          vim.env.VIMRUNTIME
+        }
       }
     }
   }
