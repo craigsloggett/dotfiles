@@ -2,7 +2,7 @@
 require("lspconfig").lua_ls.setup {
   settings = {
     Lua  = {
-      diagnostics = {
+     diagnostics = {
         globals = {
 	  "vim"
         }

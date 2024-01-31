@@ -8,4 +8,4 @@ require("mason-lspconfig").setup {
 }
 
 -- Include the configuration for each language server.
-require("plugins/lspconfig/lua_ls")
+require("language-servers/lua_ls")

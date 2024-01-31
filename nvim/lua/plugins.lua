@@ -22,4 +22,3 @@ require("lazy").setup {
 }
 
 -- Include the configuration for each plugin.
-require("plugins/mason-lspconfig")
