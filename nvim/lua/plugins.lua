@@ -16,28 +16,10 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Specify which plugins to install.
 require("lazy").setup({
-  {
-    -- Highlight, edit, and navigate code.
-    "nvim-treesitter/nvim-treesitter",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter-textobjects",
-    },
-    build = ":TSUpdate"
-  },
-  {
-    -- Manage language servers configuration.
-    "neovim/nvim-lspconfig",
-    dependencies = {
-      {
-        "williamboman/mason.nvim",
-      },
-      {
-        "williamboman/mason-lspconfig.nvim"
-      }
-    }
-  }
+  "neovim/nvim-lspconfig",
+  "williamboman/mason.nvim",
+  "williamboman/mason-lspconfig.nvim"
 })
 
 -- Include the configuration for each plugin.
-require("plugins/treesitter")
 require("plugins/mason-lspconfig")
