@@ -25,13 +25,17 @@ require("lazy").setup({
     build = ":TSUpdate"
   },
   {
-    -- Manage language servers.
-    "williamboman/mason.nvim",
-    config = true
-  },
-  {
     -- Manage language servers configuration.
-    "williamboman/mason-lspconfig.nvim"
+    "neovim/nvim-lspconfig",
+    dependencies = {
+      {
+        "williamboman/mason.nvim",
+        config = true
+      },
+      {
+        "williamboman/mason-lspconfig.nvim"
+      }
+    }
   }
 })
 

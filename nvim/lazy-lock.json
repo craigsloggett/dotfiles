@@ -2,6 +2,7 @@
   "lazy.nvim": { "branch": "main", "commit": "aedcd79811d491b60d0a6577a9c1701063c2a609" },
   "mason-lspconfig.nvim": { "branch": "main", "commit": "b9084b1f42f790d6230dc66dbcb6bcc35b148552" },
   "mason.nvim": { "branch": "main", "commit": "dcd0ea30ccfc7d47e879878d1270d6847a519181" },
-  "nvim-treesitter": { "branch": "master", "commit": "ed82d82b77e4fa3bd4593eda8fc4c4ff95a5eb25" },
+  "nvim-lspconfig": { "branch": "master", "commit": "8917d2c830e04bf944a699b8c41f097621283828" },
+  "nvim-treesitter": { "branch": "master", "commit": "95987ee2d6698577af45ae49261159fa624ea593" },
   "nvim-treesitter-textobjects": { "branch": "master", "commit": "19a91a38b02c1c28c14e0ba468d20ae1423c39b2" }
 }
