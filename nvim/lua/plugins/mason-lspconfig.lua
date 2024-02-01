@@ -4,8 +4,9 @@ require("mason-lspconfig").setup()
 
 -- Specify which language servers to install.
 require("mason-lspconfig").setup {
-  ensure_installed = { "lua_ls" }
+  ensure_installed = { "lua_ls", "terraformls" }
 }
 
 -- Include the configuration for any of the language servers.
 require("language-servers/lua_ls")
+require("language-servers/terraformls")

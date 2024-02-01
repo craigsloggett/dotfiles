@@ -16,9 +16,9 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Specify which plugins to install.
 require("lazy").setup {
-  "neovim/nvim-lspconfig",
   "williamboman/mason.nvim",
   "williamboman/mason-lspconfig.nvim",
+  "neovim/nvim-lspconfig",
   "nvim-treesitter/nvim-treesitter",
   "nvim-treesitter/nvim-treesitter-textobjects"
 }
