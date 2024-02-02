@@ -5,7 +5,7 @@ return {
     require("nvim-treesitter.configs").setup({
       ensure_installed = { "lua", "bash" },
       highlight = { enable = true },
-      indent = { enable = true }
+      indent = { enable = true },
     })
-  end
+  end,
 }

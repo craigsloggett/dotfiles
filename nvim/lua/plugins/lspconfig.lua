@@ -1,6 +1,6 @@
 return {
- "neovim/nvim-lspconfig",
+  "neovim/nvim-lspconfig",
   config = function()
     require("language-servers/lua_ls")
-  end
+  end,
 }
