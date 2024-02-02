@@ -28,7 +28,7 @@ _zsh() {
 	# Create the /etc/zshenv file to specify $ZDOTDIR.
 	printf '%s\n' "Writing to /etc/zshenv using sudo..."
 
-	cat <<- 'EOF' | sudo tee /etc/zshenv > /dev/null
+	cat <<-'EOF' | sudo tee /etc/zshenv >/dev/null
 		# /etc/zshenv: system-wide .zshenv file for zsh(1).
 		#
 		# This file is sourced on all invocations of the shell.
@@ -175,7 +175,7 @@ _bash() {
 	# configuration for interactive shells.
 	printf '%s\n' "Writing to /etc/bash.bashrc using sudo..."
 
-	cat <<- 'EOF' | sudo tee /etc/bash.bashrc > /dev/null
+	cat <<-'EOF' | sudo tee /etc/bash.bashrc >/dev/null
 		# /etc/bash.bashrc: system-wide .bashrc file for the
 		# Bourne Again shell (bash(1)).
 
@@ -212,18 +212,18 @@ _bash() {
 
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
-	*Darwin*)
-		utilities="zsh vim nvim git gpg pass less tmux yamllint"
-		;;
+*Darwin*)
+	utilities="zsh vim nvim git gpg pass less tmux yamllint"
+	;;
 
-	*)
-		utilities="bash vim nvim git gpg pass less tmux yamllint"
-		;;
+*)
+	utilities="bash vim nvim git gpg pass less tmux yamllint"
+	;;
 esac
 
 # Configure only the utilities that have been installed.
 for util in ${utilities}; do
-	if command -v "${util}" > /dev/null; then
+	if command -v "${util}" >/dev/null; then
 		printf '%s\n' "Installing ${util}..."
 		"_${util}"
 	else
