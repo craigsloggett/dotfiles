@@ -3,7 +3,7 @@ return {
   build = ":TSUpdate",
   config = function()
     require("nvim-treesitter.configs").setup({
-      ensure_installed = { "lua" },
+      ensure_installed = { "lua", "bash" },
       highlight = { enable = true },
       indent = { enable = true }
     })
