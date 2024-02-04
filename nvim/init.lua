@@ -3,3 +3,5 @@ require("config.options")
 require("config.keymaps")
 -- Bootstrap the lazy.nvim plugin manager.
 require("config.lazy")
+-- Configure language servers.
+require("language-servers.lua_ls")
