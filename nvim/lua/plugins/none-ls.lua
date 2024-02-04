@@ -1,14 +1,13 @@
 return {
-  "nvimtools/none-ls.nvim",
-  config = function()
-    require("null-ls").setup({
+  {
+    "nvimtools/none-ls.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    opts = {
       sources = {
         require("null-ls").builtins.formatting.stylua,
-        require("null-ls").builtins.formatting.shfmt,
-        require("null-ls").builtins.diagnostics.shellcheck
       },
-    })
-
-    vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, {})
-  end,
+    },
+  },
 }
