@@ -13,22 +13,22 @@ dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
 readonly dirname
 
 symlink_dotfiles() {
-	# A single operand is used to denote the utility to symlink.
-	util="${1}"
+  # A single operand is used to denote the utility to symlink.
+  util="${1}"
 
-	if [ ! -e "${XDG_CONFIG_HOME}/${util}" ]; then
-		# TODO: Update the symlink if the location changed.
-		if [ -d "${dirname}/${util}" ]; then
-			ln -s "${dirname}/${util}" "${XDG_CONFIG_HOME}/${util}"
-		fi
-	fi
+  if [ ! -e "${XDG_CONFIG_HOME}/${util}" ]; then
+    # TODO: Update the symlink if the location changed.
+    if [ -d "${dirname}/${util}" ]; then
+      ln -s "${dirname}/${util}" "${XDG_CONFIG_HOME}/${util}"
+    fi
+  fi
 }
 
 _zsh() {
-	# Create the /etc/zshenv file to specify $ZDOTDIR.
-	printf '%s\n' "Writing to /etc/zshenv using sudo..."
+  # Create the /etc/zshenv file to specify $ZDOTDIR.
+  printf '%s\n' "Writing to /etc/zshenv using sudo..."
 
-	cat <<-'EOF' | sudo tee /etc/zshenv >/dev/null
+  cat <<-'EOF' | sudo tee /etc/zshenv >/dev/null
 		# /etc/zshenv: system-wide .zshenv file for zsh(1).
 		#
 		# This file is sourced on all invocations of the shell.
@@ -47,135 +47,135 @@ _zsh() {
 		export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
 	EOF
 
-	# Setup directories.
-	mkdir -p "${XDG_CONFIG_HOME}"
-	mkdir -p "${XDG_CACHE_HOME}/zsh"
-	mkdir -p "${XDG_STATE_HOME}/zsh"
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+  mkdir -p "${XDG_CACHE_HOME}/zsh"
+  mkdir -p "${XDG_STATE_HOME}/zsh"
 
-	# Update permissions on existing system files.
-	if [ -d /usr/local/share/zsh ]; then
-		chmod 755 /usr/local/share/zsh
-		chmod 755 /usr/local/share/zsh/site-functions
-	fi
+  # Update permissions on existing system files.
+  if [ -d /usr/local/share/zsh ]; then
+    chmod 755 /usr/local/share/zsh
+    chmod 755 /usr/local/share/zsh/site-functions
+  fi
 
-	# Symlink dotfiles to the git repository.
-	symlink_dotfiles zsh
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles zsh
 
-	# Cleanup
-	# TODO: Preserve existing files and merge/prompt.
-	# TODO: Set history file to new location before deleting.
-	rm -f "${HOME}/.zsh_history"
-	rm -f "${HOME}/.zcompdump"
-	rm -f "${HOME}/.zprofile"
-	rm -f "${HOME}/.zshrc"
-	rm -rf "${HOME}/.zsh_sessions"
-	rm -rf "${ZDOTDIR}/.zsh_sessions"
+  # Cleanup
+  # TODO: Preserve existing files and merge/prompt.
+  # TODO: Set history file to new location before deleting.
+  rm -f "${HOME}/.zsh_history"
+  rm -f "${HOME}/.zcompdump"
+  rm -f "${HOME}/.zprofile"
+  rm -f "${HOME}/.zshrc"
+  rm -rf "${HOME}/.zsh_sessions"
+  rm -rf "${ZDOTDIR}/.zsh_sessions"
 }
 
 _vim() {
-	# Setup directories.
-	mkdir -p "${XDG_CONFIG_HOME}"
-	mkdir -p "${XDG_STATE_HOME}/vim"
-	mkdir -p "${XDG_DATA_HOME}/vim/spell"
-	mkdir -p "${XDG_DATA_HOME}/vim/view"
-	mkdir -p "${XDG_CACHE_HOME}/vim/backup"
-	mkdir -p "${XDG_CACHE_HOME}/vim/swap"
-	mkdir -p "${XDG_CACHE_HOME}/vim/undo"
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+  mkdir -p "${XDG_STATE_HOME}/vim"
+  mkdir -p "${XDG_DATA_HOME}/vim/spell"
+  mkdir -p "${XDG_DATA_HOME}/vim/view"
+  mkdir -p "${XDG_CACHE_HOME}/vim/backup"
+  mkdir -p "${XDG_CACHE_HOME}/vim/swap"
+  mkdir -p "${XDG_CACHE_HOME}/vim/undo"
 
-	# Symlink dotfiles to the git repository.
-	symlink_dotfiles vim
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles vim
 
-	# Install or update the vim packages.
-	git submodule update --init --recursive
+  # Install or update the vim packages.
+  git submodule update --init --recursive
 
-	# Cleanup
-	rm -f "${HOME}/.viminfo"
+  # Cleanup
+  rm -f "${HOME}/.viminfo"
 }
 
 _nvim() {
-	# Setup directories.
-	mkdir -p "${XDG_CONFIG_HOME}"
-	mkdir -p "${XDG_STATE_HOME}/nvim"
-	mkdir -p "${XDG_DATA_HOME}/nvim"
-	mkdir -p "${XDG_CACHE_HOME}/nvim"
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+  mkdir -p "${XDG_STATE_HOME}/nvim"
+  mkdir -p "${XDG_DATA_HOME}/nvim"
+  mkdir -p "${XDG_CACHE_HOME}/nvim"
 
-	# Symlink dotfiles to the git repository.
-	symlink_dotfiles nvim
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles nvim
 }
 
 _git() {
-	# Setup directories.
-	mkdir -p "${XDG_CONFIG_HOME}"
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
 
-	# Symlink dotfiles to the git repository.
-	symlink_dotfiles git
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles git
 
-	# Migrate existing git configuration.
-	if [ -f "${HOME}/.gitconfig" ]; then
-		mv "${HOME}/.gitconfig" "${XDG_CONFIG_HOME}/git/config"
-	fi
+  # Migrate existing git configuration.
+  if [ -f "${HOME}/.gitconfig" ]; then
+    mv "${HOME}/.gitconfig" "${XDG_CONFIG_HOME}/git/config"
+  fi
 }
 
 _gpg() {
-	# Migrate existing GnuPG keys, otherwise setup directory.
-	if [ -d "${HOME}/.gnupg" ]; then
-		mv "${HOME}/.gnupg" "${XDG_DATA_HOME}/gnupg"
-	else
-		mkdir -p "${XDG_DATA_HOME}/gnupg"
-		chmod 700 "${XDG_DATA_HOME}/gnupg"
-	fi
+  # Migrate existing GnuPG keys, otherwise setup directory.
+  if [ -d "${HOME}/.gnupg" ]; then
+    mv "${HOME}/.gnupg" "${XDG_DATA_HOME}/gnupg"
+  else
+    mkdir -p "${XDG_DATA_HOME}/gnupg"
+    chmod 700 "${XDG_DATA_HOME}/gnupg"
+  fi
 
-	# GnuPG requires a special case for symlinking the dotfile.
-	if [ ! -e "${XDG_DATA_HOME}/gnupg/gpg.conf" ]; then
-		# TODO: Update the symlink if the location changed.
-		if [ -f "${dirname}/gnupg/gpg.conf" ]; then
-			ln -s "${dirname}/gnupg/gpg.conf" \
-				"${XDG_DATA_HOME}/gnupg/gpg.conf"
-		fi
-	fi
+  # GnuPG requires a special case for symlinking the dotfile.
+  if [ ! -e "${XDG_DATA_HOME}/gnupg/gpg.conf" ]; then
+    # TODO: Update the symlink if the location changed.
+    if [ -f "${dirname}/gnupg/gpg.conf" ]; then
+      ln -s "${dirname}/gnupg/gpg.conf" \
+        "${XDG_DATA_HOME}/gnupg/gpg.conf"
+    fi
+  fi
 }
 
 _pass() {
-	# Migrate existing password store, otherwise setup the directory.
-	if [ -d "${HOME}/.password-store" ]; then
-		mv "${HOME}/.password-store" "${XDG_DATA_HOME}/pass"
-	else
-		mkdir -p "${XDG_DATA_HOME}/pass"
-	fi
+  # Migrate existing password store, otherwise setup the directory.
+  if [ -d "${HOME}/.password-store" ]; then
+    mv "${HOME}/.password-store" "${XDG_DATA_HOME}/pass"
+  else
+    mkdir -p "${XDG_DATA_HOME}/pass"
+  fi
 }
 
 _less() {
-	# Setup directories.
-	mkdir -p "${XDG_STATE_HOME}/less"
+  # Setup directories.
+  mkdir -p "${XDG_STATE_HOME}/less"
 
-	# Preserve existing history file.
-	if [ -f "${HOME}/.lesshst" ]; then
-		mv "${HOME}/.lesshst" "${XDG_STATE_HOME}/less/lesshst"
-	fi
+  # Preserve existing history file.
+  if [ -f "${HOME}/.lesshst" ]; then
+    mv "${HOME}/.lesshst" "${XDG_STATE_HOME}/less/lesshst"
+  fi
 }
 
 _tmux() {
-	# Setup directories.
-	mkdir -p "${XDG_CONFIG_HOME}"
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
 
-	# Symlink dotfiles to the git repository.
-	symlink_dotfiles tmux
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles tmux
 }
 
 _yamllint() {
-	# Setup directories.
-	mkdir -p "${XDG_CONFIG_HOME}"
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
 
-	# Symlink dotfiles to the git repository.
-	symlink_dotfiles yamllint
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles yamllint
 }
 
 _bash() {
-	# Create the /etc/bash.bashrc file to specify Bash
-	# configuration for interactive shells.
-	printf '%s\n' "Writing to /etc/bash.bashrc using sudo..."
+  # Create the /etc/bash.bashrc file to specify Bash
+  # configuration for interactive shells.
+  printf '%s\n' "Writing to /etc/bash.bashrc using sudo..."
 
-	cat <<-'EOF' | sudo tee /etc/bash.bashrc >/dev/null
+  cat <<-'EOF' | sudo tee /etc/bash.bashrc >/dev/null
 		# /etc/bash.bashrc: system-wide .bashrc file for the
 		# Bourne Again shell (bash(1)).
 
@@ -190,43 +190,43 @@ _bash() {
 		fi
 	EOF
 
-	# Setup directories.
-	mkdir -p "${XDG_CONFIG_HOME}"
-	mkdir -p "${XDG_STATE_HOME}/bash"
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+  mkdir -p "${XDG_STATE_HOME}/bash"
 
-	# Symlink dotfiles to the git repository.
-	symlink_dotfiles bash
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles bash
 
-	# Preserve existing history file.
-	if [ -f "${HOME}/.bash_history" ]; then
-		mv "${HOME}/.bash_history" "${XDG_STATE_HOME}/bash/history"
-	fi
+  # Preserve existing history file.
+  if [ -f "${HOME}/.bash_history" ]; then
+    mv "${HOME}/.bash_history" "${XDG_STATE_HOME}/bash/history"
+  fi
 
-	# Cleanup
-	# TODO: Preserve existing files and merge/prompt.
-	# TODO: Set history file to new location before deleting.
-	rm -f "${HOME}/.bash_logout"
-	rm -f "${HOME}/.bashrc"
-	rm -f "${HOME}/.profile"
+  # Cleanup
+  # TODO: Preserve existing files and merge/prompt.
+  # TODO: Set history file to new location before deleting.
+  rm -f "${HOME}/.bash_logout"
+  rm -f "${HOME}/.bashrc"
+  rm -f "${HOME}/.profile"
 }
 
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
 *Darwin*)
-	utilities="zsh vim nvim git gpg pass less tmux yamllint"
-	;;
+  utilities="zsh vim nvim git gpg pass less tmux yamllint"
+  ;;
 
 *)
-	utilities="bash vim nvim git gpg pass less tmux yamllint"
-	;;
+  utilities="bash vim nvim git gpg pass less tmux yamllint"
+  ;;
 esac
 
 # Configure only the utilities that have been installed.
 for util in ${utilities}; do
-	if command -v "${util}" >/dev/null; then
-		printf '%s\n' "Installing ${util}..."
-		"_${util}"
-	else
-		printf '%s\n' "Skipping ${util}..."
-	fi
+  if command -v "${util}" >/dev/null; then
+    printf '%s\n' "Installing ${util}..."
+    "_${util}"
+  else
+    printf '%s\n' "Skipping ${util}..."
+  fi
 done
