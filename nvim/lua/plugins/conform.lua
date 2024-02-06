@@ -20,5 +20,13 @@ return {
         prepend_args = { "-i", "2" },
       }
     end,
+    keys = {
+      {
+        "<leader>f",
+        function()
+          require("conform").format()
+        end,
+      },
+    },
   },
 }
