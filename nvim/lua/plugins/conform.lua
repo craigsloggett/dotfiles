@@ -1,6 +1,9 @@
 return {
   {
     "stevearc/conform.nvim",
+    dependencies = {
+      "WhoIsSethDaniel/mason-tool-installer.nvim",
+    },
     opts = {
       formatters_by_ft = {
         lua = { "stylua" },
