@@ -6,9 +6,11 @@ vim.opt.softtabstop = 4
 vim.opt.expandtab = true
 
 vim.opt.number = true
+vim.opt.signcolumn = "yes"
 vim.opt.cursorline = true
 vim.opt.splitbelow = true
 vim.opt.splitright = true
+vim.opt.termguicolors = true
 
 vim.opt.incsearch = true
 vim.opt.hlsearch = false
