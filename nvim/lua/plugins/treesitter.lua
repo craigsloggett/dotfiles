@@ -3,7 +3,12 @@ return {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     opts = {
-      ensure_installed = { "lua", "vimdoc", "toml" },
+      ensure_installed = {
+        "bash",
+        "lua",
+        "toml",
+        "vimdoc",
+      },
       highlight = { enable = true },
       indent = { enable = true },
     },
