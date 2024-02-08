@@ -16,6 +16,7 @@ return {
         "BufEnter",
         "BufWritePost",
         "InsertLeave",
+        "TextChanged",
       }, {
         callback = function()
           require("lint").try_lint()
