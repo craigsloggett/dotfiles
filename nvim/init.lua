@@ -5,3 +5,5 @@ require("config.keymaps")
 require("config.lazy")
 -- Configure language servers.
 require("language-servers.lua_ls")
+require("language-servers.terraformls")
+require("language-servers.tflint")
