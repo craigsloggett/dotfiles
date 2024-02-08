@@ -162,6 +162,30 @@ _tmux() {
   symlink_dotfiles tmux
 }
 
+_terraform() {
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+  mkdir -p "${XDG_CACHE_HOME}/terraform"
+
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles terraform
+}
+
+_tflint() {
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+
+  # Migrate existing cache, otherwise setup the directory.
+  if [ -d "${HOME}/.tflint.d" ]; then
+    mv "${HOME}/.tflint.d" "${XDG_DATA_HOME}/tflint"
+  else
+    mkdir -p "${XDG_DATA_HOME}/tflint"
+  fi
+
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles tflint
+}
+
 _yamllint() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
@@ -213,11 +237,11 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
 *Darwin*)
-  utilities="zsh vim nvim git gpg pass less tmux yamllint"
+  utilities="zsh vim nvim git gpg pass less tmux terraform tflint yamllint"
   ;;
 
 *)
-  utilities="bash vim nvim git gpg pass less tmux yamllint"
+  utilities="bash vim nvim git gpg pass less tmux terraform tflint yamllint"
   ;;
 esac
 
