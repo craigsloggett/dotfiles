@@ -18,16 +18,16 @@ typeset -U path
 path+=("${XDG_BIN_HOME}")
 
 # Utility specific environment variables.
-if [ -d "${ZDOTDIR}/.zshenv.d" ]; then
+if [ -d "${ZDOTDIR}/.zprofile.d" ]; then
   # Homebrew is sourced first to find utilities installed by Homebrew.
-  brew_zsh="${ZDOTDIR}/.zshenv.d/brew.zsh"
+  brew_zsh="${ZDOTDIR}/.zprofile.d/brew.zsh"
   [ -f "${brew_zsh}" ] && source "${brew_zsh}"
 
   # Add site-functions that come with Homebrew.
   brew_fpath="$(brew --prefix)/share/zsh/site-functions"
   [ -d "${brew_fpath}" ] && fpath+=("${brew_fpath}")
 
-  for file in "${ZDOTDIR}/.zshenv.d/"*.zsh; do
+  for file in "${ZDOTDIR}/.zprofile.d/"*.zsh; do
     [ -f "${file}" ] || continue
 
     basename="${file##*/}"
