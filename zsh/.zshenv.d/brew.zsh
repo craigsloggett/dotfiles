@@ -4,9 +4,9 @@
 
 # Check if Homebrew was installed in /opt (M1).
 if [ -d "/opt/homebrew/bin" ]; then
-	homebrew_dir="/opt/homebrew/bin"
+  homebrew_dir="/opt/homebrew/bin"
 else
-	homebrew_dir="/usr/local/bin"
+  homebrew_dir="/usr/local/bin"
 fi
 
 # Add Homebrew to the PATH variable.

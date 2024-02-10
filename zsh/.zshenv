@@ -19,26 +19,26 @@ path+=("${XDG_BIN_HOME}")
 
 # Utility specific environment variables.
 if [ -d "${ZDOTDIR}/.zshenv.d" ]; then
-	# Homebrew is sourced first to find utilities installed by Homebrew.
-	brew_zsh="${ZDOTDIR}/.zshenv.d/brew.zsh"
-	[ -f "${brew_zsh}" ] && source "${brew_zsh}"
+  # Homebrew is sourced first to find utilities installed by Homebrew.
+  brew_zsh="${ZDOTDIR}/.zshenv.d/brew.zsh"
+  [ -f "${brew_zsh}" ] && source "${brew_zsh}"
 
-	# Add site-functions that come with Homebrew.
-	brew_fpath="$(brew --prefix)/share/zsh/site-functions"
-	[ -d "${brew_fpath}" ] && fpath+=("${brew_fpath}")
+  # Add site-functions that come with Homebrew.
+  brew_fpath="$(brew --prefix)/share/zsh/site-functions"
+  [ -d "${brew_fpath}" ] && fpath+=("${brew_fpath}")
 
-	for file in "${ZDOTDIR}/.zshenv.d/"*.zsh; do
-		[ -f "${file}" ] || continue
+  for file in "${ZDOTDIR}/.zshenv.d/"*.zsh; do
+    [ -f "${file}" ] || continue
 
-		basename="${file##*/}"
-		util="${basename%.zsh}"
+    basename="${file##*/}"
+    util="${basename%.zsh}"
 
-		if [ "${util}" = "rust" ] && [ -d "${XDG_DATA_HOME}/cargo/bin" ]; then
-			source "${file}"
-		fi
+    if [ "${util}" = "rust" ] && [ -d "${XDG_DATA_HOME}/cargo/bin" ]; then
+      source "${file}"
+    fi
 
-		if command -v "${util}" > /dev/null; then
-			source "${file}"
-		fi
-	done
+    if command -v "${util}" >/dev/null; then
+      source "${file}"
+    fi
+  done
 fi
