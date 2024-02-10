@@ -6,6 +6,9 @@ return {
     },
     opts = {
       ensure_installed = {
+        "black",
+        "isort",
+        "pylint",
         "stylua",
         "shfmt",
         "shellcheck",

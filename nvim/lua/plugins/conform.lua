@@ -11,9 +11,10 @@ return {
     opts = {
       formatters_by_ft = {
         lua = { "stylua" },
+        python = { "isort", "black" },
         sh = { "shfmt" },
-        zsh = { "shfmt" },
         terraform = { "terraform_fmt" },
+        zsh = { "shfmt" },
       },
       format_on_save = {
         lsp_fallback = true,

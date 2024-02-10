@@ -7,6 +7,7 @@ return {
         "bash",
         "hcl",
         "lua",
+        "python",
         "terraform",
         "toml",
         "vimdoc",
