@@ -154,6 +154,18 @@ _less() {
   fi
 }
 
+_python() {
+  # Setup directories.
+  mkdir -p "${XDG_STATE_HOME}/python"
+  mkdir -p "${XDG_CACHE_HOME}/python"
+  mkdir -p "${XDG_DATA_HOME}/python"
+
+  # Preserve existing history file.
+  if [ -f "${HOME}/.python_history" ]; then
+    mv "${HOME}/.python_history" "${XDG_STATE_HOME}/python/history"
+  fi
+}
+
 _tmux() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
@@ -237,11 +249,11 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
 *Darwin*)
-  utilities="zsh vim nvim git gpg pass less tmux terraform tflint yamllint"
+  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamllint"
   ;;
 
 *)
-  utilities="bash vim nvim git gpg pass less tmux terraform tflint yamllint"
+  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamllint"
   ;;
 esac
 
