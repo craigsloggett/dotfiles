@@ -11,7 +11,6 @@ return {
     config = function()
       require("lint").linters_by_ft = {
         sh = { "shellcheck" },
-        python = { "pylint" },
       }
       vim.api.nvim_create_autocmd({
         "BufEnter",
