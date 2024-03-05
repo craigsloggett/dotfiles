@@ -14,6 +14,7 @@ return {
         python = { "isort", "black" },
         sh = { "shfmt" },
         terraform = { "terraform_fmt" },
+        yaml = { "yamlfmt" },
         zsh = { "shfmt" },
       },
       format_on_save = {

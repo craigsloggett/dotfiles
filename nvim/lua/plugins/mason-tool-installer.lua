@@ -6,11 +6,14 @@ return {
     },
     opts = {
       ensure_installed = {
+        "actionlint",
         "black",
         "isort",
-        "stylua",
-        "shfmt",
         "shellcheck",
+        "shfmt",
+        "stylua",
+        "yamlfmt",
+        "yamllint",
       },
       auto_update = true,
     },

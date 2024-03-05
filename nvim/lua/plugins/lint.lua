@@ -10,6 +10,7 @@ return {
     },
     config = function()
       require("lint").linters_by_ft = {
+        python = { "flake8" },
         sh = { "shellcheck" },
       }
       vim.api.nvim_create_autocmd({
@@ -20,6 +21,15 @@ return {
       }, {
         callback = function()
           require("lint").try_lint()
+          -- Handle YAML files and Actions separately.
+          local current_path = vim.fn.expand("%:p")
+          if vim.bo.filetype == "yaml" then
+            if string.find(current_path, "%.github/workflows") then
+              require("lint").try_lint("actionlint")
+            else
+              require("lint").try_lint("yamllint")
+            end
+          end
         end,
       })
     end,
