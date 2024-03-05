@@ -206,6 +206,14 @@ _yamllint() {
   symlink_dotfiles yamllint
 }
 
+_yamlfmt() {
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles yamlfmt
+}
+
 _bash() {
   # Create the /etc/bash.bashrc file to specify Bash
   # configuration for interactive shells.
@@ -249,11 +257,11 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
 *Darwin*)
-  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamllint"
+  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint"
   ;;
 
 *)
-  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamllint"
+  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint"
   ;;
 esac
 
