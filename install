@@ -214,6 +214,11 @@ _yamlfmt() {
   symlink_dotfiles yamlfmt
 }
 
+_ruff() {
+  # Setup directories.
+  mkdir -p "${XDG_CACHE_HOME}/ruff"
+}
+
 _bash() {
   # Create the /etc/bash.bashrc file to specify Bash
   # configuration for interactive shells.
@@ -257,11 +262,11 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
 *Darwin*)
-  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint"
+  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff"
   ;;
 
 *)
-  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint"
+  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff"
   ;;
 esac
 
