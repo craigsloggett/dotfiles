@@ -7,11 +7,11 @@ return {
     opts = {
       ensure_installed = {
         "actionlint",
-        "black",
-        "isort",
+        "ruff",
         "shellcheck",
         "shfmt",
         "stylua",
+        "tflint",
         "yamlfmt",
         "yamllint",
       },
