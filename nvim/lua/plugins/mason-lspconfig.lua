@@ -6,6 +6,7 @@ return {
     },
     opts = {
       ensure_installed = {
+        "gopls",
         "lua_ls",
         "terraformls",
         "tflint",

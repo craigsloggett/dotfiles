@@ -135,6 +135,11 @@ _gpg() {
   fi
 }
 
+_go() {
+  # Setup directories.
+  mkdir -p "${XDG_CACHE_HOME}/go"
+}
+
 _pass() {
   # Migrate existing password store, otherwise setup the directory.
   if [ -d "${HOME}/.password-store" ]; then
@@ -262,11 +267,11 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
 *Darwin*)
-  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff"
+  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go"
   ;;
 
 *)
-  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff"
+  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go"
   ;;
 esac
 
