@@ -22,3 +22,6 @@ vim.keymap.set("v", ">", ">gv", opts)
 
 -- Diagnostics
 vim.keymap.set("n", "<leader>e", ":lua vim.diagnostic.open_float(0, { scope = 'line' })<CR>", opts)
+
+-- Quickly split
+vim.keymap.set("n", "<leader>v", ":vsplit<CR>", opts)
