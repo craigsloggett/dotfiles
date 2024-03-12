@@ -19,3 +19,6 @@ vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", opts)
 -- Keep lines highlighted after an indentation change.
 vim.keymap.set("v", "<", "<gv", opts)
 vim.keymap.set("v", ">", ">gv", opts)
+
+-- Diagnostics
+vim.keymap.set("n", "<leader>e", ":lua vim.diagnostic.open_float(0, { scope = 'line' })<CR>", opts)
