@@ -18,6 +18,8 @@ vim.opt.hlsearch = false
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
+vim.opt.mouse = ""
+
 -- Autocommand to set options for Python filetype
 vim.api.nvim_create_augroup("PythonSettings", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
