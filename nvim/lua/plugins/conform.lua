@@ -14,6 +14,7 @@ return {
         python = { "ruff" },
         sh = { "shfmt" },
         terraform = { "terraform_fmt" },
+        hcl = { "terraform_fmt" },
         yaml = { "yamlfmt" },
         zsh = { "shfmt" },
       },
