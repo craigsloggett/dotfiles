@@ -12,6 +12,7 @@ return {
       require("lint").linters_by_ft = {
         python = { "ruff" },
         sh = { "shellcheck" },
+        terraform = { "tflint" },
         yaml = { "yamllint" },
       }
       vim.api.nvim_create_autocmd({
