@@ -9,6 +9,7 @@ return {
         "gopls",
         "lua_ls",
         "terraformls",
+        "tflint",
       },
     },
   },
