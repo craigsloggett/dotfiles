@@ -10,6 +10,7 @@ return {
     },
     config = function()
       require("lint").linters_by_ft = {
+        make = { "checkmake" },
         python = { "ruff" },
         sh = { "shellcheck" },
         yaml = { "yamllint" },
