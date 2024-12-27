@@ -224,6 +224,18 @@ _ruff() {
   mkdir -p "${XDG_CACHE_HOME}/ruff"
 }
 
+_ghostty() {
+  # Setup directories.
+  mkdir -p "${XDG_DATA_HOME}"
+
+  # Migrate existing data, otherwise setup the directory.
+  if [ -d "${HOME}/.terminfo" ]; then
+    mv "${HOME}/.terminfo" "${XDG_DATA_HOME}/terminfo"
+  else
+    mkdir -p "${XDG_DATA_HOME}/terminfo"
+  fi
+}
+
 _bash() {
   # Create the /etc/bash.bashrc file to specify Bash
   # configuration for interactive shells.
@@ -267,7 +279,7 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
 *Darwin*)
-  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go"
+  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty"
   ;;
 
 *)
