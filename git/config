@@ -6,13 +6,15 @@
 	gpgSign = true
 [pull]
 	rebase = false
+[fetch]
+	pruneTags = true
 [include]
 	path = ~/.config/git/config-personal
 [alias]
 	sttaus = status
 	lazy   = "!f() { git add --all && git commit -m 'Updates' && git push; }; f"
-        new    = "!f() { git branch $1 && git push -u origin $1 && git checkout $1; }; f"
-        gone   = "!f() { git fetch -p && git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads | awk '$2 == \"[gone]\" {print $1}' | xargs -r git branch -D; }; f"
+	new    = "!f() { git branch $1 && git push -u origin $1 && git checkout $1; }; f"
+	gone   = "!f() { git fetch -p && git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads | awk '$2 == \"[gone]\" {print $1}' | xargs -r git branch -D; }; f"
 	l      = log --pretty=format:'%C(yellow)%h%C(reset)%C(auto)%d%C(reset) %s %C(cyan)[%cn]%C(reset)' --decorate --date=short --graph
 
 # The following sample config-personal file can be used:
