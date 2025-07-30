@@ -227,6 +227,10 @@ _ruff() {
 _ghostty() {
   # Setup directories.
   mkdir -p "${XDG_DATA_HOME}"
+  mkdir -p "${XDG_CONFIG_HOME}"
+
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles ghostty
 
   # Migrate existing data, otherwise setup the directory.
   if [ -d "${HOME}/.terminfo" ]; then
