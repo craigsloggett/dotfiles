@@ -240,6 +240,23 @@ _ghostty() {
   fi
 }
 
+_claude() {
+  # Setup directories.
+  mkdir -p "${HOME}/.claude" # Claude doesn't respect XDG directories.
+
+  # Migrate existing config, otherwise setup the directory.
+  if [ -f "${HOME}/.claude/settings.json" ]; then
+    if [ ! -h "${HOME}/.claude/settings.json" ]; then
+      mv "${HOME}/.claude/settings.json" "${dirname}/claude/settings.json"
+    fi
+  fi
+
+  # Claude requires a special case for symlinking the dotfile.
+  if [ -f "${dirname}/claude/settings.json" ]; then
+    ln -sf "${dirname}/claude/settings.json" "${HOME}/.claude/settings.json"
+  fi
+}
+
 _bash() {
   # Create the /etc/bash.bashrc file to specify Bash
   # configuration for interactive shells.
@@ -283,11 +300,11 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
 *Darwin*)
-  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty"
+  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude"
   ;;
 
 *)
-  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go"
+  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go claude"
   ;;
 esac
 
