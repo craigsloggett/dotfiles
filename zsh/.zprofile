@@ -23,6 +23,10 @@ if [ -d "${ZDOTDIR}/.zprofile.d" ]; then
   brew_zsh="${ZDOTDIR}/.zprofile.d/brew.zsh"
   [ -f "${brew_zsh}" ] && source "${brew_zsh}"
 
+  # Similarly, rustup provides binaries as well.
+  rustup_zsh="${ZDOTDIR}/.zprofile.d/rustup.zsh"
+  [ -f "${rustup_zsh}" ] && source "${rustup_zsh}"
+
   for file in "${ZDOTDIR}/.zprofile.d/"*.zsh; do
     [ -f "${file}" ] || continue
 
