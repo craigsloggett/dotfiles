@@ -278,15 +278,21 @@ _irssi() {
 }
 
 _rustup() {
-  # Create the data directory.
-  mkdir -p "${XDG_DATA_HOME}/rustup"
+  # Setup directories.
+  mkdir -p "${XDG_DATA_HOME}"
 
+  # Migrate existing data, otherwise create the data directory.
+  if [ -d "${HOME}/.rustup" ]; then
+    mv "${HOME}/.rustup" "${XDG_DATA_HOME}/rustup"
+    rm -rf "${HOME}/.rustup"
+  else
+    mkdir -p "${XDG_DATA_HOME}/rustup"
+  fi
 }
 
 _cargo() {
   # Create the data directory.
   mkdir -p "${XDG_DATA_HOME}/cargo"
-
 }
 
 _bash() {
