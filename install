@@ -288,6 +288,10 @@ _rustup() {
   else
     mkdir -p "${XDG_DATA_HOME}/rustup"
   fi
+
+  # Cargo requires rustup in $PATH before it can be configured.
+  export PATH
+  PATH="$(brew --prefix rustup)/bin":"${PATH}"
 }
 
 _cargo() {
