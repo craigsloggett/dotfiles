@@ -35,22 +35,8 @@ promptinit
 # Configure the left prompt.
 PROMPT=' %(!.%F{red}%B.%F{green}%B)%b%f %~ %(!.#.$) '
 
-# Show git on the right prompt.
-setopt PROMPT_SUBST
-source "${ZDOTDIR}/plugin/git-prompt.zsh"
-
 # Enable ZSH Auto-suggestions.
-source "${ZDOTDIR}/plugin/zsh-autosuggestions.zsh"
-
-# Configure which git details to display.
-GIT_PS1_SHOWDIRTYSTATE=1
-GIT_PS1_SHOWSTASHSTATE=1
-GIT_PS1_SHOWUNTRACKEDFILES=1
-GIT_PS1_SHOWUPSTREAM="auto"
-GIT_PS1_SHOWCOLORHINTS=1
-
-# Configure the right prompt.
-export RPROMPT=$'$(__git_ps1 "%s")'
+source "${ZDOTDIR}/.zfunctions/zsh-autosuggestions"
 
 # Source the alias file.
 source "${ZDOTDIR}/aliases"
