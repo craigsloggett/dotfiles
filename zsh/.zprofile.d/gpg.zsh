@@ -1,5 +1,5 @@
 #
-# $ZDOTDIR/.zshenv.d/gpg.zsh
+# $ZDOTDIR/.zprofile.d/gpg.zsh
 #
 
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"

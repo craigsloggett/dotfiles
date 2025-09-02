@@ -1,5 +1,5 @@
 #
-# $ZDOTDIR/.zshenv.d/ghostty.zsh
+# $ZDOTDIR/.zprofile.d/ghostty.zsh
 #
 
 export TERMINFO="${XDG_DATA_HOME}"/terminfo

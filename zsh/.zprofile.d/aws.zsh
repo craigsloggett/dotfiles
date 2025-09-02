@@ -1,5 +1,5 @@
 #
-# $ZDOTDIR/.zshenv.d/aws.zsh
+# $ZDOTDIR/.zprofile.d/aws.zsh
 #
 
 export AWS_SHARED_CREDENTIALS_FILE="${XDG_CONFIG_HOME}/aws/credentials"

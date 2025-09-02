@@ -1,5 +1,5 @@
 #
-# $ZDOTDIR/.zshenv.d/tflint.zsh
+# $ZDOTDIR/.zprofile.d/tflint.zsh
 #
 
 export TFLINT_CONFIG_FILE="${XDG_CONFIG_HOME}/tflint/tflint.hcl"
