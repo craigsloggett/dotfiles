@@ -277,6 +277,18 @@ _irssi() {
   mkdir -p "${XDG_DATA_HOME}/irssi"
 }
 
+_rustup() {
+  # Create the data directory.
+  mkdir -p "${XDG_DATA_HOME}/rustup"
+
+}
+
+_cargo() {
+  # Create the data directory.
+  mkdir -p "${XDG_DATA_HOME}/cargo"
+
+}
+
 _bash() {
   # Create the /etc/bash.bashrc file to specify Bash
   # configuration for interactive shells.
@@ -320,11 +332,11 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
 *Darwin*)
-  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude irssi"
+  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude irssi rustup cargo"
   ;;
 
 *)
-  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go claude irssi"
+  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go claude irssi rustup cargo"
   ;;
 esac
 
