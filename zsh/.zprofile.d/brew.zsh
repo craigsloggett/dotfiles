@@ -1,5 +1,5 @@
 #
-# $ZDOTDIR/.zshenv.d/brew.zsh
+# $ZDOTDIR/.zprofile.d/brew.zsh
 #
 
 # Check if Homebrew was installed in /opt (M1).
@@ -12,3 +12,7 @@ fi
 # Add Homebrew to the PATH variable.
 typeset -U path
 path=("${homebrew_dir}" $path)
+
+# Add site-functions that come with Homebrew.
+brew_fpath="$(brew --prefix)/share/zsh/site-functions"
+[ -d "${brew_fpath}" ] && fpath+=("${brew_fpath}")
