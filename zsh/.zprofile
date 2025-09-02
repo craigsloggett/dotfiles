@@ -17,6 +17,9 @@ export SHELL_SESSIONS_DISABLE=1
 typeset -U path
 path+=("${XDG_BIN_HOME}")
 
+# Add local completions to FPATH variable.
+fpath+=(${ZDOTDIR}/.zfunctions/completions)
+
 # Utility specific environment variables.
 if [ -d "${ZDOTDIR}/.zprofile.d" ]; then
   # Homebrew is sourced first to find utilities installed by Homebrew.
