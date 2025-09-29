@@ -26,7 +26,7 @@ return {
     config = function(_, opts)
       require("conform").setup(opts)
       require("conform").formatters.shfmt = {
-        prepend_args = { "-i", "2" },
+        prepend_args = { "-i", "2", "-ci" },
       }
     end,
     keys = {
