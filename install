@@ -85,9 +85,6 @@ _vim() {
   # Symlink dotfiles to the git repository.
   symlink_dotfiles vim
 
-  # Install or update the vim packages.
-  git submodule update --init --recursive
-
   # Cleanup
   rm -f "${HOME}/.viminfo"
 }
@@ -238,6 +235,13 @@ _ghostty() {
   else
     mkdir -p "${XDG_DATA_HOME}/terminfo"
   fi
+
+  # Symlink the terminfo files in XDG_DATA_HOME.
+  macOS_resources_directory='/Applications/Ghostty.app/Contents/Resources'
+  if [ -d "${macOS_resources_directory}" ]; then
+    ln -s "${macOS_resources_directory}/terminfo/67" "${XDG_DATA_HOME}/terminfo/67"
+    ln -s "${macOS_resources_directory}/terminfo/78" "${XDG_DATA_HOME}/terminfo/78"
+  fi
 }
 
 _claude() {
@@ -341,13 +345,13 @@ _bash() {
 
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
-*Darwin*)
-  utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude irssi rustup cargo"
-  ;;
+  *Darwin*)
+    utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude irssi rustup cargo"
+    ;;
 
-*)
-  utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go claude irssi rustup cargo"
-  ;;
+  *)
+    utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go claude irssi rustup cargo"
+    ;;
 esac
 
 # Configure only the utilities that have been installed.
