@@ -239,8 +239,12 @@ _ghostty() {
   # Symlink the terminfo files in XDG_DATA_HOME.
   macOS_resources_directory='/Applications/Ghostty.app/Contents/Resources'
   if [ -d "${macOS_resources_directory}" ]; then
-    ln -s "${macOS_resources_directory}/terminfo/67" "${XDG_DATA_HOME}/terminfo/67"
-    ln -s "${macOS_resources_directory}/terminfo/78" "${XDG_DATA_HOME}/terminfo/78"
+    if [ ! -e "${XDG_DATA_HOME}/terminfo/67" ]; then
+      ln -s "${macOS_resources_directory}/terminfo/67" "${XDG_DATA_HOME}/terminfo/67"
+    fi
+    if [ ! -e "${XDG_DATA_HOME}/terminfo/78" ]; then
+      ln -s "${macOS_resources_directory}/terminfo/78" "${XDG_DATA_HOME}/terminfo/78"
+    fi
   fi
 }
 
