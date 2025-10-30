@@ -1,7 +1,6 @@
--- Common options to all keymaps.
 local opts = {
   noremap = true,
-  silent = true,
+  silent = true
 }
 
 -- Better window navigation.
@@ -21,7 +20,7 @@ vim.keymap.set("v", "<", "<gv", opts)
 vim.keymap.set("v", ">", ">gv", opts)
 
 -- Diagnostics
-vim.keymap.set("n", "<leader>e", ":lua vim.diagnostic.open_float(0, { scope = 'line' })<CR>", opts)
+vim.keymap.set("n", "<leader>e", ":lua vim.diagnostic.open_float()<CR>", opts)
 
 -- Quickly split
 vim.keymap.set("n", "<leader>v", ":vsplit<CR>", opts)
