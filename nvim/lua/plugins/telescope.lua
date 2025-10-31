@@ -30,3 +30,7 @@ require("telescope").setup {
     }
   }
 }
+
+vim.keymap.set("n", "<C-p>", ":lua require('telescope.builtin').find_files()<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>fg", ":lua require('telescope.builtin').live_grep()<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>fb", ":lua require('telescope.builtin').buffers()<CR>", { noremap = true, silent = true })
