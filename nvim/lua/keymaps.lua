@@ -19,8 +19,13 @@ vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", opts)
 vim.keymap.set("v", "<", "<gv", opts)
 vim.keymap.set("v", ">", ">gv", opts)
 
--- Diagnostics
+-- Open the Diagnostics floating window.
 vim.keymap.set("n", "<leader>e", ":lua vim.diagnostic.open_float()<CR>", opts)
 
--- Quickly split
+-- Quickly split buffers.
 vim.keymap.set("n", "<leader>v", ":vsplit<CR>", opts)
+
+-- Use Telescope to find and open files.
+vim.keymap.set("n", "<C-p>", ":lua require('telescope.builtin').find_files()<CR>", opts)
+vim.keymap.set("n", "<leader>fg", ":lua require('telescope.builtin').live_grep()<CR>", opts)
+vim.keymap.set("n", "<leader>fb", ":lua require('telescope.builtin').buffers()<CR>", opts)

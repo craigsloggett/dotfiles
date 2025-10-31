@@ -13,6 +13,16 @@
       "rev": "42fc28ba",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "0.10.0 - 0.10.0"
+    },
+    "plenary.nvim": {
+      "rev": "5001291",
+      "src": "https://github.com/nvim-lua/plenary.nvim",
+      "version": "0.1.4 - 0.1.4"
+    },
+    "telescope.nvim": {
+      "rev": "a0bbec2",
+      "src": "https://github.com/nvim-telescope/telescope.nvim",
+      "version": "0.1.8 - 0.1.8"
     }
   }
 }
