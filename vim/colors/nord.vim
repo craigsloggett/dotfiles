@@ -704,7 +704,7 @@ hi! link pandocSimpleTableHeader pandocAtxHeader
 hi! link pandocStrong markdownBold
 hi! link pandocTableHeaderWord pandocAtxHeader
 hi! link pandocUListItemBullet Operator
-  
+
 if has('nvim')
   " tree-sitter
   " > nvim-treesitter/nvim-treesitter

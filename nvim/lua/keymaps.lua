@@ -1,7 +1,6 @@
--- Common options to all keymaps.
 local opts = {
   noremap = true,
-  silent = true,
+  silent = true
 }
 
 -- Better window navigation.
@@ -20,8 +19,8 @@ vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", opts)
 vim.keymap.set("v", "<", "<gv", opts)
 vim.keymap.set("v", ">", ">gv", opts)
 
--- Diagnostics
-vim.keymap.set("n", "<leader>e", ":lua vim.diagnostic.open_float(0, { scope = 'line' })<CR>", opts)
+-- Open the Diagnostics floating window.
+vim.keymap.set("n", "<leader>e", ":lua vim.diagnostic.open_float()<CR>", opts)
 
--- Quickly split
+-- Quickly split buffers.
 vim.keymap.set("n", "<leader>v", ":vsplit<CR>", opts)

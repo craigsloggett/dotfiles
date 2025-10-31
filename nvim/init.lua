@@ -1,10 +1,13 @@
--- Configure vim options before loading any plugins.
-require("config.options")
-require("config.keymaps")
--- Bootstrap the lazy.nvim plugin manager.
-require("config.lazy")
--- Configure language servers.
-require("language-servers.lua_ls")
-require("language-servers.terraformls")
-require("language-servers.tflint")
-require("language-servers.gopls")
+-- Configuration
+require("options")
+require("keymaps")
+require("filetypes")
+require("autocmds")
+require("lsp")
+
+-- Plugins
+require("plugins.conform")
+require("plugins.nvim-lint")
+require("plugins.nvim-treesitter")
+require("plugins.plenary")
+require("plugins.telescope")
