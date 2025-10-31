@@ -9,7 +9,7 @@ the repo with submodules included:
 git clone --recurse-submodules https://github.com/craigsloggett/dotfiles
 ```
 
-The following (system) packages are required on the host in order to fully utilize all of these 
+The following (system) packages are required on the host in order to fully utilize all of these
 (vim) packages:
 
  - `fzf`
@@ -74,7 +74,7 @@ The following command was used to add this package to the built-in package manag
 git submodule add --name vim-terraform https://github.com/hashivim/vim-terraform ./vim-terraform
 ```
 
-The following (system) packages are required on the host in order to fully utilize this 
+The following (system) packages are required on the host in order to fully utilize this
 (vim) package:
 
  - `terraform`
