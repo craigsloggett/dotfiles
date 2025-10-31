@@ -5,7 +5,7 @@ vim.pack.add({
 })
 
 require("lint").linters_by_ft = {
+  ghaction = { "actionlint" },
   sh = { "shellcheck" },
-  yaml = { "yamllint" },
-  ghaction = { "actionlint" }
+  yaml = { "yamllint" }
 }
