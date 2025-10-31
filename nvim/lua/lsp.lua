@@ -5,7 +5,8 @@ vim.lsp.enable({
 })
 
 vim.diagnostic.config({
-  virtual_lines = true
+  virtual_lines = true,
+  float         = { source = true }
 })
 
 -- Keymaps specific to LSP.

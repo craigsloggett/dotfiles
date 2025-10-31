@@ -8,8 +8,11 @@ vim.pack.add({
 require("nvim-treesitter.configs").setup {
   ensure_installed = {
     "bash",
+    "gitcommit",
+    "gitignore",
     "hcl",
-    "terraform"
+    "terraform",
+    "yaml"
   },
   auto_install = false,
   highlight = {

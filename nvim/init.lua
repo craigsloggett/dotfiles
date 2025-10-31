@@ -1,8 +1,11 @@
--- Plugins
-require("plugins.nvim-treesitter")
-
 -- Configuration
 require("options")
-require("autocmds")
 require("keymaps")
+require("filetypes")
+require("autocmds")
 require("lsp")
+
+-- Plugins
+require("plugins.conform")
+require("plugins.nvim-lint")
+require("plugins.nvim-treesitter")

@@ -1,5 +1,14 @@
 {
   "plugins": {
+    "conform.nvim": {
+      "rev": "3543d00",
+      "src": "https://github.com/stevearc/conform.nvim.git",
+      "version": "9.1.0 - 9.1.0"
+    },
+    "nvim-lint": {
+      "rev": "9da1fb9",
+      "src": "https://github.com/mfussenegger/nvim-lint.git"
+    },
     "nvim-treesitter": {
       "rev": "42fc28ba",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",

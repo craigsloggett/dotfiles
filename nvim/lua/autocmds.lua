@@ -1,38 +1,10 @@
--- Autocommand to set options for the Lua filetype
-vim.api.nvim_create_augroup("LuaSettings", { clear = true })
-vim.api.nvim_create_autocmd("BufWritePre", {
-  group = "LuaSettings",
-  pattern = "*.lua",
-  callback = function()
-    vim.lsp.buf.format({ async = false })
-  end
-})
+-- User AutoCmds should specify `clear = true`, but this is not true when a plugin manages them.
+vim.api.nvim_create_augroup("UserAutoCmds", { clear = true })
 
--- Autocommand to set options for the Shell filetype
-vim.api.nvim_create_augroup("ShellSettings", { clear = true })
-vim.api.nvim_create_autocmd("BufWritePre", {
-  group = "ShellSettings",
-  pattern = { "*.sh", "*install*", "*setup*" },
-  callback = function()
-    vim.lsp.buf.format({ async = false })
-  end
-})
-
--- Autocommand to set options for the Terraform filetype
-vim.api.nvim_create_augroup("TerraformSettings", { clear = true })
-vim.api.nvim_create_autocmd("BufWritePre", {
-  group = "TerraformSettings",
-  pattern = { "*.tf", "*.tfvars" },
-  callback = function()
-    vim.lsp.buf.format({ async = false })
-  end
-})
-
--- Autocommand to set options for the Python filetype
-vim.api.nvim_create_augroup("PythonSettings", { clear = true })
+-- Language specific tab lengths.
 vim.api.nvim_create_autocmd("FileType", {
-  group = "PythonSettings",
-  pattern = "python",
+  group = "UserAutoCmds",
+  pattern = { "go", "python" },
   callback = function()
     vim.opt_local.tabstop = 4
     vim.opt_local.shiftwidth = 4
@@ -40,15 +12,19 @@ vim.api.nvim_create_autocmd("FileType", {
   end
 })
 
--- Autocommand to set options for the Go filetype
-vim.api.nvim_create_augroup("GoSettings", { clear = true })
+-- Language specific tab character.
 vim.api.nvim_create_autocmd("FileType", {
-  group = "GoSettings",
+  group = "UserAutoCmds",
   pattern = "go",
   callback = function()
-    vim.opt_local.tabstop = 4
-    vim.opt_local.shiftwidth = 4
-    vim.opt_local.softtabstop = 4
-    vim.opt.expandtab = false
+    vim.opt_local.expandtab = false
+  end
+})
+
+-- Lint files as you go.
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave", "TextChanged" }, {
+  group = "UserAutoCmds",
+  callback = function()
+    require("lint").try_lint()
   end
 })
