@@ -2,3 +2,6 @@
 font-feature = -calt
 font-feature = -liga
 font-feature = -dlig
+
+# Custom Keybindings
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
