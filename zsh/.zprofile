@@ -22,6 +22,11 @@ if [ -d "${ZDOTDIR}/.zprofile.d" ]; then
   # Homebrew is sourced first to find utilities installed by Homebrew.
   source "${ZDOTDIR}/.zprofile.d/brew.zsh"
 
+  # Homebrew leverages npm to install some packages, even if it isn't installed.
+  if command -v brew >/dev/null; then
+    source "${ZDOTDIR}/.zprofile.d/npm.zsh"
+  fi
+
   # Similarly, rustup provides binaries as well.
   if command -v rustup >/dev/null; then
     source "${ZDOTDIR}/.zprofile.d/rustup.zsh"

@@ -307,6 +307,31 @@ _cargo() {
   mkdir -p "${XDG_DATA_HOME}/cargo"
 }
 
+_npm() {
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+  mkdir -p "${XDG_DATA_HOME}/npm"
+  mkdir -p "${XDG_CACHE_HOME}/npm"
+  mkdir -p "${XDG_STATE_HOME}/npm"
+
+  # Migrate existing logs, otherwise create the logs directory.
+  if [ -d "${HOME}/.npm/_logs" ]; then
+    mv "${HOME}/.npm/_logs" "${XDG_STATE_HOME}/npm/logs"
+  else
+    mkdir -p "${XDG_STATE_HOME}/npm/logs"
+  fi
+
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles npm
+
+  # Remove the ~/.npm directory if it is empty.
+  if [ -d "${HOME}/.npm" ]; then
+    if [ -z "$(ls -A "${HOME}/.npm")" ]; then
+      rm -rf "${HOME}/.npm"
+    fi
+  fi
+}
+
 _bash() {
   # Create the /etc/bash.bashrc file to specify Bash
   # configuration for interactive shells.
@@ -350,7 +375,7 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
   *Darwin*)
-    utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude irssi rustup cargo"
+    utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude irssi rustup cargo npm"
     ;;
 
   *)
@@ -364,6 +389,12 @@ for util in ${utilities}; do
     printf '%s\n' "Installing ${util}..."
     "_${util}"
   else
-    printf '%s\n' "Skipping ${util}..."
+    # npm is used by Homebrew even if it isn't installed.
+    if [ "${util}" = "npm" ]; then
+      printf '%s\n' "Installing ${util}..."
+      "_${util}"
+    else
+      printf '%s\n' "Skipping ${util}..."
+    fi
   fi
 done
