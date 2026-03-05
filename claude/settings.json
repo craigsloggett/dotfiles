@@ -42,14 +42,7 @@
   "env": {
     "DISABLE_TELEMETRY": "1"
   },
-  "sandbox": {
-    "enabled": true,
-    "filesystem": {
-      "denyRead": [
-        "~/.aws/credentials",
-        "~/.ssh/*",
-        "~/.gnupg/*"
-      ]
-    }
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true
   }
 }
