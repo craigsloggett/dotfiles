@@ -1,6 +1,48 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git branch *)",
+      "Bash(git show *)",
+      "Bash(make *)",
+      "Bash(man *)",
+      "Bash(which *)",
+      "Bash(uname *)",
+      "Bash(echo *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(fd *)",
+      "Bash(sort *)",
+      "Bash(uniq *)",
+      "Bash(tr *)",
+      "Bash(cut *)",
+      "Bash(awk *)",
+      "Bash(sed *)",
+      "Bash(env)",
+      "Bash(printenv *)",
+      "Bash(type *)",
+      "Bash(file *)",
+      "Bash(stat *)",
+      "Bash(date *)",
+      "Bash(pwd)"
+    ],
+    "defaultMode": "plan"
+  },
+  "model": "claude-opus-4-6",
+  "effortLevel": "high",
   "includeCoAuthoredBy": false,
   "env": {
     "DISABLE_TELEMETRY": "1"
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true
   }
 }
