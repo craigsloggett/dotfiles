@@ -249,85 +249,21 @@ _ghostty() {
 }
 
 _claude() {
-  # Claude Code does not respect XDG Base Directory Specification.
-  # https://github.com/anthropics/claude-code/issues/1455
-  #
-  # Workaround: keep ~/.claude as the root (Claude expects it),
-  # but symlink subdirectories to proper XDG locations.
+  # Setup directories.
+  mkdir -p "${HOME}/.claude" # Claude doesn't respect XDG directories.
 
-  # Setup XDG directories.
-  mkdir -p "${XDG_CONFIG_HOME}/claude"
-  mkdir -p "${XDG_STATE_HOME}/claude"
-  mkdir -p "${XDG_DATA_HOME}/claude"
-  mkdir -p "${XDG_CACHE_HOME}/claude"
-
-  # Claude Code expects ~/.claude to exist.
-  mkdir -p "${HOME}/.claude"
-
-  # State: projects, file-history, plans, session-env, shell-snapshots
-  for dir in projects file-history plans session-env shell-snapshots; do
-    if [ -d "${HOME}/.claude/${dir}" ] && [ ! -h "${HOME}/.claude/${dir}" ]; then
-      # Migrate existing data to XDG location.
-      if [ -d "${XDG_STATE_HOME}/claude/${dir}" ]; then
-        cp -a "${HOME}/.claude/${dir}/." "${XDG_STATE_HOME}/claude/${dir}/"
-      else
-        mv "${HOME}/.claude/${dir}" "${XDG_STATE_HOME}/claude/${dir}"
-      fi
-      rm -rf "${HOME}/.claude/${dir}"
-    else
-      mkdir -p "${XDG_STATE_HOME}/claude/${dir}"
-    fi
-    if [ ! -h "${HOME}/.claude/${dir}" ]; then
-      ln -s "${XDG_STATE_HOME}/claude/${dir}" "${HOME}/.claude/${dir}"
-    fi
-  done
-
-  # State: history.jsonl (file, not directory)
-  if [ -f "${HOME}/.claude/history.jsonl" ] && [ ! -h "${HOME}/.claude/history.jsonl" ]; then
-    mv "${HOME}/.claude/history.jsonl" "${XDG_STATE_HOME}/claude/history.jsonl"
-  fi
-  if [ ! -h "${HOME}/.claude/history.jsonl" ]; then
-    ln -sf "${XDG_STATE_HOME}/claude/history.jsonl" "${HOME}/.claude/history.jsonl"
-  fi
-
-  # Data: plugins
-  if [ -d "${HOME}/.claude/plugins" ] && [ ! -h "${HOME}/.claude/plugins" ]; then
-    if [ -d "${XDG_DATA_HOME}/claude/plugins" ]; then
-      cp -a "${HOME}/.claude/plugins/." "${XDG_DATA_HOME}/claude/plugins/"
-    else
-      mv "${HOME}/.claude/plugins" "${XDG_DATA_HOME}/claude/plugins"
-    fi
-    rm -rf "${HOME}/.claude/plugins"
-  else
-    mkdir -p "${XDG_DATA_HOME}/claude/plugins"
-  fi
-  if [ ! -h "${HOME}/.claude/plugins" ]; then
-    ln -s "${XDG_DATA_HOME}/claude/plugins" "${HOME}/.claude/plugins"
-  fi
-
-  # Cache: cache, debug, backups
-  for dir in cache debug backups; do
-    if [ -d "${HOME}/.claude/${dir}" ] && [ ! -h "${HOME}/.claude/${dir}" ]; then
-      if [ -d "${XDG_CACHE_HOME}/claude/${dir}" ]; then
-        cp -a "${HOME}/.claude/${dir}/." "${XDG_CACHE_HOME}/claude/${dir}/"
-      else
-        mv "${HOME}/.claude/${dir}" "${XDG_CACHE_HOME}/claude/${dir}"
-      fi
-      rm -rf "${HOME}/.claude/${dir}"
-    else
-      mkdir -p "${XDG_CACHE_HOME}/claude/${dir}"
-    fi
-    if [ ! -h "${HOME}/.claude/${dir}" ]; then
-      ln -s "${XDG_CACHE_HOME}/claude/${dir}" "${HOME}/.claude/${dir}"
-    fi
-  done
-
-  # Config: settings.json (symlinked from dotfiles repository)
+  # Migrate existing config.
   if [ -f "${HOME}/.claude/settings.json" ]; then
     if [ ! -h "${HOME}/.claude/settings.json" ]; then
-      mv "${HOME}/.claude/settings.json" "${dirname}/claude/settings.json"
+      if [ -f "${dirname}/claude/settings.json" ]; then
+        mv "${HOME}/.claude/settings.json" "${dirname}/claude/settings.json.backup"
+      else
+        mv "${HOME}/.claude/settings.json" "${dirname}/claude/settings.json"
+      fi
     fi
   fi
+
+  # Claude requires a special case for symlinking the dotfile.
   if [ -f "${dirname}/claude/settings.json" ]; then
     ln -sf "${dirname}/claude/settings.json" "${HOME}/.claude/settings.json"
   fi
