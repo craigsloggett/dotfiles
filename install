@@ -281,6 +281,12 @@ _claude() {
   if [ -f "${dirname}/claude/CLAUDE.md" ]; then
     ln -sf "${dirname}/claude/CLAUDE.md" "${HOME}/.claude/CLAUDE.md"
   fi
+
+  # Symlink hooks.
+  mkdir -p "${HOME}/.claude/hooks"
+  if [ -f "${dirname}/claude/hooks/format.sh" ]; then
+    ln -sf "${dirname}/claude/hooks/format.sh" "${HOME}/.claude/hooks/format.sh"
+  fi
 }
 
 _irssi() {

@@ -57,5 +57,19 @@
   },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true
+  },
+  "terminalNotifications": false,
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${HOME}/.claude/hooks/format.sh\""
+          }
+        ]
+      }
+    ]
   }
 }
