@@ -32,7 +32,20 @@
       "Bash(file *)",
       "Bash(stat *)",
       "Bash(date *)",
-      "Bash(pwd)"
+      "Bash(pwd)",
+      "Bash(go *)",
+      "Bash(terraform *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr status)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue list *)",
+      "Bash(gh issue status)",
+      "Bash(gh run view *)",
+      "Bash(gh run list *)",
+      "Bash(gh repo view *)",
+      "Bash(gh search *)"
     ],
     "defaultMode": "plan"
   },

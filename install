@@ -263,9 +263,23 @@ _claude() {
     fi
   fi
 
+  # Migrate existing CLAUDE.md.
+  if [ -f "${HOME}/.claude/CLAUDE.md" ]; then
+    if [ ! -h "${HOME}/.claude/CLAUDE.md" ]; then
+      if [ -f "${dirname}/claude/CLAUDE.md" ]; then
+        mv "${HOME}/.claude/CLAUDE.md" "${dirname}/claude/CLAUDE.md.backup"
+      else
+        mv "${HOME}/.claude/CLAUDE.md" "${dirname}/claude/CLAUDE.md"
+      fi
+    fi
+  fi
+
   # Claude requires a special case for symlinking the dotfile.
   if [ -f "${dirname}/claude/settings.json" ]; then
     ln -sf "${dirname}/claude/settings.json" "${HOME}/.claude/settings.json"
+  fi
+  if [ -f "${dirname}/claude/CLAUDE.md" ]; then
+    ln -sf "${dirname}/claude/CLAUDE.md" "${HOME}/.claude/CLAUDE.md"
   fi
 }
 
