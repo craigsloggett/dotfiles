@@ -287,6 +287,24 @@ _claude() {
   if [ -f "${dirname}/claude/hooks/format.sh" ]; then
     ln -sf "${dirname}/claude/hooks/format.sh" "${HOME}/.claude/hooks/format.sh"
   fi
+
+  # Symlink agents.
+  if [ -d "${dirname}/claude/agents" ]; then
+    ln -sfn "${dirname}/claude/agents" "${HOME}/.claude/agents"
+  fi
+
+  # Symlink skills.
+  if [ -d "${dirname}/claude/skills" ]; then
+    ln -sfn "${dirname}/claude/skills" "${HOME}/.claude/skills"
+  fi
+
+  # Symlink guidelines.
+  if [ -f "${dirname}/claude/go-guidelines.md" ]; then
+    ln -sf "${dirname}/claude/go-guidelines.md" "${HOME}/.claude/go-guidelines.md"
+  fi
+  if [ -f "${dirname}/claude/terraform-guidelines.md" ]; then
+    ln -sf "${dirname}/claude/terraform-guidelines.md" "${HOME}/.claude/terraform-guidelines.md"
+  fi
 }
 
 _irssi() {
