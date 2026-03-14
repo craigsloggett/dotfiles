@@ -54,9 +54,6 @@
   "model": "claude-opus-4-6",
   "effortLevel": "high",
   "includeCoAuthoredBy": false,
-  "env": {
-    "DISABLE_TELEMETRY": "1"
-  },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true
   },
