@@ -23,7 +23,13 @@ output="${cwd}/CONTEXT.md"
 
 jq -r '
   if .type == "user" and .message.content then
-    "## User\n\n" + (.message.content | tostring) + "\n"
+    "## User\n\n" + (
+      if (.message.content | type) == "array" then
+        [.message.content[] | select(.type == "text") | .text] | join("\n")
+      else
+        (.message.content | tostring)
+      end
+    ) + "\n"
   elif .type == "assistant" and .message.content then
     [.message.content[] |
       if .type == "text" then

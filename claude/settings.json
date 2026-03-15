@@ -33,8 +33,26 @@
       "Bash(stat *)",
       "Bash(date *)",
       "Bash(pwd)",
-      "Bash(go *)",
-      "Bash(terraform *)",
+      "Bash(go build *)",
+      "Bash(go test *)",
+      "Bash(go vet *)",
+      "Bash(go fix *)",
+      "Bash(go mod *)",
+      "Bash(go fmt *)",
+      "Bash(go doc *)",
+      "Bash(go list *)",
+      "Bash(go version *)",
+      "Bash(go env *)",
+      "Bash(terraform init *)",
+      "Bash(terraform plan *)",
+      "Bash(terraform validate *)",
+      "Bash(terraform fmt *)",
+      "Bash(terraform show *)",
+      "Bash(terraform state list *)",
+      "Bash(terraform state show *)",
+      "Bash(terraform output *)",
+      "Bash(terraform providers *)",
+      "Bash(terraform version *)",
       "Bash(gh pr view *)",
       "Bash(gh pr list *)",
       "Bash(gh pr checks *)",
@@ -52,7 +70,6 @@
       "Bash(gh workflow view *)",
       "Bash(gh workflow list *)",
       "Bash(gh label list *)",
-      "Bash(gh api *)",
       "WebFetch(*)",
       "WebSearch(*)",
       "Skill(fix-github-issue:*)",
@@ -111,6 +128,15 @@
           {
             "type": "command",
             "command": "\"${HOME}/.claude/hooks/go-fix.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${HOME}/.claude/hooks/shell-lint.sh\""
           }
         ]
       }

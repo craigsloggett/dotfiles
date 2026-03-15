@@ -1,9 +1,10 @@
 #!/bin/sh
 #
-# go-fmt.sh - format all Go files after Claude edits
+# go-fmt.sh - format edited Go file after Claude edits
 #
-# Called as a PostToolUse hook. Only runs in Go projects
-# (repos with a go.mod file).
+# Called as a PostToolUse hook. Reads JSON from stdin
+# to extract the file path, then runs gofmt on it.
+# Only runs in Go projects (repos with a go.mod file).
 
 set -u
 
@@ -16,6 +17,25 @@ if ! command -v gofmt >/dev/null 2>&1; then
   exit 0
 fi
 
-gofmt -w .
+if ! command -v jq >/dev/null 2>&1; then
+  exit 0
+fi
+
+# Read tool context from stdin.
+input="$(cat)"
+
+# Extract the file path from tool_input.file_path.
+file_path="$(printf '%s\n' "${input}" | jq -r '.tool_input.file_path // empty')"
+
+if [ -z "${file_path}" ]; then
+  exit 0
+fi
+
+# Only format Go files.
+case "${file_path}" in
+  *.go)
+    gofmt -w "${file_path}"
+    ;;
+esac
 
 exit 0
