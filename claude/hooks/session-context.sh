@@ -30,14 +30,8 @@ mkdir -p "${output_dir}"
 output="${output_dir}/session-${timestamp}-${session_id}.md"
 
 jq -r '
-  if .type == "user" and .message.content then
-    "## User\n\n" + (
-      if (.message.content | type) == "array" then
-        [.message.content[] | select(.type == "text") | .text] | join("\n")
-      else
-        (.message.content | tostring)
-      end
-    ) + "\n"
+  if .type == "user" and (.message.content | type) == "string" and (.message.content | length) > 0 then
+    "## User\n\n" + .message.content + "\n"
   elif .type == "assistant" and .message.content then
     [.message.content[] |
       if .type == "text" then
