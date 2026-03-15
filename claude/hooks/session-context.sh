@@ -7,9 +7,9 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 0
 fi
 
-input=$(cat)
-transcript_path=$(printf '%s\n' "${input}" | jq -r '.transcript_path // empty')
-cwd=$(printf '%s\n' "${input}" | jq -r '.cwd // empty')
+input="$(cat)"
+transcript_path="$(printf '%s\n' "${input}" | jq -r '.transcript_path // empty')"
+cwd="$(printf '%s\n' "${input}" | jq -r '.cwd // empty')"
 
 if [ -z "${transcript_path}" ] || [ ! -f "${transcript_path}" ]; then
   exit 0
@@ -35,4 +35,4 @@ jq -r '
     ] | join("\n")
   else empty
   end
-' "${transcript_path}" > "${output}"
+' "${transcript_path}" >"${output}"
