@@ -20,10 +20,10 @@ description: Fetch a GitHub issue, analyze it, implement a fix, and create a PR.
      - Terraform: `terraform validate`, `terraform fmt -check`
      - Shell: `shellcheck <script>`
 
-6. **Commit the changes** with a message referencing the issue: `Fix #<number>: <description>`.
+6. **Commit the changes** with a message referencing the issue: `Fix #<number>: <Description>` (capitalize the first word after the colon).
 
 7. **Push the branch** and **create a PR** using `gh pr create`:
-   - Title: `Fix #<number>: <short description>`
+   - Title: `Fix #<number>: <Description>` (capitalize the first word after the colon)
    - Body: Summary of the issue, root cause, and what the fix does.
    - Link the issue in the PR body.
 

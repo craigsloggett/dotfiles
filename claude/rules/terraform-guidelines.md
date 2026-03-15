@@ -1,3 +1,9 @@
+---
+paths:
+  - "**/*.tf"
+  - "**/*.tfvars"
+---
+
 # Terraform Guidelines
 
 ## HCL Conventions
