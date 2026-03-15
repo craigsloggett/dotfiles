@@ -26,17 +26,12 @@ fi
 ext="${file_path##*.}"
 
 case "${ext}" in
-  go)
-    if command -v gofmt >/dev/null 2>&1; then
-      gofmt -w "${file_path}" 2>/dev/null
-    fi
-    ;;
-  tf|tfvars)
+  tf | tfvars)
     if command -v terraform >/dev/null 2>&1; then
       terraform fmt "${file_path}" 2>/dev/null
     fi
     ;;
-  yaml|yml)
+  yaml | yml)
     if command -v yamlfmt >/dev/null 2>&1; then
       yamlfmt "${file_path}" 2>/dev/null
     fi
