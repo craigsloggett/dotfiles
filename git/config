@@ -4,6 +4,8 @@
 	signingKey = 24D7E38CCECE344585A0822F3D5272A2CA547996!
 [commit]
 	gpgSign = true
+[init]
+	defaultBranch = main
 [pull]
 	rebase = false
 [fetch]

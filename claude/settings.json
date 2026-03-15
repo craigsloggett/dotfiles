@@ -33,8 +33,26 @@
       "Bash(stat *)",
       "Bash(date *)",
       "Bash(pwd)",
-      "Bash(go *)",
-      "Bash(terraform *)",
+      "Bash(go build *)",
+      "Bash(go test *)",
+      "Bash(go vet *)",
+      "Bash(go fix *)",
+      "Bash(go mod *)",
+      "Bash(go fmt *)",
+      "Bash(go doc *)",
+      "Bash(go list *)",
+      "Bash(go version *)",
+      "Bash(go env *)",
+      "Bash(terraform init *)",
+      "Bash(terraform plan *)",
+      "Bash(terraform validate *)",
+      "Bash(terraform fmt *)",
+      "Bash(terraform show *)",
+      "Bash(terraform state list *)",
+      "Bash(terraform state show *)",
+      "Bash(terraform output *)",
+      "Bash(terraform providers *)",
+      "Bash(terraform version *)",
       "Bash(gh pr view *)",
       "Bash(gh pr list *)",
       "Bash(gh pr checks *)",
@@ -45,28 +63,89 @@
       "Bash(gh run view *)",
       "Bash(gh run list *)",
       "Bash(gh repo view *)",
-      "Bash(gh search *)"
+      "Bash(gh search *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh release view *)",
+      "Bash(gh release list *)",
+      "Bash(gh workflow view *)",
+      "Bash(gh workflow list *)",
+      "Bash(gh label list *)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "Skill(fix-github-issue:*)",
+      "Skill(review-pr:*)"
     ],
     "defaultMode": "plan"
   },
-  "model": "claude-opus-4-6",
+  "model": "claude-opus-4-6[1m]",
   "effortLevel": "high",
   "includeCoAuthoredBy": false,
-  "env": {
-    "DISABLE_TELEMETRY": "1"
-  },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true
   },
+  "statusLine": {
+    "type": "command",
+    "command": "\"${HOME}/.claude/statusline-command.sh\""
+  },
+  "enableRemoteControl": true,
   "terminalNotifications": false,
   "hooks": {
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${HOME}/.claude/hooks/session-context.sh\""
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
             "command": "\"${HOME}/.claude/hooks/format.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${HOME}/.claude/hooks/go-fmt.sh\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${HOME}/.claude/hooks/go-fix.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${HOME}/.claude/hooks/shell-lint.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${HOME}/.claude/hooks/turn-context.sh\""
           }
         ]
       }

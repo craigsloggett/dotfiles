@@ -283,10 +283,33 @@ _claude() {
   fi
 
   # Symlink hooks.
-  mkdir -p "${HOME}/.claude/hooks"
-  if [ -f "${dirname}/claude/hooks/format.sh" ]; then
-    ln -sf "${dirname}/claude/hooks/format.sh" "${HOME}/.claude/hooks/format.sh"
+  if [ -d "${dirname}/claude/hooks" ]; then
+    ln -sfn "${dirname}/claude/hooks" "${HOME}/.claude/hooks"
   fi
+
+  # Symlink statusline command.
+  if [ -f "${dirname}/claude/statusline-command.sh" ]; then
+    ln -sf "${dirname}/claude/statusline-command.sh" "${HOME}/.claude/statusline-command.sh"
+  fi
+
+  # Symlink agents.
+  if [ -d "${dirname}/claude/agents" ]; then
+    ln -sfn "${dirname}/claude/agents" "${HOME}/.claude/agents"
+  fi
+
+  # Symlink skills.
+  if [ -d "${dirname}/claude/skills" ]; then
+    ln -sfn "${dirname}/claude/skills" "${HOME}/.claude/skills"
+  fi
+
+  # Symlink rules.
+  if [ -d "${dirname}/claude/rules" ]; then
+    ln -sfn "${dirname}/claude/rules" "${HOME}/.claude/rules"
+  fi
+
+  # Clean up legacy guideline symlinks.
+  rm -f "${HOME}/.claude/go-guidelines.md"
+  rm -f "${HOME}/.claude/terraform-guidelines.md"
 }
 
 _irssi() {
