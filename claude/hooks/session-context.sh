@@ -1,5 +1,5 @@
 #!/bin/sh
-# SessionEnd hook: extract session transcript to CONTEXT.md in the working directory.
+# SessionEnd hook: extract session transcript to .claude/context/session-<timestamp>-<session_id>.md.
 
 set -u
 
@@ -10,6 +10,7 @@ fi
 input="$(cat)"
 transcript_path="$(printf '%s\n' "${input}" | jq -r '.transcript_path // empty')"
 cwd="$(printf '%s\n' "${input}" | jq -r '.cwd // empty')"
+session_id="$(printf '%s\n' "${input}" | jq -r '.session_id // empty')"
 
 if [ -z "${transcript_path}" ] || [ ! -f "${transcript_path}" ]; then
   exit 0
@@ -19,7 +20,14 @@ if [ -z "${cwd}" ] || [ ! -d "${cwd}" ]; then
   exit 0
 fi
 
-output="${cwd}/CONTEXT.md"
+if [ -z "${session_id}" ]; then
+  exit 0
+fi
+
+timestamp="$(date -u +%Y-%m-%dT%H-%M-%S)"
+output_dir="${cwd}/.claude/context"
+mkdir -p "${output_dir}"
+output="${output_dir}/session-${timestamp}-${session_id}.md"
 
 jq -r '
   if .type == "user" and .message.content then
@@ -42,3 +50,6 @@ jq -r '
   else empty
   end
 ' "${transcript_path}" >"${output}"
+
+# Clean up the turns state file for this session.
+rm -f "${XDG_STATE_HOME:-${HOME}/.local/state}/claude/${session_id}.lines" 2>/dev/null

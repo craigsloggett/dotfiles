@@ -139,6 +139,15 @@
             "command": "\"${HOME}/.claude/hooks/shell-lint.sh\""
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${HOME}/.claude/hooks/turn-context.sh\""
+          }
+        ]
       }
     ]
   }
