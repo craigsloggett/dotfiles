@@ -119,6 +119,15 @@
             "command": "\"${HOME}/.claude/hooks/go-fmt.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${HOME}/.claude/hooks/go-lint.sh\""
+          }
+        ]
       }
     ],
     "Stop": [
