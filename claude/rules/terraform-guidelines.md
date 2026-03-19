@@ -56,5 +56,6 @@ paths:
 - Use `count` for simple conditional resources. Use `for_each` for collections.
 - Avoid `depends_on` unless absolutely necessary. Implicit dependencies are preferred.
 - Use `moved` blocks for resource renames to avoid destroy/recreate.
-- Pin provider versions to minor version ranges: `~> 5.0`.
+- Root modules: pin provider versions to an exact version: `5.0.0`. Always use the latest version available.
+- Modules: pin provider versions to minor version ranges: `~> 5.0`.
 - Use `aws_iam_policy_document` data sources for IAM policies. They are type-safe, easier to read, and composable. Avoid inline `jsonencode` blocks for policy JSON.
