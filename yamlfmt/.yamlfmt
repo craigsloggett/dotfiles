@@ -4,3 +4,6 @@ formatter:
   indentless_arrays: false
   retain_line_breaks_single: true
   trim_trailing_whitespace: true
+  eof_newline: true
+  pad_line_comments: 1
+  include_document_start: false
