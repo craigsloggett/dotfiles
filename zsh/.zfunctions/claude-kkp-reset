@@ -1,0 +1,11 @@
+# .zfunctions/claude-kkp-reset
+
+# Workaround: Claude Code enables the kitty keyboard protocol (CSI u mode)
+# but may not restore the terminal on unclean exit, leaving keypresses
+# interpreted as raw escape sequences. This resets CSI u mode before each
+# prompt. Safe to remove once the bug is fixed upstream:
+# https://github.com/anthropics/claude-code/issues/38761
+if command -v claude >/dev/null; then
+  _claude_kkp_reset() { printf '\e[=0u\e[<99u' 2>/dev/null }
+  precmd_functions+=(_claude_kkp_reset)
+fi

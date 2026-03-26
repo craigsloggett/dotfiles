@@ -38,6 +38,11 @@ PROMPT=' %(!.%F{red}%B.%F{green}%B)%b%f %~ %(!.#.$) '
 # Enable ZSH Auto-suggestions.
 source "${ZDOTDIR}/.zfunctions/zsh-autosuggestions"
 
+# Reset Kitty Keyboard Protocol state left by Claude Code.
+# TODO: Remove once the following issue is resolved:
+# https://github.com/anthropics/claude-code/issues/38761
+source "${ZDOTDIR}/.zfunctions/claude-kkp-reset"
+
 # Source the alias file.
 source "${ZDOTDIR}/aliases"
 
@@ -57,12 +62,3 @@ zstyle ':completion:*' expand prefix suffix
 autoload edit-command-line
 zle -N edit-command-line
 bindkey '^Xe' edit-command-line
-
-# Workaround: Claude Code enables the kitty keyboard protocol (CSI u mode)
-# but may not restore the terminal on unclean exit, leaving keypresses
-# interpreted as raw escape sequences. This resets CSI u mode before each
-# prompt. Safe to remove once the bug is fixed upstream:
-# https://github.com/anthropics/claude-code/issues/38761
-if command -v claude >/dev/null; then
-  precmd() { printf '\e[<u' 2>/dev/null }
-fi
