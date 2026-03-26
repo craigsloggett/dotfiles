@@ -42,6 +42,7 @@ source "${ZDOTDIR}/.zfunctions/zsh-autosuggestions"
 # TODO: Remove once the following issue is resolved:
 # https://github.com/anthropics/claude-code/issues/38761
 source "${ZDOTDIR}/.zfunctions/claude-kkp-reset"
+precmd_functions+=(_claude_kkp_reset)
 
 # Source the alias file.
 source "${ZDOTDIR}/aliases"

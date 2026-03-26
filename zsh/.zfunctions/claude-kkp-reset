@@ -7,5 +7,4 @@
 # https://github.com/anthropics/claude-code/issues/38761
 if command -v claude >/dev/null; then
   _claude_kkp_reset() { printf '\e[=0u\e[<99u' 2>/dev/null }
-  precmd_functions+=(_claude_kkp_reset)
 fi
