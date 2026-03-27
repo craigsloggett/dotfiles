@@ -66,3 +66,8 @@ paths:
 - `staticcheck` — Extended static analysis.
 - `golangci-lint` — Aggregated linter runner.
 - `go test -race` — Race condition detection. Run in CI.
+
+## Module Versioning
+
+- Set the `go` directive in `go.mod` to the lowest Go version that successfully builds the project without known security vulnerabilities — not necessarily the latest release.
+- Run `go mod tidy` after any version change to reconcile `go.sum`.
