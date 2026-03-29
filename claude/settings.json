@@ -41,14 +41,13 @@
   "effortLevel": "high",
   "includeCoAuthoredBy": false,
   "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true
   },
   "statusLine": {
     "type": "command",
     "command": "\"${HOME}/.claude/statusline-command.sh\""
   },
-  "enableRemoteControl": true,
-  "terminalNotifications": false,
   "hooks": {
     "SessionEnd": [
       {
