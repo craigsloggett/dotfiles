@@ -5,6 +5,7 @@
       "Read(//private/tmp/**)",
       "Read(//tmp/**)",
       "Read(//Users/Craig/Developer/**)",
+      "Read(//Users/Craig/.claude/**)",
       "WebFetch(*)",
       "WebSearch(*)",
       "Skill(*)"
