@@ -11,8 +11,6 @@
       "Skill(*)"
     ],
     "deny": [
-      "Bash(git push)",
-      "Bash(git push *)",
       "Bash(terraform apply)",
       "Bash(terraform apply *)",
       "Bash(terraform destroy)",
@@ -39,8 +37,13 @@
     "defaultMode": "plan"
   },
   "model": "claude-opus-4-6[1m]",
-  "effortLevel": "high",
-  "includeCoAuthoredBy": false,
+  "effortLevel": "max",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "spinnerTipsEnabled": false,
+  "prefersReducedMotion": true,
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true
