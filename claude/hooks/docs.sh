@@ -47,14 +47,14 @@ case "${ext}" in
     # Capture checksum before regeneration.
     before=""
     if [ -f "${readme}" ]; then
-      before="$(cksum "${readme}")"
+      before="$(shasum "${readme}")"
     fi
 
     terraform-docs markdown table "${dir}" --output-file README.md 2>/dev/null
 
     # Only track if the README content actually changed.
     if [ -n "${session_id}" ] && [ -f "${readme}" ]; then
-      after="$(cksum "${readme}")"
+      after="$(shasum "${readme}")"
       if [ "${before}" != "${after}" ]; then
         state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/claude"
         mkdir -p "${state_dir}"
