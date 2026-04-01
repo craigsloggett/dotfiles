@@ -42,13 +42,24 @@ case "${ext}" in
       dir="$(dirname "${dir}")"
     done
 
+    readme="${dir}/README.md"
     terraform-docs markdown table "${dir}" --output-file README.md 2>/dev/null
 
-    # Track the generated README for the lint Stop hook.
-    if [ -n "${session_id}" ]; then
-      state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/claude"
-      mkdir -p "${state_dir}"
-      printf '%s\n' "${dir}/README.md" >>"${state_dir}/edited-docs-${session_id}"
+    # Only track if the README actually changed.
+    if [ -n "${session_id}" ] && [ -f "${readme}" ]; then
+      changed=false
+      if command -v git >/dev/null 2>&1 && git -C "${dir}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        if git -C "${dir}" diff --quiet -- "${readme}" 2>/dev/null; then
+          changed=false
+        else
+          changed=true
+        fi
+      fi
+      if [ "${changed}" = "true" ]; then
+        state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/claude"
+        mkdir -p "${state_dir}"
+        printf '%s\n' "${readme}" >>"${state_dir}/edited-docs-${session_id}"
+      fi
     fi
     ;;
 esac
