@@ -3,7 +3,7 @@
 # go-fix.sh - run Go analysis and auto-fix tools before stopping
 #
 # Called as a Stop hook. Reads the list of .go files edited during
-# the session (tracked by go-fmt.sh), finds their module roots,
+# the session (tracked by format.sh), finds their module roots,
 # and runs go fix and go vet in each. Blocks the agent from
 # stopping if go vet reports issues so it can address them.
 

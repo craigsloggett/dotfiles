@@ -40,8 +40,10 @@ if [ ! -f "${state_file}" ]; then
   exit 0
 fi
 
-# Deduplicate the file list.
-files="$(sort -u "${state_file}" | sed '/^$/d')"
+# Deduplicate and filter to existing files.
+files="$(sort -u "${state_file}" | sed '/^$/d' | while read -r f; do
+  [ -f "${f}" ] && printf '%s\n' "${f}"
+done)"
 
 if [ -z "${files}" ]; then
   exit 0
