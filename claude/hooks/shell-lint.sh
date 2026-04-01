@@ -1,10 +1,11 @@
 #!/bin/sh
 #
-# shell-lint.sh - run shellcheck on modified shell scripts at session end
+# shell-lint.sh - run shellcheck on modified shell scripts before stopping
 #
 # Called as a Stop hook. Finds shell scripts that have been
 # modified in the current git working tree and runs shellcheck
-# on them.
+# on them. Blocks the agent from stopping if issues are found
+# so it can address them.
 
 set -u
 
@@ -13,6 +14,20 @@ if ! command -v shellcheck >/dev/null 2>&1; then
 fi
 
 if ! command -v git >/dev/null 2>&1; then
+  exit 0
+fi
+
+if ! command -v jq >/dev/null 2>&1; then
+  exit 0
+fi
+
+# Read hook input from stdin.
+input="$(cat)"
+
+# Avoid infinite loops: if the agent already continued from a
+# previous Stop hook, let it stop this time.
+stop_hook_active="$(printf '%s\n' "${input}" | jq -r '.stop_hook_active // false')"
+if [ "${stop_hook_active}" = "true" ]; then
   exit 0
 fi
 
@@ -42,6 +57,12 @@ if [ -z "${files}" ]; then
   exit 0
 fi
 
-printf '%s\n' "${files}" | xargs shellcheck
+# Run shellcheck. If issues are found, block so the agent can fix them.
+output="$(printf '%s\n' "${files}" | xargs shellcheck 2>&1)"
+
+if [ -n "${output}" ]; then
+  printf '%s\n' "${output}"
+  exit 2
+fi
 
 exit 0
