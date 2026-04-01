@@ -37,17 +37,26 @@ case "${ext}" in
       yamlfmt "${file_path}" 2>/dev/null
     fi
     ;;
+  go)
+    if command -v gofmt >/dev/null 2>&1; then
+      gofmt -w "${file_path}" 2>/dev/null
+    fi
+    ;;
   sh)
     if command -v shfmt >/dev/null 2>&1; then
       shfmt -i 2 -ci -w "${file_path}" 2>/dev/null
     fi
-    # Track edited shell scripts for the shell-lint Stop hook.
-    if [ -n "${session_id}" ]; then
-      state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/claude"
-      mkdir -p "${state_dir}"
-      printf '%s\n' "${file_path}" >>"${state_dir}/edited-sh-${session_id}"
-    fi
     ;;
 esac
+
+# Track edited files for Stop hooks (go-fix, shell-lint).
+if [ -n "${session_id}" ]; then
+  state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/claude"
+  mkdir -p "${state_dir}"
+  case "${ext}" in
+    go) printf '%s\n' "${file_path}" >>"${state_dir}/edited-go-${session_id}" ;;
+    sh) printf '%s\n' "${file_path}" >>"${state_dir}/edited-sh-${session_id}" ;;
+  esac
+fi
 
 exit 0
