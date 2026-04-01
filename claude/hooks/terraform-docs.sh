@@ -32,10 +32,10 @@ case "${file_path}" in
   *) exit 0 ;;
 esac
 
-# Find the project root by walking up from the edited file.
+# Find the project root by walking up to .git.
 dir="$(dirname "${file_path}")"
 while [ "${dir}" != "/" ]; do
-  if [ -f "${dir}/.terraform-docs.yml" ]; then
+  if [ -d "${dir}/.git" ]; then
     break
   fi
   dir="$(dirname "${dir}")"
