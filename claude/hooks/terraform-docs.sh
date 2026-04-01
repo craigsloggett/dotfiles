@@ -8,11 +8,6 @@
 
 set -u
 
-# Only run in Terraform projects.
-if [ ! -f ".terraform-docs.yml" ]; then
-  exit 0
-fi
-
 if ! command -v terraform-docs >/dev/null 2>&1; then
   exit 0
 fi
@@ -33,9 +28,23 @@ fi
 
 # Only run for Terraform files.
 case "${file_path}" in
-  *.tf)
-    terraform-docs markdown table . --output-file README.md
-    ;;
+  *.tf) ;;
+  *) exit 0 ;;
 esac
+
+# Find the project root by walking up from the edited file.
+dir="$(dirname "${file_path}")"
+while [ "${dir}" != "/" ]; do
+  if [ -f "${dir}/.terraform-docs.yml" ]; then
+    break
+  fi
+  dir="$(dirname "${dir}")"
+done
+
+if [ ! -f "${dir}/.terraform-docs.yml" ]; then
+  exit 0
+fi
+
+terraform-docs markdown table "${dir}" --output-file README.md
 
 exit 0

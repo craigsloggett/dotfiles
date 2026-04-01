@@ -8,11 +8,6 @@
 
 set -u
 
-# Only run in Go projects.
-if [ ! -f "go.mod" ]; then
-  exit 0
-fi
-
 if ! command -v gofmt >/dev/null 2>&1; then
   exit 0
 fi
@@ -33,9 +28,23 @@ fi
 
 # Only format Go files.
 case "${file_path}" in
-  *.go)
-    gofmt -w "${file_path}"
-    ;;
+  *.go) ;;
+  *) exit 0 ;;
 esac
+
+# Find the module root by walking up from the edited file.
+dir="$(dirname "${file_path}")"
+while [ "${dir}" != "/" ]; do
+  if [ -f "${dir}/go.mod" ]; then
+    break
+  fi
+  dir="$(dirname "${dir}")"
+done
+
+if [ ! -f "${dir}/go.mod" ]; then
+  exit 0
+fi
+
+gofmt -w "${file_path}"
 
 exit 0
