@@ -50,7 +50,6 @@ if [ -f "${state_file}" ]; then
   # Go linting.
   if [ -n "${go_files}" ] && command -v go >/dev/null 2>&1; then
     # Find unique module roots.
-    module_roots=""
     printf '%s\n' "${go_files}" | while read -r f; do
       [ -z "${f}" ] && continue
       dir="$(dirname "${f}")"
