@@ -76,7 +76,7 @@ ${module_roots}
 EOF
 
 if [ -n "${all_output}" ]; then
-  printf '%s\n' "${all_output}"
+  printf '%s\n' "${all_output}" >&2
   exit 2
 fi
 

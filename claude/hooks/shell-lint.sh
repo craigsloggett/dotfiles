@@ -51,7 +51,7 @@ fi
 output="$(printf '%s\n' "${files}" | xargs shellcheck 2>&1)"
 
 if [ -n "${output}" ]; then
-  printf '%s\n' "${output}"
+  printf '%s\n' "${output}" >&2
   exit 2
 fi
 
