@@ -4,7 +4,7 @@
 #
 # Called as a PostToolUse hook. Reads JSON from stdin
 # to extract the file path, then runs terraform-docs.
-# Only runs in Terraform projects (repos with a .terraform-docs.yml file).
+# Only runs when the edited file is a .tf file inside a git repository.
 
 set -u
 
@@ -40,10 +40,6 @@ while [ "${dir}" != "/" ]; do
   fi
   dir="$(dirname "${dir}")"
 done
-
-if [ ! -f "${dir}/.terraform-docs.yml" ]; then
-  exit 0
-fi
 
 terraform-docs markdown table "${dir}" --output-file README.md
 
