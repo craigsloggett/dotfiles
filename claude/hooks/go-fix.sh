@@ -2,9 +2,10 @@
 #
 # go-fix.sh - run Go analysis and auto-fix tools before stopping
 #
-# Called as a Stop hook. Only runs in Go projects
-# (repos with a go.mod file). Blocks the agent from stopping
-# if go vet reports issues so it can address them.
+# Called as a Stop hook. Reads the list of .go files edited during
+# the session (tracked by go-fmt.sh), finds their module roots,
+# and runs go fix and go vet in each. Blocks the agent from
+# stopping if go vet reports issues so it can address them.
 
 set -u
 
@@ -26,19 +27,60 @@ if [ "${stop_hook_active}" = "true" ]; then
   exit 0
 fi
 
-# Only run in Go projects.
-if [ ! -f "go.mod" ]; then
+session_id="$(printf '%s\n' "${input}" | jq -r '.session_id // empty')"
+if [ -z "${session_id}" ]; then
   exit 0
 fi
 
-# Apply automatic fixes silently.
-go fix ./... 2>/dev/null
+# Read the list of edited Go files tracked by go-fmt.sh.
+state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/claude"
+state_file="${state_dir}/edited-go-${session_id}"
 
-# Check for issues. If go vet finds problems, block so the agent can fix them.
-output="$(go vet ./... 2>&1)"
+if [ ! -f "${state_file}" ]; then
+  exit 0
+fi
 
-if [ -n "${output}" ]; then
-  printf '%s\n' "${output}"
+# Find unique module roots from edited file paths.
+module_roots=""
+while read -r f; do
+  [ -z "${f}" ] && continue
+  dir="$(dirname "${f}")"
+  while [ "${dir}" != "/" ]; do
+    if [ -f "${dir}/go.mod" ]; then
+      module_roots="$(printf '%s\n%s' "${module_roots}" "${dir}")"
+      break
+    fi
+    dir="$(dirname "${dir}")"
+  done
+done <"${state_file}"
+
+module_roots="$(printf '%s\n' "${module_roots}" | sort -u | while read -r d; do
+  if [ -n "${d}" ]; then
+    printf '%s\n' "${d}"
+  fi
+done)"
+
+if [ -z "${module_roots}" ]; then
+  exit 0
+fi
+
+# Run go fix and go vet in each module root.
+all_output=""
+printf '%s\n' "${module_roots}" | while read -r root; do
+  cd "${root}" && go fix ./... 2>/dev/null
+done
+
+while read -r root; do
+  output="$(cd "${root}" && go vet ./... 2>&1)"
+  if [ -n "${output}" ]; then
+    all_output="$(printf '%s\n%s' "${all_output}" "${output}")"
+  fi
+done <<EOF
+${module_roots}
+EOF
+
+if [ -n "${all_output}" ]; then
+  printf '%s\n' "${all_output}"
   exit 2
 fi
 
