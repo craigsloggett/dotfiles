@@ -79,16 +79,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${HOME}/.claude/hooks/go-lint.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${HOME}/.claude/hooks/terraform-docs.sh\""
+            "command": "\"${HOME}/.claude/hooks/docs.sh\""
           }
         ]
       }
@@ -99,16 +90,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${HOME}/.claude/hooks/go-fix.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${HOME}/.claude/hooks/shell-lint.sh\""
+            "command": "\"${HOME}/.claude/hooks/lint.sh\""
           }
         ]
       },
