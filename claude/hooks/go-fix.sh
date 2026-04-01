@@ -54,11 +54,7 @@ while read -r f; do
   done
 done <"${state_file}"
 
-module_roots="$(printf '%s\n' "${module_roots}" | sort -u | while read -r d; do
-  if [ -n "${d}" ]; then
-    printf '%s\n' "${d}"
-  fi
-done)"
+module_roots="$(printf '%s\n' "${module_roots}" | sort -u | sed '/^$/d')"
 
 if [ -z "${module_roots}" ]; then
   exit 0
