@@ -1,4 +1,8 @@
 {
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash(*)",
@@ -37,21 +41,6 @@
     "defaultMode": "plan"
   },
   "model": "claude-opus-4-6[1m]",
-  "effortLevel": "max",
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  },
-  "spinnerTipsEnabled": false,
-  "prefersReducedMotion": true,
-  "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "\"${HOME}/.claude/statusline-command.sh\""
-  },
   "hooks": {
     "SessionEnd": [
       {
@@ -104,5 +93,16 @@
         ]
       }
     ]
-  }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "\"${HOME}/.claude/statusline-command.sh\""
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true
+  },
+  "spinnerTipsEnabled": false,
+  "voiceEnabled": true,
+  "prefersReducedMotion": true
 }
