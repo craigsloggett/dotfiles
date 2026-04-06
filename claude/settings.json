@@ -1,4 +1,8 @@
 {
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash(*)",
@@ -37,21 +41,6 @@
     "defaultMode": "plan"
   },
   "model": "claude-opus-4-6[1m]",
-  "effortLevel": "max",
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  },
-  "spinnerTipsEnabled": false,
-  "prefersReducedMotion": true,
-  "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "\"${HOME}/.claude/statusline-command.sh\""
-  },
   "hooks": {
     "SessionEnd": [
       {
@@ -79,25 +68,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${HOME}/.claude/hooks/go-fmt.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${HOME}/.claude/hooks/go-lint.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${HOME}/.claude/hooks/terraform-docs.sh\""
+            "command": "\"${HOME}/.claude/hooks/docs.sh\""
           }
         ]
       }
@@ -108,16 +79,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${HOME}/.claude/hooks/go-fix.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${HOME}/.claude/hooks/shell-lint.sh\""
+            "command": "\"${HOME}/.claude/hooks/lint.sh\""
           }
         ]
       },
@@ -131,5 +93,16 @@
         ]
       }
     ]
-  }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "\"${HOME}/.claude/statusline-command.sh\""
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true
+  },
+  "spinnerTipsEnabled": false,
+  "voiceEnabled": true,
+  "prefersReducedMotion": true
 }
