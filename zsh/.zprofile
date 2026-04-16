@@ -16,7 +16,6 @@ export SHELL_SESSIONS_DISABLE=1
 # Add XDG_BIN_HOME to PATH variable.
 typeset -U path
 path+=("${XDG_BIN_HOME}")
-path+=("${GOPATH}/bin")
 
 # Utility specific environment variables.
 if [ -d "${ZDOTDIR}/.zprofile.d" ]; then

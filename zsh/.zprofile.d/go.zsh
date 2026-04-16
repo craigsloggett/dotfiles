@@ -3,3 +3,4 @@
 #
 
 export GOPATH="${XDG_CACHE_HOME}/go"
+path+=("${GOPATH}/bin")
