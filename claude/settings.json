@@ -43,17 +43,6 @@
   "model": "opus[1m]",
   "effortLevel": "high",
   "hooks": {
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${HOME}/.claude/hooks/session-context.sh\""
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",
@@ -81,15 +70,6 @@
           {
             "type": "command",
             "command": "\"${HOME}/.claude/hooks/lint.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${HOME}/.claude/hooks/turn-context.sh\""
           }
         ]
       }
