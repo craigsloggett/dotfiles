@@ -8,12 +8,18 @@ vim.pack.add({
 require("conform").setup {
   formatters_by_ft = {
     hcl = { "terraform_fmt" },
+    json = { "jq" },
     sh = { "shfmt" },
     yaml = { "yamlfmt" },
     zsh = { "shfmt" },
     ["*"] = { "trim_whitespace", "trim_newlines" }
   },
   formatters = {
+    jq = {
+      command = "jq",
+      args = { "." },
+      stdin = true
+    },
     shfmt = {
       prepend_args = { "-i", "2", "-ci" }
     }
