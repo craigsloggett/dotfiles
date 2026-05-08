@@ -76,5 +76,6 @@
   },
   "voice": {
     "enabled": true
-  }
+  },
+  "spinnerTipsEnabled": false
 }
