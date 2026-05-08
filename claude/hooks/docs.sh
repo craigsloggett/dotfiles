@@ -1,67 +1,48 @@
 #!/bin/sh
 #
-# docs.sh - regenerate documentation after Claude edits
+# hooks/docs.sh
 #
-# Called as a PostToolUse hook. Reads JSON from stdin
-# to extract the file path, then runs the appropriate
-# documentation generator. Tracks generated files to a
-# per-session state file for the lint Stop hook to review.
+# Regenerate documentation after Claude edits.
 
-set -u
+set -euf
 
-if ! command -v jq >/dev/null 2>&1; then
-  exit 0
-fi
+TOOL_CONTEXT="$(cat)"
+readonly TOOL_CONTEXT
 
-# Read tool context from stdin.
-input="$(cat)"
+check_prerequisites() {
+  for utility in terraform-docs jq; do
+    command -v "${utility}" >/dev/null 2>&1 || return 1
+  done
+}
 
-# Extract the file path and session ID from the hook input.
-file_path="$(printf '%s\n' "${input}" | jq -r '.tool_input.file_path // empty')"
-session_id="$(printf '%s\n' "${input}" | jq -r '.session_id // empty')"
+get_file_path() (
+  tool_context="$1"
+  printf '%s' "${tool_context}" | jq -r '.tool_input.file_path // empty'
+)
 
-if [ -z "${file_path}" ]; then
-  exit 0
-fi
+get_file_extension() (
+  file_path="$1"
+  printf '%s' "${file_path##*.}"
+)
 
-# Determine the file extension.
-ext="${file_path##*.}"
+main() {
+  check_prerequisites || return 0
 
-case "${ext}" in
-  tf)
-    if ! command -v terraform-docs >/dev/null 2>&1; then
-      exit 0
-    fi
+  file_path="$(get_file_path "${TOOL_CONTEXT}")"
+  if [ -z "${file_path}" ]; then
+    return 0
+  fi
 
-    # Find the project root by walking up to .git.
-    dir="$(dirname "${file_path}")"
-    while [ "${dir}" != "/" ]; do
-      if [ -d "${dir}/.git" ]; then
-        break
-      fi
-      dir="$(dirname "${dir}")"
-    done
+  file_extension="$(get_file_extension "${file_path}")"
+  if [ -z "${file_extension}" ]; then
+    return 0
+  fi
 
-    readme="${dir}/README.md"
+  case "${file_extension}" in
+    tf)
+      terraform-docs markdown table "$(dirname "${file_path}")" --output-file README.md --output-mode inject 2>/dev/null
+      ;;
+  esac
+}
 
-    # Capture checksum before regeneration.
-    before=""
-    if [ -f "${readme}" ]; then
-      before="$(shasum "${readme}")"
-    fi
-
-    terraform-docs markdown table "${dir}" --output-file README.md 2>/dev/null
-
-    # Only track if the README content actually changed.
-    if [ -n "${session_id}" ] && [ -f "${readme}" ]; then
-      after="$(shasum "${readme}")"
-      if [ "${before}" != "${after}" ]; then
-        state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/claude"
-        mkdir -p "${state_dir}"
-        printf '%s\n' "${readme}" >>"${state_dir}/edited-docs-${session_id}"
-      fi
-    fi
-    ;;
-esac
-
-exit 0
+main "$@"
