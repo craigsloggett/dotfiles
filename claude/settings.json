@@ -46,31 +46,25 @@
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Write|MultiEdit",
+        "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "\"${HOME}/.claude/hooks/format.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
+            "command": "\"${HOME}\"/.claude/hooks/format.sh"
+          },
           {
             "type": "command",
-            "command": "\"${HOME}/.claude/hooks/docs.sh\""
+            "command": "\"${HOME}\"/.claude/hooks/docs.sh"
           }
         ]
       }
     ],
     "Stop": [
       {
-        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "\"${HOME}/.claude/hooks/lint.sh\""
+            "command": "\"${HOME}\"/.claude/hooks/lint.sh"
           }
         ]
       }
@@ -78,13 +72,9 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "\"${HOME}/.claude/statusline-command.sh\""
+    "command": "\"${HOME}\"/.claude/statusline-command.sh"
   },
-  "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true
-  },
-  "spinnerTipsEnabled": false,
-  "voiceEnabled": true,
-  "prefersReducedMotion": true
+  "voice": {
+    "enabled": true
+  }
 }

@@ -2,41 +2,29 @@
 #
 # hooks/docs.sh
 #
-# Regenerate documentation after Claude edits.
+# Regenerate documentation on PostToolUse
 
 set -euf
 
-TOOL_CONTEXT="$(cat)"
-readonly TOOL_CONTEXT
+HOOK_INPUT="$(cat)"
+readonly HOOK_INPUT
 
 check_prerequisites() {
-  for utility in terraform-docs jq; do
+  for utility in jq terraform-docs; do
     command -v "${utility}" >/dev/null 2>&1 || return 1
   done
 }
 
-get_file_path() (
-  tool_context="$1"
-  printf '%s' "${tool_context}" | jq -r '.tool_input.file_path // empty'
-)
-
-get_file_extension() (
-  file_path="$1"
-  printf '%s' "${file_path##*.}"
-)
-
 main() {
   check_prerequisites || return 0
 
-  file_path="$(get_file_path "${TOOL_CONTEXT}")"
-  if [ -z "${file_path}" ]; then
-    return 0
-  fi
+  file_path="$(printf '%s' "${HOOK_INPUT}" | jq -r '.tool_input.file_path // empty')"
+
+  [ -n "${file_path}" ] || return 0
+  [ -f "${file_path}" ] || return 0
 
   file_extension="$(get_file_extension "${file_path}")"
-  if [ -z "${file_extension}" ]; then
-    return 0
-  fi
+  [ -n "${file_extension}" ] || return 0
 
   case "${file_extension}" in
     tf)
