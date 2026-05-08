@@ -23,8 +23,7 @@ main() {
   [ -n "${file_path}" ] || return 0
   [ -f "${file_path}" ] || return 0
 
-  file_extension="$(get_file_extension "${file_path}")"
-  [ -n "${file_extension}" ] || return 0
+  file_extension="${file_path##*.}"
 
   case "${file_extension}" in
     tf)
