@@ -1,3 +1,4 @@
+# shellcheck disable=SC2155,SC2148
 #
 # ${XDG_CONFIG_HOME}/bash/profile.d/vim.sh
 #
