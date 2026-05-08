@@ -1,50 +1,39 @@
 #!/bin/sh
+#
+# statusline-command.sh
+#
+# Render the Claude Code status line
 
-set -u
+set -euf
 
-if ! command -v jq >/dev/null 2>&1; then
-  exit 0
-fi
+STATUSLINE_INPUT="$(cat)"
+readonly STATUSLINE_INPUT
 
-input="$(cat)"
+check_prerequisites() {
+  command -v jq >/dev/null 2>&1
+}
 
-model="$(printf '%s\n' "${input}" | jq -r '.model.display_name // empty')"
-remaining="$(printf '%s\n' "${input}" | jq -r '.context_window.remaining_percentage // empty')"
-cwd="$(printf '%s\n' "${input}" | jq -r '.workspace.current_dir // empty')"
+main() {
+  check_prerequisites || return 0
 
-# Read effort level from global settings.
-effort=""
-settings="${HOME}/.claude/settings.json"
-if [ -f "${settings}" ]; then
-  effort="$(jq -r '.effortLevel // empty' "${settings}" 2>/dev/null)"
-fi
+  model_display_name="$(printf '%s' "${STATUSLINE_INPUT}" | jq -r '.model.display_name // empty')"
+  context_remaining="$(printf '%s' "${STATUSLINE_INPUT}" | jq -r '.context_window.remaining_percentage // 100')"
+  workspace_directory="$(printf '%s' "${STATUSLINE_INPUT}" | jq -r '.workspace.current_dir // empty')"
+  short_workspace_directory="$(printf '%s' "${workspace_directory}" | sed "s|^${HOME}|~|")"
 
-# Shorten home directory to ~.
-short_cwd="$(printf '%s\n' "${cwd}" | sed "s|^${HOME}|~|")"
-
-# Build status line: model effort · remaining% left · path
-status=""
-if [ -n "${model}" ]; then
-  status="${model}"
-  if [ -n "${effort}" ]; then
-    status="${status} ${effort}"
+  effort_level=""
+  settings="${HOME}/.claude/settings.json"
+  if [ -f "${settings}" ]; then
+    effort_level="$(jq -r '.effortLevel // empty' "${settings}" 2>/dev/null)"
   fi
-fi
 
-if [ -n "${remaining}" ]; then
-  if [ -n "${status}" ]; then
-    status="${status} · ${remaining}% left"
-  else
-    status="${remaining}% left"
-  fi
-fi
+  statusline=""
+  statusline="${model_display_name}"
+  statusline="${statusline} · ${effort_level}"
+  statusline="${statusline} · ${context_remaining}% left"
+  statusline="${statusline} · ${short_workspace_directory}"
 
-if [ -n "${short_cwd}" ]; then
-  if [ -n "${status}" ]; then
-    status="${status} · ${short_cwd}"
-  else
-    status="${short_cwd}"
-  fi
-fi
+  printf '%s' "${statusline}"
+}
 
-printf '%s' "${status}"
+main "$@"
