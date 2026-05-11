@@ -1,7 +1,8 @@
-# shellcheck disable=SC2155,SC2148
+# shellcheck shell=sh
 #
 # ${XDG_CONFIG_HOME}/bash/profile.d/gpg.sh
 #
 
+GPG_TTY="$(tty)"
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
-export GPG_TTY="$(tty)"
+export GPG_TTY

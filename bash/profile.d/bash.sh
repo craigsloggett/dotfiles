@@ -1,4 +1,4 @@
-# shellcheck disable=SC2155,SC2148
+# shellcheck shell=sh
 #
 # ${XDG_CONFIG_HOME}/bash/profile.d/bash.sh
 #
