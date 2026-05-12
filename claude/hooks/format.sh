@@ -15,6 +15,31 @@ check_prerequisites() {
   done
 }
 
+block_with_reason() (
+  reason="$1"
+  jq -n --arg reason "${reason}" '{decision: "block", reason: $reason}'
+)
+
+format_file() (
+  file_path="$1"
+  file_extension="${file_path##*.}"
+
+  case "${file_extension}" in
+    tf | tfvars)
+      terraform fmt "${file_path}" 2>&1
+      ;;
+    yaml | yml)
+      yamlfmt "${file_path}" 2>&1
+      ;;
+    go)
+      gofmt -s -w "${file_path}" 2>&1
+      ;;
+    sh)
+      shfmt -i 2 -ci -w "${file_path}" 2>&1
+      ;;
+  esac
+)
+
 main() {
   check_prerequisites || return 0
 
@@ -23,22 +48,10 @@ main() {
   [ -n "${file_path}" ] || return 0
   [ -f "${file_path}" ] || return 0
 
-  file_extension="${file_path##*.}"
-
-  case "${file_extension}" in
-    tf | tfvars)
-      terraform fmt "${file_path}" 2>/dev/null
-      ;;
-    yaml | yml)
-      yamlfmt "${file_path}" 2>/dev/null
-      ;;
-    go)
-      gofmt -s -w "${file_path}" 2>/dev/null
-      ;;
-    sh)
-      shfmt -i 2 -ci -w "${file_path}" 2>/dev/null
-      ;;
-  esac
+  if ! format_output="$(format_file "${file_path}")"; then
+    block_with_reason "Formatter reported errors for ${file_path}:
+${format_output}"
+  fi
 }
 
 main "$@"
