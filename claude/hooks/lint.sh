@@ -43,8 +43,8 @@ lint_go() (
 )
 
 lint_shell() (
-  find . \( -path '*/.git' -o -path '*/.local' \) -prune -o -name '*.sh' -print0 |
-    xargs -0 shellcheck 2>&1
+  find . \( -path '*/.git' -o -path '*/.local' \) -prune -o -name '*.sh' \
+    -exec shellcheck {} + 2>&1
 )
 
 lint_terraform() (
@@ -56,9 +56,8 @@ lint_terraform() (
 )
 
 lint_yaml() (
-  find . \( -path '*/.git' -o -path '*/.local' \) -prune -o \
-    \( -name '*.yaml' -o -name '*.yml' \) -print0 |
-    xargs -0 yamllint 2>&1
+  find . \( -path '*/.git' -o -path '*/.local' \) -prune -o \( -name '*.yaml' -o -name '*.yml' \) \
+    -exec yamllint {} + 2>&1
 )
 
 main() {
@@ -89,8 +88,7 @@ ${lint_go_output}"
   fi
 
   # Shell
-  if find . \( -path '*/.git' -o -path '*/.local' \) -prune -o \
-    -name '*.sh' -print -quit | grep -q .; then
+  if find . \( -path '*/.git' -o -path '*/.local' \) -prune -o -name '*.sh' -print -quit | grep -q .; then
     if ! lint_shell_output="$(lint_shell)"; then
       combined_output="${combined_output}
 === Shell ===
@@ -100,7 +98,7 @@ ${lint_shell_output}"
 
   # Terraform
   if [ -f .tflint.hcl ]; then
-    if find . -name '*.tf' -not -path '*/.terraform/*' | grep -q .; then
+    if find . -path '*/.terraform/*' -prune -o -name '*.tf' -print -quit | grep -q .; then
       if ! lint_terraform_output="$(lint_terraform)"; then
         combined_output="${combined_output}
 === Terraform ===
@@ -110,8 +108,7 @@ ${lint_terraform_output}"
   fi
 
   # YAML
-  if find . \( -path '*/.git' -o -path '*/.local' \) -prune -o \
-    \( -name '*.yaml' -o -name '*.yml' \) -print -quit | grep -q .; then
+  if find . \( -path '*/.git' -o -path '*/.local' \) -prune -o \( -name '*.yaml' -o -name '*.yml' \) -print -quit | grep -q .; then
     if ! lint_yaml_output="$(lint_yaml)"; then
       combined_output="${combined_output}
 === YAML ===
