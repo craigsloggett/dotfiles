@@ -43,7 +43,7 @@ lint_go() (
 )
 
 lint_shell() (
-  find . -name '*.sh' -not -path '*/.git/*' -print0 |
+  find . \( -path '*/.git' -o -path '*/.local' \) -prune -o -name '*.sh' -print0 |
     xargs -0 shellcheck 2>&1
 )
 
@@ -56,7 +56,9 @@ lint_terraform() (
 )
 
 lint_yaml() (
-  yamllint . 2>&1
+  find . \( -path '*/.git' -o -path '*/.local' \) -prune -o \
+    \( -name '*.yaml' -o -name '*.yml' \) -print0 |
+    xargs -0 yamllint 2>&1
 )
 
 main() {
@@ -87,7 +89,8 @@ ${lint_go_output}"
   fi
 
   # Shell
-  if find . -name '*.sh' -not -path '*/.git/*' | grep -q .; then
+  if find . \( -path '*/.git' -o -path '*/.local' \) -prune -o \
+    -name '*.sh' -print -quit | grep -q .; then
     if ! lint_shell_output="$(lint_shell)"; then
       combined_output="${combined_output}
 === Shell ===
@@ -107,7 +110,8 @@ ${lint_terraform_output}"
   fi
 
   # YAML
-  if find . \( -name '*.yaml' -o -name '*.yml' \) -not -path '*/.git/*' | grep -q .; then
+  if find . \( -path '*/.git' -o -path '*/.local' \) -prune -o \
+    \( -name '*.yaml' -o -name '*.yml' \) -print -quit | grep -q .; then
     if ! lint_yaml_output="$(lint_yaml)"; then
       combined_output="${combined_output}
 === YAML ===
