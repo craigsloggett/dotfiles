@@ -96,11 +96,13 @@ ${lint_shell_output}"
   fi
 
   # Terraform
-  if find . -name '*.tf' -not -path '*/.terraform/*' | grep -q .; then
-    if ! lint_terraform_output="$(lint_terraform)"; then
-      combined_output="${combined_output}
+  if [ -f .tflint.hcl ]; then
+    if find . -name '*.tf' -not -path '*/.terraform/*' | grep -q .; then
+      if ! lint_terraform_output="$(lint_terraform)"; then
+        combined_output="${combined_output}
 === Terraform ===
 ${lint_terraform_output}"
+      fi
     fi
   fi
 
