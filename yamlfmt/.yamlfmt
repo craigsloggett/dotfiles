@@ -7,3 +7,4 @@ formatter:
   eof_newline: true
   pad_line_comments: 1
   include_document_start: false
+  scan_folded_as_literal: true
