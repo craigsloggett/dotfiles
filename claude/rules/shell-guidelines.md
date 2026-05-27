@@ -13,7 +13,7 @@ paths:
 - Use `$(( ))` for arithmetic. Avoid `expr` (legacy, fork-heavy).
 - Use `printf` for all output. Never `echo`.
 - Single-quote `printf` format strings. For variable expansion, use `%s` and pass the value as a separate double-quoted argument: `printf '%s\n' "message: ${var}"`. With no expansion, single-quote the full string: `printf 'static message.\n'`.
-- Pass values into `sed`/`awk` programs as data, not by splicing into program text. Use `awk -v var="${value}"` and reference `var` inside the program. Avoid 'sed "s|pat|${value}|"' patterns, which break when ${value} contains the delimiter, &, \, or newlines. If you genuinely need `sed` with a dynamic replacement, escape the value first; `sed` is fine for static patterns.
+- Pass values into `sed` programs as data, not by splicing into program text. Avoid 'sed "s|pat|${value}|"' patterns, which break when ${value} contains the delimiter, &, \, or newlines. If you genuinely need `sed` with a dynamic replacement, escape the value first; `sed` is fine for static patterns.
 
 ## Quoting and Variable Expansion
 
