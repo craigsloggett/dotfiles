@@ -35,6 +35,8 @@ arguments:
 
 6. **Apply changes** only after the user confirms. Do not batch unrelated changes into a single commit.
 
+7. **Run the Consistency Reviewer.** After changes are applied, invoke the **Consistency Reviewer** subagent on the pending diff. It will interrogate the result for patterns applied to one case but missed on a sibling case (e.g., a file renamed in one place but not in another). Address any findings before considering the sync complete.
+
 ## Rules
 
 - Read both directories thoroughly before proposing anything. Never assume what a file contains.

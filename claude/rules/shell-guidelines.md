@@ -86,15 +86,11 @@ paths:
 - Format embedded program text (awk, jq, sed, sqlite, `python -c`, heredocs) across multiple lines when it exceeds one short line. Open the quote on the same line as the command and its flags; indent the program body two spaces from the command; close the quote on its own line, dedented back to the command, with any remaining shell arguments and redirects on that closing line. Indent inside the embedded program with the same two-space step. Example:
 
 ```sh
-  awk -v pat="${LINE_MATCH}" -v repl="${LINE_REPLACE}" '
-    $0 ~ pat {
-      out = repl
-      gsub(/REGEX/, "X", out)
-      print out
-      next
-    }
-    { print }
+  jq -r '
+    .items[]
+    | select(.status == "active")
+    | "\(.name): \(.count)"
   ' "${FILE}" >"${staging}"
 ```
 
-  One-liners stay one line: `awk -v x=1 '{ print $1+x }' file`. The multi-line form is for programs with multiple actions, function definitions, or anything that won't fit comfortably.
+  One-liners stay one line: `jq -r '.name' "${FILE}"`. The multi-line form is for programs with multiple actions, function definitions, or anything that won't fit comfortably.
