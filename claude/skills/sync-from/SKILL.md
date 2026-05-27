@@ -16,6 +16,7 @@ arguments:
    - **Target:** Read the directory structure and the same categories of files to understand the current state.
 
 3. **Compare across categories.** For each category present in both projects, diff the approach:
+   - **Shell scripts** — Shebang and dialect (POSIX `sh` vs bash), strict-mode flags (`set -ef`), `main()` entrypoint pattern, function style (subshell `()` for resource-owning scopes with their own `trap EXIT INT TERM HUP`, brace `{}` for plain helpers that never set EXIT traps), session-scoped `TMPDIR_SESSION` handling, reconciler/idempotency patterns, atomic-rename-from-staging for file writes, and `shellcheck -s sh` directives.
    - **Infrastructure code** — Resource patterns, naming, variable structure, provider versions, module usage.
    - **CI/CD** — Workflow definitions, pipeline stages, job configuration.
    - **Linting and formatting** — Config files (`.yamllint`, `.tflint.hcl`, `.golangci.yml`, etc.) and their rule sets.
@@ -39,5 +40,5 @@ arguments:
 - Read both directories thoroughly before proposing anything. Never assume what a file contains.
 - Respect CLAUDE.md and project-level conventions. The source informs what to change, not how to write code.
 - Do not copy files wholesale. Adapt patterns to fit the target project's structure.
-- If the source and target are different project types (e.g., module vs root module), account for the structural differences. Not everything in the source will apply.
+- If the source and target are different project types, account for the structural differences. Not everything in the source will apply.
 - Keep proposals minimal. Only suggest changes where the source is clearly ahead of the target.
