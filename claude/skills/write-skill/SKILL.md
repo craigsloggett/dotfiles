@@ -47,7 +47,7 @@ Content:
 - One job per skill. Multi-purpose skills branch internally and balloon.
 - Gotchas over conventions. Conventions are derivable from the code. Gotchas are what justify the skill.
 - Show, do not tell. A conformant example in `examples/` beats a paragraph describing the shape.
-- Inline shell with `!` injects real state. Prefer `!git diff HEAD` over "look at the current diff".
+- Inline shell with `!` injects real state. Prefer `!git diff HEAD` over "look at the current diff". Only pin `!command` for ambient state available at load time (auth user, current repo, current branch). Values the user passes as arguments cannot be substituted into a `!` command, so reference them inside a step instead (e.g. `git -C $source log` in step 2).
 - Be opinionated about terminology. Pick one term, name the rejected alternatives, move on.
 - Check, do not guess. If the skill can verify a file exists or a command is on PATH, have it verify.
 
