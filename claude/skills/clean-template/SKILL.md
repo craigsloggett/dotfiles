@@ -5,13 +5,20 @@ description: Scan a repo cloned from a template, identify placeholder artifacts,
 
 ## Workflow
 
-1. **Identify the project** by reading the repo name, directory structure, git remote, and any existing README to understand what the repo is for and which template it came from.
+1. **Identify the project** by reading the repo name, directory structure, git remote, and any existing README to understand what the repo is for and which template it came from. The authenticated GitHub user, used below to distinguish real owner references from placeholder usernames, is **!`gh api user --jq .login`**.
 
-2. **Scan for template artifacts** by launching Explore agents in parallel across three categories:
+2. **Scan for template artifacts** by launching Explore agents in parallel. The goal is to identify any value the template author left as a stand-in for the consumer to replace. Use semantic judgment, not a fixed keyword list: a value is a placeholder if a human reading it would conclude "this exists only because the template needs *something* in this slot." Signals that suggest a placeholder, any of which is enough to flag a candidate:
 
-   - **Placeholder strings** — Search all files for `UPDATE_ME`, `CHANGEME`, `TODO`, `REPLACE`, `MYGITHUBUSERNAME`, `TEMPLATE`, `YOUR_`, and `XXX`. Record each match with its file path, line number, and surrounding context.
-   - **Template instruction comments** — Search for comments containing phrases like "Remove if not using", "Update this to", "Replace with", or "Delete this". Include YAML comments (`#`), HCL comments (`#`, `//`), and Markdown comments (`<!-- -->`).
-   - **Template metadata** — Check the README for a title matching the template name, checklists of files to update, and boilerplate descriptions. Check `.github/CODEOWNERS` for placeholder usernames. Check for any files that exist solely as template scaffolding (empty files, example files).
+   - **Generic or self-naming values** — `my-input`, `My Service`, `MY_VAR`, `example`, `foo`, or anything else whose name describes its role rather than identifying it.
+   - **Self-referential or tautological text** — descriptions that describe the act of describing ("This is my input, there is no other input like it.", "The default description.", "The output this composite action produces.").
+   - **Incomplete content** — values ending in `...`, sentence fragments, or `<...>`-style angle-bracket slots.
+   - **Conventional placeholder tokens** — anything obviously stand-in, including but not limited to `UPDATE_ME`, `CHANGEME`, `YOUR_*`, `XXX`. Treat the literal token list as illustrative, not exhaustive.
+   - **Template instruction comments** — "Remove if not using", "Update this to", "Replace with", "Delete this" in any comment syntax (`#`, `//`, `<!-- -->`).
+   - **Template metadata** — README titles matching the template repo's name, checklists of files to update, boilerplate "this is a template for X" descriptions.
+   - **Files that exist only as scaffolding** — empty files, example files, `.gitkeep` in a directory that has no other content.
+   - **License attribution carried over from the template author** — the `LICENSE` file's copyright holder and year are commonly missed because they look like real values. Compare the copyright holder to the authenticated GitHub user above and to `git config user.name`; if they differ, flag for replacement. Compare the year to the current year and flag if stale.
+
+   For each candidate, record file path, line number, current value, and which signal flagged it. Use surrounding context to rule out legitimate values: `@craigsloggett` in `CODEOWNERS` matches the authenticated user above and is the real owner, not a placeholder.
 
 3. **Present findings** grouped by file. For each artifact, show the file path, line number, current value, and what kind of artifact it is (placeholder, instruction comment, or template metadata). If no artifacts are found, report that the repo appears clean and stop.
 
