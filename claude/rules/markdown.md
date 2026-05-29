@@ -21,6 +21,12 @@ paths:
 | `branch` | The head branch |
 ```
 
+## Line length
+
+- Keep prose and bullet lines to 120 characters or fewer.
+- Exempt content that cannot reasonably wrap: tables, code blocks, headings, and long URLs or paths.
+- Applies to new and edited content; do not reflow existing files solely to satisfy it.
+
 ## Frontmatter
 
 - The YAML frontmatter of a Markdown document must pass a `yamllint` check.
