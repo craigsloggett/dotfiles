@@ -36,7 +36,7 @@ Dotfiles repo root:
 
 1. Resolve the target: `~/.claude/rules/<type>-guidelines.md`. If it is in the list above, continue. If not, stop (write nothing, create nothing):
    - If `<type>` looks like a typo or alias for a listed file, show the available files and ask which one.
-   - If no file covers this topic, hand back to the user. Do not create a new guidelines file. A new file is a new always-on, path-gated config layer, and deciding a topic is rule-shaped enough to own one is an authoring decision, outside this skill's mandate. Only the user decides whether to create it and what it covers.
+   - If no file covers this topic, hand back to the user. Do not create a new guidelines file; that is an authoring decision (a new always-on, path-gated config layer) outside this skill's mandate, and it has its own skill, `write-claude-rule`. The test for whether a new file is even warranted: the topic must activate on a glob no existing rule file owns. A glob that is a subset of another file's (awk and yq both fire on `**/*.sh`, so they are sections of shell, not files) means the rule belongs in that existing file.
 2. Read the whole target file, including its headings.
 3. Check the `rule` against every existing line:
    - Duplicate (an existing line already states this intent): report which line, change nothing, stop.
