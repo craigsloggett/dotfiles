@@ -13,7 +13,7 @@ paths:
 - Use `$(( ))` for arithmetic, never `expr`.
 - Use `printf` for all output, never `echo`.
 - Single-quote `printf` format strings; pass expansions as `%s` with separate double-quoted arguments: `printf '%s\n' "message: ${var}"`.
-- Pass values into `sed` as data, not spliced into program text. `sed` is fine for static patterns; escape the value first if the replacement is dynamic.
+- Pass values into embedded programs (`sed`, `awk`, `jq`) as data, not spliced into program text. `sed` is fine for static patterns; escape the value first if the replacement is dynamic. For awk-specific mechanics (`-v` escaping, regex literals), see the `posix-awk` skill.
 
 ## Quoting and Variable Expansion
 
