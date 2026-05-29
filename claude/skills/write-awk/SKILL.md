@@ -1,9 +1,28 @@
 ---
-paths:
-  - "**/*.sh"
+name: write-awk
+description: >
+  Use when a script pipes through awk or emits an awk program. Ensures POSIX
+  awk (not gawk), flags gawk-isms that break under mawk, and applies the
+  filter-pattern structure.
 ---
 
-# awk Guidelines
+# POSIX awk
+
+mawk is the default `/usr/bin/awk` on Ubuntu and GitHub-hosted runners, so a gawk-ism that runs locally can break or behave differently in CI. Write to POSIX awk; reach for an extension only when the runtime is known to be gawk.
+
+## POSIX vs gawk
+
+Non-POSIX features to avoid by default:
+
+- String functions: `gensub`, `patsplit`, `strtonum`, `asort`, `asorti`. Use POSIX `sub`/`gsub`/`split`/`match` instead. `gensub` backreferences have no POSIX equivalent; restructure with `match` + `substr`.
+- Time functions: `systime`, `strftime`, `mktime`. Non-POSIX (mawk has them too, but a strict POSIX awk does not). Prefer shell `date` and pass the value in with `-v`.
+- Bit and type functions: `and`, `or`, `xor`, `lshift`, `rshift`, `compl`, `isarray`, `typeof`. All gawk-only.
+- `length(array)`: non-POSIX. Count with a `for (k in arr) n++` loop.
+- `delete arr` (whole array): non-POSIX. Delete elements with `delete arr[k]`, or loop.
+- `nextfile`: non-POSIX.
+- Regex `RS` (multi-character record separator) and the `RT` variable: gawk-only. POSIX `RS` is a single character.
+- gawk-only variables: `PROCINFO`, `FPAT`, `FIELDWIDTHS`, `IGNORECASE`, `ARGIND`, `ERRNO`, `BINMODE`.
+- `\x` hex escapes in string constants: non-POSIX. Octal `\ddd` is POSIX.
 
 ## Passing Shell Values
 
