@@ -58,3 +58,7 @@ paths:
 - Keep functions short and focused.
 - `snake_case` for functions and variables.
 - Format embedded program text (awk, jq, sed, sqlite, `python -c`, heredocs) across multiple lines when it exceeds one short line: open the quote on the command line, indent the body two spaces, close the quote on its own line dedented to the command with any remaining arguments and redirects there. One-liners stay one line.
+
+## Gotchas
+
+- In mikefarah yq (v4), `select(.uses | test(...))` needs no `// ""` guard, since `test()` on null returns false.
