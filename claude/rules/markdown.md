@@ -24,3 +24,7 @@ paths:
 ## Frontmatter
 
 - The YAML frontmatter of a Markdown document must pass a `yamllint` check.
+
+## Gotchas
+
+- `yamllint` validates YAML, not Markdown; running it on the whole `.md` file lints the body prose as YAML and produces spurious errors. Extract the frontmatter block first (the lines between the opening and closing `---`) and lint only that.
