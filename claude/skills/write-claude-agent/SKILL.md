@@ -1,6 +1,10 @@
 ---
 name: write-claude-agent
-description: Use when the user asks to create a new Claude Code subagent (a reusable worker spawned for context isolation), or to clean up an existing one.
+description: >
+  Use whenever the user asks to create, write, scaffold, add, or clean up a Claude Code subagent or agent file
+  (including any request to author a new agent in `.claude/agents/`), even if phrased as just "write an agent."
+  Always use this skill for authoring agents rather than writing the frontmatter directly; it encodes the
+  discipline that hand-written agents miss.
 ---
 
 ## Skill or agent?
