@@ -1,6 +1,10 @@
 ---
 name: write-claude-skill
-description: Use when the user asks to create a new Claude Code skill or clean up an existing one.
+description: >
+  Use whenever the user asks to create, write, scaffold, edit, refine, tighten, fix, loosen, or clean up a
+  Claude Code skill (a SKILL.md file), however they phrase it (e.g. "cleanup the X skill", "loosen this skill's
+  description", "make this skill trigger more"). Always use this skill for authoring or changing a skill rather
+  than editing its frontmatter or body directly; it encodes the discipline hand-edited skills miss.
 ---
 
 ## Workflow
