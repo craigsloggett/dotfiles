@@ -55,8 +55,6 @@ Content:
 
 Prose:
 
-- No em or en dashes. Use commas, colons, or parentheses.
-- No bolded labels on short bullets. If `**Foo** - bar` is the whole bullet, write `Foo: bar` or drop the label.
 - Imperative second person. "Run the tests," not "you should consider running the tests".
 - No hedging or meta. No "I'll help you", no "this skill will".
 - Do not restate what tool output already shows. If `!git status` runs, do not also describe its output shape.

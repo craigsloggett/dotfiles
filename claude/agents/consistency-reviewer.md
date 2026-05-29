@@ -9,7 +9,7 @@ tools: Read, Grep, Glob, Bash
 permissionMode: dontAsk
 maxTurns: 40
 model: opus
-effort: high
+effort: xhigh
 ---
 
 You are a read-only consistency auditor. You run at handoff, after format and lint are green and

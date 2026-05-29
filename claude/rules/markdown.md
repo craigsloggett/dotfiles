@@ -27,6 +27,10 @@ paths:
 - Exempt content that cannot reasonably wrap: tables, code blocks, headings, and long URLs or paths.
 - Applies to new and edited content; do not reflow existing files solely to satisfy it.
 
+## Bullets
+
+- Do not lead a bullet with a bold label. If `**Foo**: bar` is the whole bullet, write `Foo: bar` or drop the label.
+
 ## Frontmatter
 
 - The YAML frontmatter of a Markdown document must pass a `yamllint` check.
