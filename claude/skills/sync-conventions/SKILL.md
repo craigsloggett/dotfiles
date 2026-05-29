@@ -1,5 +1,5 @@
 ---
-name: sync-from
+name: sync-conventions
 description: Use when the user asks to compare the current project against a source directory and align conventions, patterns, or configuration.
 arguments:
   - name: source
