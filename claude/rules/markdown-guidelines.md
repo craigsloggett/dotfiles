@@ -20,3 +20,7 @@ paths:
 | `number` | The number      |
 | `branch` | The head branch |
 ```
+
+## Frontmatter
+
+- The YAML frontmatter of a Markdown document must pass a `yamllint` check.
