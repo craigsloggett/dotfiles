@@ -24,11 +24,12 @@ Existing agents:
 
 ## Auditor archetype
 
-Read-only is not one switch. It decomposes into three independent leaks, and you plug all three or the agent is read-only in appearance only.
+Read-only is enforced by Claude Code, not by pattern-matching commands. Do not grep Bash in a `PreToolUse` hook to catch mutations: shell has unbounded ways to express a write (`git -C other commit`, `cp`, `find -delete`, `eval "$(...)"`, command substitution), so the guard fails open on the first form it does not anticipate. That is the awk `-v` trap in agent clothing. Use a permission mode instead.
 
-1. Tool layer: `disallowedTools: Write, Edit`. Necessary, not sufficient.
-2. Shell layer: a `PreToolUse` Bash-guard hook. The moment an auditor has Bash (and it does, for `git diff` and `shellcheck`), the denylist is a half-measure: `disallowedTools` does not touch Bash, so the agent can still `git commit`, `git push`, `rm`, redirect with `>`, or `sed -i`. Copy `templates/bash-guard.sh` next to the agent and reference it. The coupling is absolute: an auditor with Bash in its tools carries the Bash-guard hook. The two are emitted together, never separately. An auditor with no Bash may use `permissionMode: plan` instead and skip the guard (plan mode permits read-only Bash but blocks edits).
-3. Runaway layer: set `maxTurns` so a misfiring auditor cannot loop forever.
+1. Boundary: `permissionMode: dontAsk`. It auto-denies any tool call not pre-approved while still running read-only Bash, so the auditor's read-only git (`git diff`, `git log`, `git show`) works and every mutation is denied by default. Fail-closed and enforced. `permissionMode: plan` is the alternative for pure read-only exploration; it runs read-only git the same way.
+2. Tools: allowlist what a reader needs, `tools: Read, Grep, Glob, Bash`. Allowlisting is bounded where a denylist is not; Write, Edit, and everything else are denied. (`disallowedTools: Write, Edit` is the looser equivalent and does not touch Bash, so it is never the boundary alone.)
+3. Non-recognized read-only tools: if the auditor runs a tool Claude Code does not know is read-only (`shellcheck`, `tflint`), `dontAsk` denies it. Allowlist those exact commands in `.claude/settings.json` `permissions.allow` (`"Bash(shellcheck:*)"`). Command-scoping lives in settings.json, not frontmatter, and the allowlist is project-wide, so allowlist only genuinely read-only commands.
+4. Runaway: set `maxTurns` so a misfiring auditor cannot loop forever.
 
 Hard gate: if the request is an auditor but names Edit or Write in its tools, refuse. "An auditor cannot hold Edit or Write. Drop them, or switch the archetype to investigator." A reviewer that can edit defends its own edits.
 
@@ -44,7 +45,7 @@ Trigger, in usage docs not frontmatter: run the auditor at true handoff, behind 
 
 ## Investigator archetype
 
-Lighter. It reads many files and returns a summary; the reason to make it an agent at all is context isolation, keeping that verbose reading out of the main thread. It may hold read tools and Bash, and it carries none of the auditor constraints: no binary verdict, no three-layer guard. `isolation: worktree` exists for action-taking fan-out (relevant to `cascade-change`), not for a pure reader.
+Lighter. It reads many files and returns a summary; the reason to make it an agent at all is context isolation, keeping that verbose reading out of the main thread. It may hold read tools and Bash, and it carries none of the auditor constraints: no binary verdict, no read-only permission mode. `isolation: worktree` exists for action-taking fan-out (relevant to `cascade-change`), not for a pure reader.
 
 ## Frontmatter schema
 
@@ -54,11 +55,11 @@ Only `name` and `description` are required.
 | ----------------- | ---------------------------------------------------------------------------- |
 | `name`            | Required. Lowercase and hyphens. A noun.                                     |
 | `description`     | Required. When to delegate to this agent.                                    |
-| `tools`           | Allowlist. Resolved against the pool left after `disallowedTools`.           |
-| `disallowedTools` | Denylist, applied first. `Write, Edit` for any auditor.                      |
+| `tools`           | Allowlist (bare tool names only). Resolved after `disallowedTools`.          |
+| `disallowedTools` | Denylist, applied first. Ignores Bash; a `tools` allowlist is tighter.       |
 | `model`           | Alias, full ID, or `inherit`. `opus` for high-stakes auditing.               |
 | `effort`          | Effort override. `high` for judgment work.                                   |
-| `permissionMode`  | `plan` is read-only (allows read Bash, blocks edits); also `default`, etc.   |
+| `permissionMode`  | `dontAsk` (auto-deny unlisted; read Bash runs) or `plan` for auditors.       |
 | `maxTurns`        | Turn ceiling. Set it on auditors.                                            |
 | `skills`          | Preload full skill content. No `disable-model-invocation: true` skills.      |
 | `hooks`           | Inline lifecycle hooks. `PreToolUse` with exit 2 blocks a call.              |
@@ -71,7 +72,8 @@ Only `name` and `description` are required.
 
 ## Gotchas
 
-- `disallowedTools: Write, Edit` does not block Bash writes. An auditor with Bash needs the Bash-guard hook, or it is writable in practice. This is the agent-world cousin of the awk `-v` escaping trap.
+- `disallowedTools: Write, Edit` does not block Bash writes, so it is never the read-only boundary alone. Enforce read-only with `permissionMode: dontAsk` (or `plan`), never a grep-based Bash hook. Text-matching a shell command fails open: that is the awk `-v` trap in agent clothing.
+- Command-scoped Bash allowlists (`Bash(shellcheck:*)`) live in settings.json `permissions.allow`, not in agent frontmatter. The `tools` field takes bare tool names only, and there is no `permissions` field on an agent.
 - Noun naming, not verb. Agents are addressed, not invoked.
 - An auditor emits SHIP or FIX, never prose.
 - Never preload a `disable-model-invocation: true` skill.
