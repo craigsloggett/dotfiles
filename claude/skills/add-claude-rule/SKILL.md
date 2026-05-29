@@ -1,10 +1,10 @@
 ---
 name: add-claude-rule
 description: >
-  Use when the user says add a <type> rule: <imperative> (e.g. add a markdown rule, add a shell rule). Files an
-  already-vetted, imperatively-stated rule into the matching cross-repo <type>.md. The user has decided it is
-  rule-worthy; scribe it, do not author or reword it.
-disable-model-invocation: true
+  Use when the user wants to add a rule to an existing ~/.claude/rules/<type>.md, however they phrase it
+  (e.g. "add a markdown rule to keep lines under 120", "make it a shell rule that ...") for a known type.
+  Interpret the rule from their message and file it; capture their intent without expanding its scope.
+  For a brand-new rule file on a topic no existing file owns, use write-claude-rule instead.
 arguments:
   - name: type
     description: >
@@ -13,18 +13,19 @@ arguments:
     required: true
   - name: rule
     description: >
-      The finished imperative rule, exactly as the user stated it. Do not invent, reword, or expand its intent.
+      The rule to file, interpreted from the user's request. Phrase it as a clean imperative bullet that
+      captures what they asked for, without inventing or expanding the intent.
     required: true
 allowed-tools: Read, Edit, Bash
 ---
 
 # Add Claude rule
 
-You are a scribe, not an author. The `rule` argument is final. Preserve its intent exactly. The only permitted edit is tidying surface voice (capitalization, leading verb form, punctuation) to match sibling bullets. Never change what the rule means.
+Capture the user's intent, do not author beyond it. Interpret their request into a clean imperative bullet that matches the voice and format of sibling bullets, but never add scope, caveats, or constraints they did not ask for. If their wording is already a clean rule, keep it close to how they said it.
 
 The target is `<type>.md`. The rules directory is a symlink into the dotfiles repo. Edit through the symlink, run git in the repo so the change is versioned.
 
-Three conditions stop the scribe cold: the target file does not exist, the rule duplicates an existing line, or it contradicts one. On any of them, change nothing and hand back to the user.
+Three conditions stop it cold: the target file does not exist, the rule duplicates an existing line, or it contradicts one. On any of them, change nothing and hand back to the user.
 
 Available rule files:
 
@@ -41,6 +42,6 @@ Dotfiles repo root:
 3. Check the `rule` against every existing line:
    - Duplicate (an existing line already states this intent): report which line, change nothing, stop.
    - Contradicts an existing line: surface both lines, ask the user how to resolve, do not write.
-4. Append it under the best-fitting existing heading, matching the file's bullet format. Tidy voice only. If no existing heading fits, propose a new heading and confirm it before writing.
+4. Append it under the best-fitting existing heading, matching the file's bullet format. If no existing heading fits, propose a new heading and confirm it before writing.
 5. Show the one-line diff (`git -C <repo-root> diff -- claude/rules/<type>.md`) and confirm before committing.
 6. Commit GPG-signed. This repo scopes commits by directory, so use `claude: <subject>` (subject under 70 chars, imperative, no trailing period, no AI attribution). On signing failure, hand the session back to the user; do not disable signing.
