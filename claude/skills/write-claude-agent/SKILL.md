@@ -11,8 +11,6 @@ description: >
 
 Decide this first. A subagent is for context isolation: it does verbose work you will not reference again, reads many files, and returns a summary to the main thread. A skill is a reusable prompt that runs in the main context. "Define a custom subagent when you keep spawning the same kind of worker with the same instructions." If what you want is a reusable prompt, not an isolated worker, stop and use `write-claude-skill` instead.
 
-The boilerplate is not the point. What this skill bakes in is the agent-specific discipline: the archetype fork, mechanical read-only enforcement, a terminating verdict, and noun naming.
-
 ## Workflow
 
 Existing agents:
