@@ -1,9 +1,12 @@
 ---
-name: write-awk
+name: write-posix-awk
 description: >
-  Use when a script pipes through awk or emits an awk program. Ensures POSIX
-  awk (not gawk), flags gawk-isms that break under mawk, and applies the
-  filter-pattern structure.
+  Write strictly POSIX-conformant awk and flag any gawk/mawk extensions
+  (gensub, asort, length(array), systime/strftime, FIELDWIDTHS, IGNORECASE,
+  bitwise fns, coprocesses). Use whenever a task involves writing, editing,
+  or reviewing awk (including awk one-liners inside shell scripts, pipelines,
+  Makefiles, or CI), even if POSIX is not mentioned and even if the awk is a
+  single line. If awk appears, this skill applies.
 ---
 
 # POSIX awk
