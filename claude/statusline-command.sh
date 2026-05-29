@@ -13,7 +13,7 @@ check_prerequisites() {
   command -v jq >/dev/null 2>&1
 }
 
-format_duration() {
+format_duration() (
   total_seconds="$1"
 
   if [ "${total_seconds}" -lt 0 ]; then
@@ -27,7 +27,7 @@ format_duration() {
   else
     printf '%dd' "$((total_seconds / 86400))"
   fi
-}
+)
 
 main() {
   check_prerequisites || return 0
