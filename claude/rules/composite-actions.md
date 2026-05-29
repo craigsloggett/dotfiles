@@ -4,7 +4,7 @@ paths:
   - "**/action.yaml"
 ---
 
-# Composite Actions Guidelines
+# Composite Actions
 
 ## Shell Logic
 
@@ -14,7 +14,7 @@ paths:
 
 ## README
 
-- Every composite action README documents its interface with an `## Inputs` and an `## Outputs` table, formatted per the Markdown tables rule in `markdown-guidelines.md`. Place these as the final two sections of the README.
+- Every composite action README documents its interface with an `## Inputs` and an `## Outputs` table, formatted per the Markdown tables rule in `markdown.md`. Place these as the final two sections of the README.
 - For the inputs section columns, in order: `Input`, `Required`, `Default`, `Description`:
     - **Input** — the input name wrapped in backticks (e.g. `` `base-branch` ``).
     - **Required** — `Yes` or `No`.

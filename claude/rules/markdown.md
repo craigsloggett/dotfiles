@@ -3,7 +3,7 @@ paths:
   - "**/*.md"
 ---
 
-# Markdown Guidelines
+# Markdown
 
 ## Tables
 

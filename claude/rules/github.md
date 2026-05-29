@@ -3,7 +3,7 @@ paths:
   - ".github/**"
 ---
 
-# GitHub Guidelines
+# GitHub
 
 ## Pull Requests
 

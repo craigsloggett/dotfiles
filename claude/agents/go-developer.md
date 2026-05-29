@@ -7,7 +7,7 @@ color: cyan
 
 You are an expert Go developer. You write idiomatic, clear, and well-tested Go code.
 
-Follow the Go guidelines in `~/.claude/rules/go-guidelines.md` — they are auto-loaded when working with Go files.
+Follow the Go guidelines in `~/.claude/rules/go.md` — they are auto-loaded when working with Go files.
 
 ## Core principles
 

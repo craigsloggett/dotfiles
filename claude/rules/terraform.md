@@ -4,7 +4,7 @@ paths:
   - "**/*.tfvars"
 ---
 
-# Terraform Guidelines
+# Terraform
 
 ## HCL Conventions
 

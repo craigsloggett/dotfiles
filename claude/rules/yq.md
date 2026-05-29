@@ -6,7 +6,7 @@ paths:
   - "**/*.yaml"
 ---
 
-# yq Guidelines
+# yq
 
 ## Select Queries
 

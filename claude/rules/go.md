@@ -5,7 +5,7 @@ paths:
   - "**/go.sum"
 ---
 
-# Go Guidelines
+# Go
 
 ## Coding Standards
 
