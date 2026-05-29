@@ -31,6 +31,7 @@ paths:
 - Set `trap cleanup EXIT INT TERM HUP` when creating temporary resources. Traps don't inherit into subshells; set them in the scope that owns the resource.
 - Single-statement failure: `cmd || die "msg"`. Multi-statement: `if ! cmd; then ... fi`, not the `{ }` block form.
 - One condition per statement, failing immediately with a specific message. Don't collect errors to report at the end and don't nest checks. Use `cond || die "msg"` for single conditions and `if cond1 && cond2; then die "msg"; fi` for compound ones; avoid `cond1 && cond2 && die "msg"`.
+- Aggregating output from independent tools into one block (e.g. running several linters and printing all their findings together) is reporting, not error collection; the fail-fast rule above governs validation conditions, so deferring such output to the end is fine.
 
 ## Temporary Files
 
