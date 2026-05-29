@@ -1,7 +1,7 @@
 ---
 paths:
-  - "**/*.sh"
-  - "install"
+  - '**/*.sh'
+  - install
 ---
 
 # Shell

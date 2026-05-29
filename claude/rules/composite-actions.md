@@ -1,7 +1,7 @@
 ---
 paths:
-  - "**/action.yml"
-  - "**/action.yaml"
+  - '**/action.yml'
+  - '**/action.yaml'
 ---
 
 # Composite Actions

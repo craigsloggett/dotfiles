@@ -1,8 +1,8 @@
 ---
 paths:
-  - "**/*.go"
-  - "**/go.mod"
-  - "**/go.sum"
+  - '**/*.go'
+  - '**/go.mod'
+  - '**/go.sum'
 ---
 
 # Go
