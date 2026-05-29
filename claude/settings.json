@@ -27,7 +27,6 @@
       "Bash(cargo publish)",
       "Bash(cargo publish *)",
       "Bash(rm -rf *)",
-      "Bash(rmdir *)",
       "Bash(aws * create-*)",
       "Bash(aws * delete-*)",
       "Bash(aws * put-*)",
