@@ -1,5 +1,5 @@
 ---
-name: write-skill
+name: write-claude-skill
 description: Use when the user asks to create a new Claude Code skill or clean up an existing one.
 ---
 

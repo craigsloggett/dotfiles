@@ -19,7 +19,7 @@ allowed-tools: Write, Bash
 
 # Write Claude rule
 
-This authors a new rule file, the one thing the scribe `add-claude-rule` refuses to do. It is two parts: a taxonomy gate (the real value) and a trivial scaffold. The gate is what stops a topic that is really a section (yq) from becoming its own always-on file. This is separate from `write-skill`, which has a different output shape (a folder with references, not a single file).
+This authors a new rule file, the one thing the scribe `add-claude-rule` refuses to do. It is two parts: a taxonomy gate (the real value) and a trivial scaffold. The gate is what stops a topic that is really a section (yq) from becoming its own always-on file. This is separate from `write-claude-skill`, which has a different output shape (a folder with references, not a single file).
 
 The target is `<type>.md`. The rules directory is a symlink into the dotfiles repo. Write through the symlink, run git in the repo so the change is versioned.
 
