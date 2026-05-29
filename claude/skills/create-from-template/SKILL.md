@@ -1,6 +1,6 @@
 ---
-name: new-from-template
-description: Use when the user asks to create a new GitHub repo from a template, clone it locally, apply standard repo settings, and hand off to the clean-template skill.
+name: create-from-template
+description: Use when the user asks to create a new GitHub repo from a template, clone it locally, apply standard repo settings, and hand off to the clean-scaffold skill.
 arguments:
   - name: template
     description: owner/repo of the template. If omitted, the skill lists the user's accessible template repos via gh and prompts.
@@ -78,9 +78,9 @@ Existing descriptions, tagged with their topics:
      --title v0.0.1 \
      --notes "Initial release"
    ```
-   Flags verified via `gh release create --help`. This runs before the clean-template hand-off so `v0.0.1` marks the unmodified template state; subsequent cleanup work lands in later commits and a future release.
+   Flags verified via `gh release create --help`. This runs before the clean-scaffold hand-off so `v0.0.1` marks the unmodified template state; subsequent cleanup work lands in later commits and a future release.
 
-10. Hand off to clean-template. Invoke the `clean-template` skill on `~/Developer/GitHub/<owner>/<name>` so it can scan for placeholders, apply replacements, and rewrite the README.
+10. Hand off to clean-scaffold. Invoke the `clean-scaffold` skill on `~/Developer/GitHub/<owner>/<name>` so it can scan for placeholders, apply replacements, and rewrite the README.
 
 ## Rules
 

@@ -1,16 +1,16 @@
 ---
-name: cascade-bump
-description: Use when the user wants to apply a change concurrently across a list of versioned upstream repos via auto-merging PRs, wait for new releases, then bump references in a consumer repo to pin the new versions.
+name: cascade-change
+description: Use when the user wants to apply a change concurrently across a list of versioned upstream repos via auto-merging PRs and release each. Hands off to bump-consumer to pin the new versions in a consumer repo.
 arguments:
   - name: upstream-repos
     description: Either an explicit list of upstream repo paths/identifiers, or a discovery description (e.g., "all action repos in ~/Developer/GitHub/craigsloggett that define emit_state_log()"). When a description is given, the skill resolves it to a concrete list and confirms with the user before proceeding.
     required: true
-  - name: consumer-repo
-    description: Path to the consumer repo whose dependency references should be bumped after release.
-    required: true
   - name: change
     description: Description of the change to apply to each upstream repo (provided in the invocation prompt).
     required: true
+  - name: consumer-repo
+    description: Path to a consumer repo to re-pin after release. If provided, the skill hands off to bump-consumer with the captured versions. If omitted, the skill stops after aggregation and reports the new tags.
+    required: false
 ---
 
 ## Workflow
@@ -58,28 +58,18 @@ Subagent contract:
 ### Phase 3: Aggregate
 
 1. Collect subagent results. Build the list of `{repo, new_tag, tag_sha}` from successes.
-2. Halt on any failure. Surface the failed repos, the phase each failed in, and the error excerpt. Do not start Phase 4 until the user resolves.
+2. Halt on any failure. Surface the failed repos, the phase each failed in, and the error excerpt. Do not hand off until the user resolves.
 
-### Phase 4: Bump the consumer
+### Phase 4: Hand off
 
-1. Pre-flight scan. Read the consumer repo. For each upstream `owner/repo`, find all references matched on full `owner/repo` (never trailing name only). Print: "found N refs to <owner/repo> across M files," with file paths.
-2. Halt on zero matches for any upstream the user expected to bump. Ask before continuing.
-3. Refuse if the consumer is on `main` or `master`. The skill pushes to the currently-checked-out branch (assumed to be an active PR branch).
-4. Rewrite refs semantically. For each match, infer the ref format from context, for example:
-   - GitHub Actions: `uses: owner/repo@<sha> # <version>`
-   - Terraform: `source = "..."` paired with `version = "..."`
-   - npm/Go/etc.: format inferred from the manifest in use.
-
-   Replace with the new SHA and version captured in Phase 3.
-5. Show the full consumer diff. Confirm before pushing.
-6. Commit and push to the consumer's currently-checked-out branch. GPG-signed, conventional commit. Never force-push.
+1. If `consumer-repo` was provided, invoke the `bump-consumer` skill with the consumer path and the `{repo, new_tag, tag_sha}` list from Phase 3 so it can re-pin the references.
+2. If `consumer-repo` was omitted, report the captured `{repo, new_tag, tag_sha}` list and stop. The user can run `bump-consumer` later with that list.
 
 ## Rules
 
 - Concurrent commits hit the GPG agent simultaneously. If any subagent's commit fails to sign, abort that subagent and surface the failure so the user can unlock the key before retrying.
 - The canonical preview is the only per-edit human review. Subagents cannot prompt the user, so do not add per-repo confirmation gates inside the concurrent fan-out.
-- Match consumer refs on full `owner/repo`, never trailing name only.
 - Use the upstream repo's default merge style; do not override.
-- Never `--force` push. Never push to `main` on the consumer.
+- Never `--force` push.
 - GPG-sign every commit. On signing failure, hand the session back to the user.
 - No AI/Claude attribution in commit messages or PR bodies.

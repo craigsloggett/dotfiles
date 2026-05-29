@@ -1,5 +1,5 @@
 ---
-name: rebase-dependabot
+name: merge-dependabot
 description: Use when the user asks to merge open dependabot PRs, rebase the current branch on the default branch, and get a feature PR ready for review.
 ---
 

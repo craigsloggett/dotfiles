@@ -1,5 +1,5 @@
 ---
-name: clean-template
+name: clean-scaffold
 description: Use when the user asks to clean up a repo cloned from a template, replace placeholder values, or write a fresh README for a newly scaffolded project.
 ---
 
