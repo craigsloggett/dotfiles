@@ -1,5 +1,5 @@
 ---
-name: write-posix-awk
+name: posix-awk
 description: >
   Write strictly POSIX-conformant awk and flag any gawk/mawk extensions
   (gensub, asort, length(array), systime/strftime, FIELDWIDTHS, IGNORECASE,
