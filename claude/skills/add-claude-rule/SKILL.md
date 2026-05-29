@@ -24,6 +24,8 @@ You are a scribe, not an author. The `rule` argument is final. Preserve its inte
 
 The target is `<type>-guidelines.md`, not `<type>.md`. The rules directory is a symlink into the dotfiles repo. Edit through the symlink, run git in the repo so the change is versioned.
 
+Three conditions stop the scribe cold: the target file does not exist, the rule duplicates an existing line, or it contradicts one. On any of them, change nothing and hand back to the user.
+
 Available rule files:
 
 !`ls ~/.claude/rules/`
@@ -32,11 +34,13 @@ Dotfiles repo root:
 
 !`git -C ~/.claude/rules rev-parse --show-toplevel`
 
-1. Resolve the target: `~/.claude/rules/<type>-guidelines.md`. If it is not in the list above, stop, show the available files, and ask which to use. Do not create a new guidelines file without confirmation.
+1. Resolve the target: `~/.claude/rules/<type>-guidelines.md`. If it is in the list above, continue. If not, stop (write nothing, create nothing):
+   - If `<type>` looks like a typo or alias for a listed file, show the available files and ask which one.
+   - If no file covers this topic, hand back to the user. Do not create a new guidelines file. A new file is a new always-on, path-gated config layer, and deciding a topic is rule-shaped enough to own one is an authoring decision, outside this skill's mandate. Only the user decides whether to create it and what it covers.
 2. Read the whole target file, including its headings.
 3. Check the `rule` against every existing line:
    - Duplicate (an existing line already states this intent): report which line, change nothing, stop.
    - Contradicts an existing line: surface both lines, ask the user how to resolve, do not write.
 4. Append it under the best-fitting existing heading, matching the file's bullet format. Tidy voice only. If no existing heading fits, propose a new heading and confirm it before writing.
 5. Show the one-line diff (`git -C <repo-root> diff -- claude/rules/<type>-guidelines.md`) and confirm before committing.
-6. Commit GPG-signed with a conventional message (subject under 70 chars, imperative, no trailing period, no AI attribution). On signing failure, hand the session back to the user; do not disable signing.
+6. Commit GPG-signed. This repo scopes commits by directory, so use `claude: <subject>` (subject under 70 chars, imperative, no trailing period, no AI attribution). On signing failure, hand the session back to the user; do not disable signing.
