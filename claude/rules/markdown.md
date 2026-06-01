@@ -41,6 +41,10 @@ paths:
 
 - Keep lists tight: no blank lines between list items, or between a list and its introductory line.
 
+### Indentation
+
+- Indent with spaces, never tabs.
+
 ### Code Blocks
 
 - Use fenced code blocks, not indented code blocks.
