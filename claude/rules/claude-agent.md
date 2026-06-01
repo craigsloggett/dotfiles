@@ -16,16 +16,16 @@ belongs in a skill, not an agent.
 ### Workflow
 
 1. Archetype gate, asked first. Auditor or investigator? An auditor checks encoded rules, stays
-	 read-only, and returns a binary verdict. An investigator reads many files and reports a summary.
-	 Everything downstream forks here, so settle it before writing anything.
+   read-only, and returns a binary verdict. An investigator reads many files and reports a summary.
+   Everything downstream forks here, so settle it before writing anything.
 2. Name it as a noun. Agents are entities you address (`consistency-reviewer`, `pr-reviewer`), not
-	 actions you invoke. This is the inverse of the verb-noun rule for skills. Lowercase and hyphens
-	 (the schema requires that anyway).
+   actions you invoke. This is the inverse of the verb-noun rule for skills. Lowercase and hyphens
+   (the schema requires that anyway).
 3. Build the frontmatter for the archetype (see below).
 4. Write the body. The body is the system prompt. A subagent gets only this plus basic environment,
-	 not the full Claude Code prompt, so it has to be self-contained.
+   not the full Claude Code prompt, so it has to be self-contained.
 5. Pick model and effort. High-stakes judgment auditing gets `model: opus` or `effort: high`.
-	 Low-effort auditing produces shallow misses, which defeats the point.
+   Low-effort auditing produces shallow misses, which defeats the point.
 
 ### Auditor Archetype
 
@@ -36,18 +36,18 @@ the first form it does not anticipate. That is the awk `-v` trap in agent clothi
 mode instead.
 
 1. Boundary: `permissionMode: dontAsk`. It auto-denies any tool call not pre-approved while still
-	 running read-only Bash, so the auditor's read-only git (`git diff`, `git log`, `git show`) works
-	 and every mutation is denied by default. Fail-closed and enforced. `permissionMode: plan` is the
-	 alternative for pure read-only exploration; it should run read-only git the same way, though that
-	 is unverified.
+   running read-only Bash, so the auditor's read-only git (`git diff`, `git log`, `git show`) works
+   and every mutation is denied by default. Fail-closed and enforced. `permissionMode: plan` is the
+   alternative for pure read-only exploration; it should run read-only git the same way, though that
+   is unverified.
 2. Tools: allowlist what a reader needs, `tools: Read, Grep, Glob, Bash`. Allowlisting is bounded
-	 where a denylist is not; Write, Edit, and everything else are denied. (`disallowedTools: Write,
-	 Edit` is the looser equivalent and does not touch Bash, so it is never the boundary alone.)
+   where a denylist is not; Write, Edit, and everything else are denied. (`disallowedTools: Write,
+   Edit` is the looser equivalent and does not touch Bash, so it is never the boundary alone.)
 3. Non-recognized read-only tools: if the auditor runs a tool Claude Code does not know is
-	 read-only (`shellcheck`, `tflint`), `dontAsk` denies it. Allowlist those exact commands in
-	 `.claude/settings.json` `permissions.allow` (`"Bash(shellcheck:*)"`). Command-scoping lives in
-	 settings.json, not frontmatter, and the allowlist is project-wide, so allowlist only genuinely
-	 read-only commands.
+   read-only (`shellcheck`, `tflint`), `dontAsk` denies it. Allowlist those exact commands in
+   `.claude/settings.json` `permissions.allow` (`"Bash(shellcheck:*)"`). Command-scoping lives in
+   settings.json, not frontmatter, and the allowlist is project-wide, so allowlist only genuinely
+   read-only commands.
 4. Runaway: set `maxTurns` so a misfiring auditor cannot loop forever.
 
 Hard gate: if the request is an auditor but names Edit or Write in its tools, refuse. "An auditor

@@ -36,12 +36,12 @@ Dotfiles repo root:
 !`git -C ~/.claude/rules rev-parse --show-toplevel`
 
 1. Resolve the target: `~/.claude/rules/<type>.md`. If it is in the list above, continue. If not, stop (write nothing, create nothing):
-	 - If `<type>` looks like a typo or alias for a listed file, show the available files and ask which one.
-	 - If no file covers this topic, hand back to the user. Do not create a new rule file; that is an authoring decision (a new always-on, path-gated config layer) outside this skill's mandate, and it has its own skill, `write-claude-rule`. The test for whether a new file is even warranted: the topic must activate on a glob no existing rule file owns. A glob that is a subset of another file's (yq fires on `**/*.sh`, so it is a section of shell, not its own file) means the rule belongs in that existing file.
+   - If `<type>` looks like a typo or alias for a listed file, show the available files and ask which one.
+   - If no file covers this topic, hand back to the user. Do not create a new rule file; that is an authoring decision (a new always-on, path-gated config layer) outside this skill's mandate, and it has its own skill, `write-claude-rule`. The test for whether a new file is even warranted: the topic must activate on a glob no existing rule file owns. A glob that is a subset of another file's (yq fires on `**/*.sh`, so it is a section of shell, not its own file) means the rule belongs in that existing file.
 2. Read the whole target file, including its headings.
 3. Check the `rule` against every existing line:
-	 - Duplicate (an existing line already states this intent): report which line, change nothing, stop.
-	 - Contradicts an existing line: surface both lines, ask the user how to resolve, do not write.
+   - Duplicate (an existing line already states this intent): report which line, change nothing, stop.
+   - Contradicts an existing line: surface both lines, ask the user how to resolve, do not write.
 4. Append it under the best-fitting existing heading, matching the file's bullet format. If no existing heading fits, propose a new heading and confirm it before writing.
 5. Show the one-line diff (`git -C <repo-root> diff -- claude/rules/<type>.md`) and confirm before committing.
 6. Commit GPG-signed. This repo scopes commits by directory, so use `claude: <subject>` (subject under 70 chars, imperative, no trailing period, no AI attribution). On signing failure, hand the session back to the user; do not disable signing.

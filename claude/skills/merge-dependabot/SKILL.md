@@ -14,7 +14,7 @@ Open PRs on the current repo:
 3. Check `gh run list --branch main` to see if any workflows are running from the merges. Wait for them to complete with `gh run watch`.
 4. Rebase the current branch on the default branch:
 
-	 ```sh
+   ```sh
    git checkout main
    git pull
    git gone
@@ -25,7 +25,7 @@ Open PRs on the current repo:
 5. Resolve conflicts if any arise. Take the newer dependabot versions for action refs while preserving the intent of the feature branch changes.
 6. Force push the rebased branch:
 
-	 ```sh
+   ```sh
    git push --force
    ```
 

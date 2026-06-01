@@ -19,9 +19,9 @@ arguments:
 
 1. If `upstream-repos` is an explicit list, use it as-is.
 2. If it is a discovery description, resolve it to a concrete list:
-	 - Identify the scope (e.g., a parent directory) from the description.
-	 - Use `grep`, `find`, or read repo contents to identify the repos that match the predicate.
-	 - Match only locally cloned git repositories. Do not invent repos.
+   - Identify the scope (e.g., a parent directory) from the description.
+   - Use `grep`, `find`, or read repo contents to identify the repos that match the predicate.
+   - Match only locally cloned git repositories. Do not invent repos.
 3. Present the resolved list to the user with file paths. Confirm before fanning out. Stop and ask if zero matches, or if the count is suspicious (e.g., the description implied "a few" but matched dozens).
 
 ### Phase 1: Canonical Preview

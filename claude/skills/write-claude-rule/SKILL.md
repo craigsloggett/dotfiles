@@ -33,11 +33,11 @@ Dotfiles repo root:
 
 1. Refuse if it already exists. If `<type>` is in the list above, stop: the file exists, so appending a rule is `add-claude-rule`'s job, not this skill's.
 2. Taxonomy gate. Establish the activation glob the topic owns (from the `glob` argument, or propose one and confirm). Compare it to the globs above:
-	 - If it is already owned by, or a subset of, an existing file's glob, refuse. The topic is a section of that file, not its own file (yq fires on `**/*.sh`, so it belongs in shell). Point the user at `add-claude-rule` for that file and stop.
-	 - A topic qualifies only if it activates on a pattern no existing file owns. It need not be a file extension; a distinct path pattern counts (`**/action.yml`, `.github/**`).
+   - If it is already owned by, or a subset of, an existing file's glob, refuse. The topic is a section of that file, not its own file (yq fires on `**/*.sh`, so it belongs in shell). Point the user at `add-claude-rule` for that file and stop.
+   - A topic qualifies only if it activates on a pattern no existing file owns. It need not be a file extension; a distinct path pattern counts (`**/action.yml`, `.github/**`).
 3. Scaffold. Write the file with frontmatter listing the glob(s) and a single H1 title in title case (`composite-actions` becomes `# Composite Actions`):
 
-	 ```
+   ```
    ---
    paths:
      - "<glob>"
@@ -46,7 +46,7 @@ Dotfiles repo root:
    # <Type>
    ```
 
-	 No invented rules and no headings beyond the title. Headings appear when `add-claude-rule` files the first rule.
+   No invented rules and no headings beyond the title. Headings appear when `add-claude-rule` files the first rule.
 4. Stage the new file and show `git -C <repo-root> diff --staged -- claude/rules/<type>.md`. Confirm before committing.
 5. Commit GPG-signed as `claude: Add <type> rule` (subject under 70 chars, imperative, no trailing period, no AI attribution). On signing failure, hand the session back to the user; do not disable signing.
 6. Hand off. If the user has the first rule in hand, invoke `add-claude-rule` for `<type>` to file it.

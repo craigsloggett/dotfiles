@@ -16,11 +16,11 @@ arguments:
 2. Halt on zero matches for any upstream the user expected to bump. Ask before continuing.
 3. Refuse if the consumer is on `main` or `master`. The skill pushes to the currently-checked-out branch (assumed to be an active PR branch).
 4. Rewrite refs semantically. For each match, infer the ref format from context, for example:
-	 - GitHub Actions: `uses: owner/repo@<sha> # <version>`
-	 - Terraform: `source = "..."` paired with `version = "..."`
-	 - npm/Go/etc.: format inferred from the manifest in use.
+   - GitHub Actions: `uses: owner/repo@<sha> # <version>`
+   - Terraform: `source = "..."` paired with `version = "..."`
+   - npm/Go/etc.: format inferred from the manifest in use.
 
-	 Replace with the new SHA and version from the `upstreams` list.
+   Replace with the new SHA and version from the `upstreams` list.
 5. Show the full consumer diff. Confirm before pushing.
 6. Commit and push to the consumer's currently-checked-out branch. GPG-signed, conventional commit. Never force-push.
 
