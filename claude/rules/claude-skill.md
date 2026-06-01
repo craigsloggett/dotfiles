@@ -1,6 +1,7 @@
 ---
 paths:
-  - '**/skills/**/*.md'
+  - '**/.claude/skills/**/*.md'
+  - '**/claude/skills/**/*.md'
 ---
 
 ## Claude Skill

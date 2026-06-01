@@ -1,6 +1,7 @@
 ---
 paths:
-  - '**/agents/**/*.md'
+  - '**/.claude/agents/*.md'
+  - '**/claude/agents/*.md'
 ---
 
 ## Claude Agent

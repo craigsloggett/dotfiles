@@ -1,6 +1,7 @@
 ---
 paths:
-  - '**/rules/**/*.md'
+  - '**/.claude/rules/*.md'
+  - '**/claude/rules/*.md'
 ---
 
 ## Claude Rule
