@@ -27,8 +27,7 @@ paths:
 
 ### Line Length
 
-- Don't add newlines to trim line length.
-- If there are continuous lines broken with a new line, remove the new line and increase the line length.
+- Wrap prose and bullet lines at 80 characters.
 - Exempt content that cannot reasonably wrap: tables, code blocks, headings, and long URLs or paths.
 - Applies to new and edited content; do not reflow existing files solely to satisfy it.
 
