@@ -75,7 +75,7 @@ agents that act.
 Reference preload: if the auditor audits against a reference encoded in a skill, `skills:
 [posix-awk]` injects that skill's full content at startup, so a shell auditor already knows the
 gawk-versus-POSIX rules with no discovery step. You cannot preload a skill that sets
-`disable-model-invocation: true` (a scribe like `add-claude-rule`), and you would never preload a
+`disable-model-invocation: true`, and you would never preload a
 side-effecting scribe into a reader anyway.
 
 Trigger, in usage docs not frontmatter: run the auditor at true handoff, behind green lint, not on
