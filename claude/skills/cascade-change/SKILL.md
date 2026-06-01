@@ -15,16 +15,16 @@ arguments:
 
 ## Workflow
 
-### Phase 0: Resolve the upstream list
+### Phase 0: Resolve the upstream List
 
 1. If `upstream-repos` is an explicit list, use it as-is.
 2. If it is a discovery description, resolve it to a concrete list:
-   - Identify the scope (e.g., a parent directory) from the description.
-   - Use `grep`, `find`, or read repo contents to identify the repos that match the predicate.
-   - Match only locally cloned git repositories. Do not invent repos.
+	 - Identify the scope (e.g., a parent directory) from the description.
+	 - Use `grep`, `find`, or read repo contents to identify the repos that match the predicate.
+	 - Match only locally cloned git repositories. Do not invent repos.
 3. Present the resolved list to the user with file paths. Confirm before fanning out. Stop and ask if zero matches, or if the count is suspicious (e.g., the description implied "a few" but matched dozens).
 
-### Phase 1: Canonical preview
+### Phase 1: Canonical Preview
 
 Pick one upstream repo from the resolved list as the canonical example.
 
@@ -33,7 +33,7 @@ Pick one upstream repo from the resolved list as the canonical example.
 3. Show the diff to the user and confirm it matches the invocation's intent. This is the only per-edit review; the same change pattern is applied to all remaining repos by subagents.
 4. Revert the edit: `git restore .` so the canonical repo starts Phase 2 from a clean main, like every other repo.
 
-### Phase 2: Concurrent fan-out
+### Phase 2: Concurrent Fan-out
 
 Spawn one subagent per upstream repo in a single tool-call batch so they run in parallel. Each subagent owns its repo's pipeline end-to-end.
 
