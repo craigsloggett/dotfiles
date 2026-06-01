@@ -5,6 +5,10 @@ paths:
 
 ## Claude Skill
 
+### Headings
+
+- Use `##` for the document title and `###` for sections; do not use `#` (H1).
+
 ### Workflow
 
 1. Clarify the trigger. In one sentence, state what user request should make Claude reach for this skill. That sentence becomes the frontmatter description.

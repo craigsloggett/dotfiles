@@ -7,7 +7,6 @@ paths:
 
 ### Headings
 
-- Use `##` for the document title and `###` for sections; do not use `#` (H1).
 - Use Title Case for headings.
 
 ### Tables

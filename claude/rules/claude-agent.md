@@ -5,6 +5,10 @@ paths:
 
 ## Claude Agent
 
+### Headings
+
+- Use `##` for the document title and `###` for sections; do not use `#` (H1).
+
 ### Skill or Agent?
 
 Decide this first. A subagent is for context isolation: it does verbose work you will not reference
