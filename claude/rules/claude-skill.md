@@ -39,8 +39,8 @@ description: Use when ...
 
 Fields:
 - `name`: kebab-case, action-oriented (verb-noun)
-- `description`: when to invoke, not what it does. This is the only field loaded
-  at session start, so it has to help Claude decide relevance
+- `description`: when to invoke, not what it does. It is the field loaded into
+  context at session start, so it has to help Claude decide relevance
 - `arguments`: optional. List of `{name, description, required}` for
   slash-command arguments
 - `disable-model-invocation: true`: side-effecting skills only
@@ -52,9 +52,9 @@ Default: single `SKILL.md` inside a folder named after the skill. The folder
 lets you add `templates/`, `examples/`, or reference docs later without
 restructuring.
 
-Split a section into its own file when it has a format spec of its own (the
-linked article's `CONTEXT-FORMAT.md` is the model). Otherwise keep it inline.
-Create supporting files lazily, only when you have something to write.
+Split a section into its own file when it has a format spec of its own.
+Otherwise keep it inline. Create supporting files lazily, only when you have
+something to write.
 
 ### Rules
 
