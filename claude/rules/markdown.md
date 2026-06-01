@@ -8,6 +8,7 @@ paths:
 ### Headings
 
 - Use `##` for the document title and `###` for sections; do not use `#` (H1).
+- Use Title Case for headings.
 
 ### Tables
 
@@ -35,6 +36,14 @@ paths:
 ### Bullets
 
 - Do not lead a bullet with a bold label. If `**Foo**: bar` is the whole bullet, write `Foo: bar` or drop the label.
+
+### Lists
+
+- Keep lists tight: no blank lines between list items, or between a list and its introductory line.
+
+### Code Blocks
+
+- Use fenced code blocks, not indented code blocks.
 
 ### Frontmatter
 
