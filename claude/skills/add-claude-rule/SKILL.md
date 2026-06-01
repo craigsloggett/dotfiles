@@ -43,5 +43,4 @@ Dotfiles repo root:
    - Duplicate (an existing line already states this intent): report which line, change nothing, stop.
    - Contradicts an existing line: surface both lines, ask the user how to resolve, do not write.
 4. Append it under the best-fitting existing heading, matching the file's bullet format. If no existing heading fits, propose a new heading and confirm it before writing.
-5. Show the one-line diff (`git -C <repo-root> diff -- claude/rules/<type>.md`) and confirm before committing.
-6. Commit GPG-signed. This repo scopes commits by directory, so use `claude: <subject>` (subject under 70 chars, imperative, no trailing period, no AI attribution). On signing failure, hand the session back to the user; do not disable signing.
+5. Commit GPG-signed. This repo scopes commits by directory, so use `claude: <subject>` (subject under 70 chars, imperative, no trailing period, no AI attribution). On signing failure, hand the session back to the user; do not disable signing.
