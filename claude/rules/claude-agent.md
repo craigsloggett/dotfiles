@@ -88,7 +88,7 @@ mode. The auditor's permission mode exists because it is trusted to be read-only
 skips it because it makes no such promise. `isolation: worktree` exists for action-taking fan-out
 (relevant to `cascade-change`), not for a pure reader.
 
-## Frontmatter Schema
+### Frontmatter Schema
 
 Only `name` and `description` are required.
 
