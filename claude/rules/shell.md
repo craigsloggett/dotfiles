@@ -13,7 +13,7 @@ paths:
 - Use `$(( ))` for arithmetic, never `expr`.
 - Use `printf` for all output, never `echo`.
 - Single-quote `printf` format strings; pass expansions as `%s` with separate double-quoted arguments: `printf '%s\n' "message: ${var}"`.
-- Pass values into embedded programs (`sed`, `awk`, `jq`) as data, not spliced into program text. `sed` is fine for static patterns; escape the value first if the replacement is dynamic. For awk-specific mechanics (`-v` escaping, regex literals), see the `posix-awk` skill.
+- Pass values into embedded programs (`sed`, `awk`, `jq`) as data, not spliced into program text. `sed` is fine for static patterns; escape the value first if the replacement is dynamic.
 
 ### Quoting and Variable Expansion
 
@@ -31,7 +31,7 @@ paths:
 - Set `trap cleanup EXIT INT TERM HUP` when creating temporary resources. Traps don't inherit into subshells; set them in the scope that owns the resource.
 - Single-statement failure: `cmd || die "msg"`. Multi-statement: `if ! cmd; then ... fi`, not the `{ }` block form.
 - One condition per statement, failing immediately with a specific message. Don't collect errors to report at the end and don't nest checks. Use `cond || die "msg"` for single conditions and `if cond1 && cond2; then die "msg"; fi` for compound ones; avoid `cond1 && cond2 && die "msg"`.
-- Aggregating output from independent tools into one block (e.g. running several linters and printing all their findings together) is reporting, not error collection; the fail-fast rule above governs validation conditions, so deferring such output to the end is fine.
+- Aggregating output from independent tools (e.g. several linters' findings) is reporting, not error collection; deferring it to the end is fine. The fail-fast rule governs validation conditions only.
 
 ### Temporary Files
 
