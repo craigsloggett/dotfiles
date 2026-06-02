@@ -17,13 +17,16 @@ paths:
 
 ## File Structure
 
-- `main.tf` — All resource and data source blocks.
-- `terraform.tf` — A single `terraform` block defining `required_version` and `required_providers`.
-- `backend.tf` — Backend configuration.
-- `providers.tf` — All provider blocks and configuration.
-- `variables.tf` — Input variable blocks, in alphabetical order.
-- `outputs.tf` — Output blocks, in alphabetical order.
-- `locals.tf` — Local values (only when needed).
+| File           | Contents                                                                          |
+| -------------- | --------------------------------------------------------------------------------- |
+| `main.tf`      | All resource and data source blocks.                                              |
+| `terraform.tf` | A single `terraform` block defining `required_version` and `required_providers`.  |
+| `backend.tf`   | Backend configuration.                                                            |
+| `providers.tf` | All provider blocks and configuration.                                            |
+| `variables.tf` | Input variable blocks, in alphabetical order.                                     |
+| `outputs.tf`   | Output blocks, in alphabetical order.                                             |
+| `locals.tf`    | Local values (only when needed).                                                  |
+
 - Split resources and data sources into files by logical group (e.g. `network.tf`, `compute.tf`) as the configuration grows.
 
 ## Module Structure
