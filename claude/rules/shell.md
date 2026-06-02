@@ -43,6 +43,10 @@ paths:
 
 - Run all scripts through `shellcheck -x`.
 
+## Debugging
+
+- Use `:` with arguments as a silent trace marker: the line emits nothing normally but prints its expansion under `set -x` (`+ : HOME is /home/user`).
+
 ## Temporary Files
 
 - Use `mktemp` for files and `mktemp -d` for session-scoped directories. Respect `$TMPDIR`; never hard-code `/tmp`.
