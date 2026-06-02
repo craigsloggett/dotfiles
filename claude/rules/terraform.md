@@ -29,6 +29,9 @@ paths:
 - Pass a module's dependencies in as input variables instead of creating them inside the module, so the root can rewire modules or swap inputs for data sources without changing the module.
 - Don't write a module that detects whether an object exists and creates it conditionally; accept it as an input variable and let the caller pass either a managed `resource` or a `data` source.
 - Type such a dependency variable as an `object({...})` listing only the attributes the module uses, so either a resource or a data source satisfies it.
+- Declare provider configurations only in the root module; reusable modules must not contain `provider` blocks, which would break `count`, `for_each`, and `depends_on` on the module block.
+- Pass providers to child modules implicitly by inheritance, or explicitly with the `providers` argument when a module needs a non-default or aliased configuration.
+- Have every module declare its own provider requirements in a `required_providers` block (source and version), even though the configuration itself is shared from the root.
 - Document required vs optional variables with `description` and `default`.
 - Use `validation` blocks for input constraints.
 
@@ -59,6 +62,6 @@ paths:
 - Avoid `depends_on` unless absolutely necessary. Implicit dependencies are preferred.
 - Use `moved` blocks for resource renames to avoid destroy/recreate.
 - Root modules: pin provider versions to an exact version: `5.0.0`. Always use the latest version available.
-- Modules: pin provider versions to minor version ranges: `~> 5.0`.
+- Shared modules: constrain only the minimum provider version with `>=`, so callers can select a newer version other parts of their configuration need.
 - Use `aws_iam_policy_document` data sources for IAM policies. They are type-safe, easier to read, and composable. Avoid inline `jsonencode` blocks for policy JSON.
 - Encode assumptions (conditions that must hold for a resource to be usable) as `precondition` blocks and guarantees (behavior consumers rely on) as `postcondition` blocks, so violations fail early and in context with a clear `error_message`.
