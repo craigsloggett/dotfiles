@@ -25,6 +25,8 @@ paths:
 - Modules go in `modules/<name>/`.
 - Every module has `variables.tf`, `outputs.tf`, `main.tf`, and `versions.tf`.
 - Keep modules focused on a single concern.
+- Compose modules at the root, keeping the tree flat (one level of child modules); wire them together with expressions like `module.network.vpc_id` rather than nesting modules inside modules.
+- Pass a module's dependencies in as input variables instead of creating them inside the module, so the root can rewire modules or swap inputs for data sources without changing the module.
 - Document required vs optional variables with `description` and `default`.
 - Use `validation` blocks for input constraints.
 
