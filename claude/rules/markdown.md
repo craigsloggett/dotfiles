@@ -27,9 +27,7 @@ paths:
 
 ### Line Length
 
-- Wrap prose and bullet lines at 80 characters.
-- Exempt content that cannot reasonably wrap: tables, code blocks, headings, and long URLs or paths.
-- Applies to new and edited content; do not reflow existing files solely to satisfy it.
+- Set no line length limit on prose; never wrap to satisfy a character count, but keep wording clear and concise.
 
 ### Bullets
 
