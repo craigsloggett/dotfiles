@@ -61,3 +61,4 @@ paths:
 - Root modules: pin provider versions to an exact version: `5.0.0`. Always use the latest version available.
 - Modules: pin provider versions to minor version ranges: `~> 5.0`.
 - Use `aws_iam_policy_document` data sources for IAM policies. They are type-safe, easier to read, and composable. Avoid inline `jsonencode` blocks for policy JSON.
+- Encode assumptions (conditions that must hold for a resource to be usable) as `precondition` blocks and guarantees (behavior consumers rely on) as `postcondition` blocks, so violations fail early and in context with a clear `error_message`.
