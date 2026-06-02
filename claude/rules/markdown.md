@@ -3,9 +3,17 @@ paths:
   - '**/*.md'
 ---
 
-## Headings
+## Style
 
 - Use Title Case for headings.
+- Set no line length limit on prose; never wrap to satisfy a character count, but keep wording clear and concise.
+- Do not lead a bullet with a bold label. If `**Foo**: bar` is the whole bullet, write `Foo: bar` or drop the label.
+- Do not use `—` to describe a bullet point; migrate to a table in a new section if possible.
+- Keep lists tight: no blank lines between list items, or between a list and its introductory line.
+- Indent with spaces, never tabs.
+- Use fenced code blocks, not indented code blocks.
+- The YAML frontmatter of a Markdown document must pass a `yamllint` check.
+- `yamllint` validates YAML, not Markdown; running it on the whole `.md` file lints the body prose as YAML and produces spurious errors. Extract the frontmatter block first (the lines between the opening and closing `---`) and lint only that.
 
 ## Tables
 
@@ -22,31 +30,3 @@ paths:
 | `number` | The number      |
 | `branch` | The head branch |
 ```
-
-## Line Length
-
-- Set no line length limit on prose; never wrap to satisfy a character count, but keep wording clear and concise.
-
-## Bullets
-
-- Do not lead a bullet with a bold label. If `**Foo**: bar` is the whole bullet, write `Foo: bar` or drop the label.
-
-## Lists
-
-- Keep lists tight: no blank lines between list items, or between a list and its introductory line.
-
-## Indentation
-
-- Indent with spaces, never tabs.
-
-## Code Blocks
-
-- Use fenced code blocks, not indented code blocks.
-
-## Frontmatter
-
-- The YAML frontmatter of a Markdown document must pass a `yamllint` check.
-
-## Gotchas
-
-- `yamllint` validates YAML, not Markdown; running it on the whole `.md` file lints the body prose as YAML and produces spurious errors. Extract the frontmatter block first (the lines between the opening and closing `---`) and lint only that.
