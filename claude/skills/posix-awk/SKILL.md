@@ -37,6 +37,7 @@ Non-POSIX features to avoid by default:
 - Reason: `awk -v` runs C-style string-escape processing on the value before the regex engine sees it. POSIX leaves unknown escapes like `\.` undefined; mawk (the default `/usr/bin/awk` on Ubuntu, including GitHub-hosted runners) warns and strips the backslash, so the regex evaluated is `.` (any character), not `\.` (literal dot). gawk and BWK awk preserve `\.`. Regex literals (`/.../`) skip the string layer and behave identically on all three.
 - When the pattern genuinely is dynamic, `-v` is the right tool; the caller is responsible for the double-escape (e.g., shell-level `\\.` to survive both layers).
 - `sub(/regex/, repl)` returns the substitution count, so it doubles as a boolean condition. Prefer `cond && sub(/r/, repl) { action }` over `if (match($0, r)) { action; sub(r, repl) }`, which duplicates the regex.
+- Build a non-trivial regex from named parts: assign each fragment to a `BEGIN` variable named for what it matches, then concatenate them into the final pattern. The names document the regex in place of a comment. Name parts and patterns for their meaning (`leading_indent`, `key_separator`, `key_line_pattern`), never opaque abbreviations (`keyre`).
 
 ### Script Structure
 
