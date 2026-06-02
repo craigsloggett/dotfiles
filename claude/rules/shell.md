@@ -71,6 +71,7 @@ paths:
 - Wrap the script body in `main()`; call `main "$@"` as the last line. Small single-purpose scripts (hooks, one-shot utilities) may omit `main()` and run linearly.
 - Define helper functions above `main()`.
 - Each logical step gets its own function.
+- Open the script with a comment explaining what it does and why it exists or where it sits in a larger flow, not how it works line-by-line. The "how" belongs in inline comments or is self-evident from the code.
 - Document each function with a complete sentence beginning with the function's name, in a comment directly preceding the declaration with no intervening blank line.
 - Scope function-local variables with a subshell body `func() ( ... )` rather than `_`-prefixed names. Use a plain `{ ... }` body when the function must set a variable for the caller to read.
 - Return via exit status (and optionally stdout), not by mutating caller variables.
