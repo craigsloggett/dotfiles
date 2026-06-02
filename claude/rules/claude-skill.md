@@ -19,13 +19,15 @@ description: Use when ...
 ---
 ```
 
-| Argument                   | Description                                                                                                                                                                                               |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`                     | kebab-case, action-oriented (verb-noun).                                                                                                                                                                  |
-| `description`              | State when to invoke, not what it does. Loaded into context at session start, so it must help Claude decide relevance. Write it as the one sentence describing the request that should trigger the skill. |
-| `arguments`                | Optional. List of `{name, description, required}` for slash-command arguments.                                                                                                                            |
-| `disable-model-invocation` | `true` for side-effecting skills only. Set it for anything that mutates shared state (deploys, pushes, sends messages); leave it off for read-only or scaffolding skills so they auto-invoke.             |
-| `allowed-tools`            | The minimum set the skill needs.                                                                                                                                                                          |
+Only `name` and `description` are required.
+
+| Field                      | Use                                                                          |
+| -------------------------- | ---------------------------------------------------------------------------- |
+| `name`                     | Required. kebab-case, action-oriented (verb-noun).                           |
+| `description`              | Required. When to invoke, not what it does; what Claude reads for relevance. |
+| `arguments`                | List of `{name, description, required}` for slash-command arguments.         |
+| `disable-model-invocation` | `true` for side-effecting skills only; leave off read-only ones to auto-run. |
+| `allowed-tools`            | The minimum set the skill needs.                                             |
 
 ### Scope
 
