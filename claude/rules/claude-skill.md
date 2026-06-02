@@ -8,15 +8,6 @@ paths:
 
 ### Frontmatter
 
-```yaml
----
-name: kebab-case-name
-description: Use when ...
----
-```
-
-Only `name` and `description` are required.
-
 | Field                      | Use                                                                          |
 | -------------------------- | ---------------------------------------------------------------------------- |
 | `name`                     | Required. kebab-case, action-oriented (verb-noun).                           |
@@ -24,6 +15,15 @@ Only `name` and `description` are required.
 | `arguments`                | List of `{name, description, required}` for slash-command arguments.         |
 | `disable-model-invocation` | `true` for side-effecting skills only; leave off read-only ones to auto-run. |
 | `allowed-tools`            | The minimum set the skill needs.                                             |
+
+Example:
+
+```yaml
+---
+name: kebab-case-name
+description: Use when ...
+---
+```
 
 ### Headings
 

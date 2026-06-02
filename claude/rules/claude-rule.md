@@ -8,14 +8,18 @@ paths:
 
 ### Frontmatter
 
+| Field   | Use                                                            |
+| ------- | -------------------------------------------------------------- |
+| `paths` | Required. List of activation glob(s) and nothing else.         |
+
+Example:
+
 ```yaml
 ---
 paths:
   - '<glob>'
 ---
 ```
-
-- Frontmatter is the `paths:` list of activation glob(s) and nothing else.
 
 ### Headings
 

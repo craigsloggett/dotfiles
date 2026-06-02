@@ -8,15 +8,6 @@ paths:
 
 ### Frontmatter
 
-```yaml
----
-name: consistency-reviewer
-description: Use when a branch is ready for review to audit it against the rules.
----
-```
-
-Only `name` and `description` are required.
-
 | Field             | Use                                                                       |
 | ----------------- | ------------------------------------------------------------------------- |
 | `name`            | Required. Lowercase and hyphens. A noun you address.                      |
@@ -35,6 +26,15 @@ Only `name` and `description` are required.
 | `background`      | `true` runs the agent as a background task.                               |
 | `color`           | Display color.                                                            |
 | `initialPrompt`   | Auto-submitted first turn when the agent runs as a main session.          |
+
+Example:
+
+```yaml
+---
+name: consistency-reviewer
+description: Use when a branch is ready for review to audit it against the rules.
+---
+```
 
 ### Headings
 
