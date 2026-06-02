@@ -52,12 +52,16 @@ paths:
 - Set one trap covering all cleanup near the top of `main()` (or top-level for scripts without `main`), not one per resource. A second `trap` for the same signal silently disables the first.
 - Mark session resources `readonly` so the path the trap will `rm -rf` can't be reassigned.
 
+## Prelude
+
+- The prelude runs after `set -euf` and before function definitions.
+- Include required-input checks (`${VAR:?msg}`).
+- Include default assignments (`${VAR:=}`).
+- Include tool checks (`command -v`).
+- Add a `check_requirements` function called from `main()` when the script supports `--help`, parses arguments before deciding what to do, or might be sourced by tests.
+
 ## Script Structure
 
-- Required-input checks (`${VAR:?msg}`) may sit at the top of the file as preamble, after `set -euf` and before function definitions.
-- Default assignments (`${VAR:=}`) may sit at the top of the file as preamble, after `set -euf` and before function definitions.
-- Tool checks (`command -v`) may sit at the top of the file as preamble, after `set -euf` and before function definitions.
-- Move them into a `check_requirements` function called from `main()` when the script supports `--help`, parses arguments before deciding what to do, or might be sourced by tests.
 - Wrap the script body in `main()`; call `main "$@"` as the last line. Small single-purpose scripts (hooks, one-shot utilities) may omit `main()` and run linearly.
 - Define helper functions above `main()`.
 - Each logical step gets its own function.
