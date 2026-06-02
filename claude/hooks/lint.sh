@@ -44,7 +44,7 @@ lint_go() (
 
 lint_shell() (
   find . \( -path '*/.git' -o -path '*/.local' \) -prune -o -name '*.sh' \
-    -exec shellcheck {} + 2>&1
+    -exec shellcheck -x {} + 2>&1
 )
 
 lint_terraform() (
