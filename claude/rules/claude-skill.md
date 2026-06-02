@@ -4,9 +4,7 @@ paths:
   - '**/claude/skills/**/*.md'
 ---
 
-## Claude Skill
-
-### Frontmatter
+## Frontmatter
 
 | Field                      | Use                                                                          |
 | -------------------------- | ---------------------------------------------------------------------------- |
@@ -25,17 +23,17 @@ description: Use when ...
 ---
 ```
 
-### Headings
+## Headings
 
 - Use `##` for the document title and `###` for sections; do not use `#` (H1).
 
-### Scope
+## Scope
 
 - One job per skill. Multi-purpose skills branch internally and balloon.
 - A skill earns its existence from gotchas. If there are no gotchas to capture,
   do not write it.
 
-### Body
+## Body
 
 - Gotchas are the load-bearing content. Conventions are derivable from the code;
   gotchas are what justify the skill.
@@ -51,7 +49,7 @@ description: Use when ...
 - Check, do not guess. If the skill can verify a file exists or a command is on
   PATH, have it verify.
 
-### Structure
+## Structure
 
 - Default to a single `SKILL.md` inside a folder named after the skill. The
   folder lets you add `templates/`, `examples/`, or reference docs later without
@@ -60,7 +58,7 @@ description: Use when ...
   when the file would otherwise sprawl past ~150 lines. Otherwise keep it inline.
 - Create supporting files lazily, only when you have something to write.
 
-### Prose
+## Prose
 
 - Imperative second person. "Run the tests," not "you should consider running
   the tests".

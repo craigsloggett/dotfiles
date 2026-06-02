@@ -4,9 +4,7 @@ paths:
   - '**/claude/rules/*.md'
 ---
 
-## Claude Rule
-
-### Frontmatter
+## Frontmatter
 
 | Field   | Use                                                            |
 | ------- | -------------------------------------------------------------- |
@@ -21,16 +19,16 @@ paths:
 ---
 ```
 
-### Headings
+## Headings
 
-- Use `##` for the document title and `###` for sections; do not use `#` (H1).
+- Use `##` for section headings; omit a document title heading. Do not use `#` (H1).
 
-### New Files
+## New Files
 
 - A topic earns its own rule file only when it activates on a glob no existing rule file owns.
 - A glob that is a subset of another's is a section of that file, not a new file.
 
-### Adding Rules
+## Adding Rules
 
 - Phrase rules as a clean imperative bullet matching the voice and format of sibling bullets.
 - Keep each bullet to a single scannable point (one idea); split a bullet that bundles distinct rules. A rule paired with its rationale or exception is one idea, not two.

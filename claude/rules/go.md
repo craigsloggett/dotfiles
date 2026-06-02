@@ -5,14 +5,12 @@ paths:
   - '**/go.sum'
 ---
 
-## Go
-
-### Coding Standards
+## Coding Standards
 
 - Follow [Effective Go](https://go.dev/doc/effective_go) and [Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments).
 - Prefer the standard library. Only add dependencies when they provide clear value.
 - Write clear, idiomatic Go.
 
-### Module Versioning
+## Module Versioning
 
 - Set the `go` directive in `go.mod` to the lowest Go version that successfully builds the project without known security vulnerabilities.

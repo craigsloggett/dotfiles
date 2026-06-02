@@ -4,9 +4,7 @@ paths:
   - '**/claude/agents/*.md'
 ---
 
-## Claude Agent
-
-### Frontmatter
+## Frontmatter
 
 | Field             | Use                                                                       |
 | ----------------- | ------------------------------------------------------------------------- |
@@ -36,28 +34,28 @@ description: Use when a branch is ready for review to audit it against the rules
 ---
 ```
 
-### Headings
+## Headings
 
 - Use `##` for the document title and `###` for sections; do not use `#` (H1).
 
-### When To Create
+## When To Create
 
 - Create a subagent only for context isolation: verbose work you will not
   reference again that returns a summary to the main thread.
 - A reusable prompt that runs in the main context is a skill, not an agent.
 
-### Name
+## Name
 
 - Name agents as nouns you address (`consistency-reviewer`, `pr-reviewer`), not
   actions you invoke.
 - Lowercase and hyphens (the schema requires that anyway).
 
-### Description
+## Description
 
 - State when to delegate to the agent, not what it does. It is what Claude reads
   to decide relevance.
 
-### Tools
+## Tools
 
 - Allowlist the minimum a reader needs, `tools: Read, Grep, Glob, Bash`.
   Allowlisting is bounded where a denylist is not.
@@ -74,7 +72,7 @@ description: Use when a branch is ready for review to audit it against the rules
 - An investigator may hold Bash and write tools; an auditor holds neither Edit
   nor Write. If a read-only agent names them, refuse or switch the archetype.
 
-### Body
+## Body
 
 - The body is the system prompt. A subagent gets only this plus basic
   environment, so it must be self-contained.
@@ -84,7 +82,7 @@ description: Use when a branch is ready for review to audit it against the rules
 - Note the trigger in the body: run an auditor at true handoff, behind green
   format and lint.
 
-### Model And Effort
+## Model And Effort
 
 - High-stakes judgment auditing gets `model: opus` or `effort: high`; low effort
   produces shallow misses.

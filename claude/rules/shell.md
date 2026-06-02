@@ -4,9 +4,7 @@ paths:
   - install
 ---
 
-## Shell
-
-### POSIX Compliance
+## POSIX Compliance
 
 - Shebang `#!/bin/sh`. Never `#!/bin/bash` or `#!/usr/bin/env bash`.
 - No bashisms: no `[[ ]]`, no `local`, no arrays, no `source` (use `.`), no `set -o pipefail`.
@@ -18,14 +16,14 @@ paths:
 - Pass values into embedded programs (`sed`, `awk`, `jq`) as data, not spliced into program text.
 - `sed` is fine for static patterns; escape the value first if the replacement is dynamic.
 
-### Quoting and Variable Expansion
+## Quoting and Variable Expansion
 
 - Always `"${var}"`. Exception: positional parameters use bare double quotes (`"$1"`, `"$@"`, `"$#"`), not `"${1}"`.
 - Quote all command substitutions: `"$(command)"`.
 - Pass arguments through with `"$@"`, never `$*`.
 - Use `read -r`.
 
-### Error Handling
+## Error Handling
 
 - Set strict mode at the top of the file, before any function definitions: `set -euf`.
 - Use `${var:?error message}` for required arguments.
@@ -41,11 +39,11 @@ paths:
 - Use `cond || die "msg"` for single conditions and `if cond1 && cond2; then die "msg"; fi` for compound ones; avoid `cond1 && cond2 && die "msg"`.
 - Aggregating output from independent tools (e.g. several linters' findings) is reporting, not error collection; deferring it to the end is fine. The fail-fast rule governs validation conditions only.
 
-### Linting
+## Linting
 
 - Run all scripts through `shellcheck -x`.
 
-### Temporary Files
+## Temporary Files
 
 - Use `mktemp` for files and `mktemp -d` for session-scoped directories. Respect `$TMPDIR`; never hard-code `/tmp`.
 - Write atomically: `mktemp` a staging file in the target's directory, then `mv` into place.
@@ -54,9 +52,11 @@ paths:
 - Set one trap covering all cleanup near the top of `main()` (or top-level for scripts without `main`), not one per resource. A second `trap` for the same signal silently disables the first.
 - Mark session resources `readonly` so the path the trap will `rm -rf` can't be reassigned.
 
-### Script Structure
+## Script Structure
 
-- Required-input checks (`${VAR:?msg}`), default assignments (`${VAR:=}`), and tool checks (`command -v`) may sit at the top of the file as preamble, after `set -euf` and before function definitions.
+- Required-input checks (`${VAR:?msg}`) may sit at the top of the file as preamble, after `set -euf` and before function definitions.
+- Default assignments (`${VAR:=}`) may sit at the top of the file as preamble, after `set -euf` and before function definitions.
+- Tool checks (`command -v`) may sit at the top of the file as preamble, after `set -euf` and before function definitions.
 - Move them into a `check_requirements` function called from `main()` when the script supports `--help`, parses arguments before deciding what to do, or might be sourced by tests.
 - Wrap the script body in `main()`; call `main "$@"` as the last line. Small single-purpose scripts (hooks, one-shot utilities) may omit `main()` and run linearly.
 - Define helper functions above `main()`.
@@ -71,13 +71,13 @@ paths:
 - Iterate over positional arguments with `for x in "$@"; do`. Never `for x in $@` (word-splits) or `utilities="$@"; for x in ${utilities}` (loses argument boundaries).
 - Prefer `case` over chained `if`/`elif` for fixed alternatives.
 
-### Formatting
+## Formatting
 
 - `shfmt -i 2 -ci -s`: 2-space indent, indented case bodies, simplify.
 - Keep functions short and focused: prefer scripts under ~100 lines and functions under ~50 lines.
 - `snake_case` for functions and variables.
 - Format embedded program text (awk, jq, sed, sqlite, `python -c`, heredocs) across multiple lines when it exceeds one short line: open the quote on the command line, indent the body two spaces, close the quote on its own line dedented to the command with any remaining arguments and redirects there. One-liners stay one line.
 
-### Gotchas
+## Gotchas
 
 - In mikefarah yq (v4), `select(.uses | test(...))` needs no `// ""` guard, since `test()` on null returns false.
