@@ -6,10 +6,6 @@ paths:
 
 ## Claude Skill
 
-### Headings
-
-- Use `##` for the document title and `###` for sections; do not use `#` (H1).
-
 ### Frontmatter
 
 ```yaml
@@ -28,6 +24,10 @@ Only `name` and `description` are required.
 | `arguments`                | List of `{name, description, required}` for slash-command arguments.         |
 | `disable-model-invocation` | `true` for side-effecting skills only; leave off read-only ones to auto-run. |
 | `allowed-tools`            | The minimum set the skill needs.                                             |
+
+### Headings
+
+- Use `##` for the document title and `###` for sections; do not use `#` (H1).
 
 ### Scope
 

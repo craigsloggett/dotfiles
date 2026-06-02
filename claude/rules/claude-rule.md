@@ -6,15 +6,6 @@ paths:
 
 ## Claude Rule
 
-### Headings
-
-- Use `##` for the document title and `###` for sections; do not use `#` (H1).
-
-### New Files
-
-- A topic earns its own rule file only when it activates on a glob no existing rule file owns.
-- A glob that is a subset of another's is a section of that file, not a new file.
-
 ### Frontmatter
 
 ```yaml
@@ -25,6 +16,15 @@ paths:
 ```
 
 - Frontmatter is the `paths:` list of activation glob(s) and nothing else.
+
+### Headings
+
+- Use `##` for the document title and `###` for sections; do not use `#` (H1).
+
+### New Files
+
+- A topic earns its own rule file only when it activates on a glob no existing rule file owns.
+- A glob that is a subset of another's is a section of that file, not a new file.
 
 ### Adding Rules
 

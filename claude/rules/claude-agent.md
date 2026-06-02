@@ -6,17 +6,14 @@ paths:
 
 ## Claude Agent
 
-### Headings
-
-- Use `##` for the document title and `###` for sections; do not use `#` (H1).
-
-### When To Create
-
-- Create a subagent only for context isolation: verbose work you will not
-  reference again that returns a summary to the main thread.
-- A reusable prompt that runs in the main context is a skill, not an agent.
-
 ### Frontmatter
+
+```yaml
+---
+name: consistency-reviewer
+description: Use when a branch is ready for review to audit it against the rules.
+---
+```
 
 Only `name` and `description` are required.
 
@@ -38,6 +35,16 @@ Only `name` and `description` are required.
 | `background`      | `true` runs the agent as a background task.                               |
 | `color`           | Display color.                                                            |
 | `initialPrompt`   | Auto-submitted first turn when the agent runs as a main session.          |
+
+### Headings
+
+- Use `##` for the document title and `###` for sections; do not use `#` (H1).
+
+### When To Create
+
+- Create a subagent only for context isolation: verbose work you will not
+  reference again that returns a summary to the main thread.
+- A reusable prompt that runs in the main context is a skill, not an agent.
 
 ### Name
 
