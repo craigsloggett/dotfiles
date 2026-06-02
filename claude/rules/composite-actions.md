@@ -7,7 +7,8 @@ paths:
 ## Shell Logic
 
 - Extract non-trivial shell logic into scripts in the `src/` directory.
-- Reference scripts via `${{ github.action_path }}/src/script_name.sh` with `shell: sh`.
+- Name the script after its composite action: `src/<action-name>.sh`.
+- Reference scripts via `${{ github.action_path }}/src/<action-name>.sh` with `shell: sh`.
 - Never inline multi-line shell logic in `action.yml`.
 
 ## README
