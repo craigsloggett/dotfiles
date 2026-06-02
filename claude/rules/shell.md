@@ -38,6 +38,8 @@ paths:
 - Don't collect errors to report at the end and don't nest checks.
 - Use `cond || die "msg"` for single conditions and `if cond1 && cond2; then die "msg"; fi` for compound ones; avoid `cond1 && cond2 && die "msg"`.
 - Aggregating output from independent tools (e.g. several linters' findings) is reporting, not error collection; deferring it to the end is fine. The fail-fast rule governs validation conditions only.
+- Functions `return` a status so the caller decides what to do; this keeps them composable (`func || ...`) and sourceable by tests.
+- Only the top-level flow and `die()` use `exit`; reserve it for aborting the whole script, never for ending a reusable helper.
 
 ## Linting
 
