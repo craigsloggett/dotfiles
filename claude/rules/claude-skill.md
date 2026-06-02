@@ -10,24 +10,6 @@ paths:
 
 - Use `##` for the document title and `###` for sections; do not use `#` (H1).
 
-### Workflow
-
-1. Clarify the trigger. In one sentence, state what user request should make
-   Claude reach for this skill. That sentence becomes the frontmatter
-   description.
-2. Decide invocation. Auto-invoke for read-only or scaffolding skills. Set
-   `disable-model-invocation: true` for anything that mutates shared state
-   (deploys, pushes, sends messages).
-3. List the gotchas this skill exists to capture. Gotchas are the load-bearing
-   content. If there are no gotchas, the skill probably is not worth writing.
-4. Draft the body around those gotchas. Use `!command` inline where current
-   state matters more than a description of it.
-5. Decide structure. Default to a single `SKILL.md`. Split into supporting
-   files only when the file would otherwise sprawl past ~150 lines, or when a
-   section is a standalone format spec worth isolating.
-6. Trim. Read the draft top to bottom and delete anything that restates what
-   the reader already knows.
-
 ### Frontmatter
 
 ```yaml
@@ -37,31 +19,24 @@ description: Use when ...
 ---
 ```
 
-Fields:
-- `name`: kebab-case, action-oriented (verb-noun)
-- `description`: when to invoke, not what it does. It is the field loaded into
-  context at session start, so it has to help Claude decide relevance
-- `arguments`: optional. List of `{name, description, required}` for
-  slash-command arguments
-- `disable-model-invocation: true`: side-effecting skills only
-- `allowed-tools`: the minimum set the skill needs
+| Argument                   | Description                                                                                                                                                                                               |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                     | kebab-case, action-oriented (verb-noun).                                                                                                                                                                  |
+| `description`              | State when to invoke, not what it does. Loaded into context at session start, so it must help Claude decide relevance. Write it as the one sentence describing the request that should trigger the skill. |
+| `arguments`                | Optional. List of `{name, description, required}` for slash-command arguments.                                                                                                                            |
+| `disable-model-invocation` | `true` for side-effecting skills only. Set it for anything that mutates shared state (deploys, pushes, sends messages); leave it off for read-only or scaffolding skills so they auto-invoke.             |
+| `allowed-tools`            | The minimum set the skill needs.                                                                                                                                                                          |
 
-### Structure
+### Scope
 
-Default: single `SKILL.md` inside a folder named after the skill. The folder
-lets you add `templates/`, `examples/`, or reference docs later without
-restructuring.
-
-Split a section into its own file when it has a format spec of its own.
-Otherwise keep it inline. Create supporting files lazily, only when you have
-something to write.
-
-### Rules
-
-Content:
 - One job per skill. Multi-purpose skills branch internally and balloon.
-- Gotchas over conventions. Conventions are derivable from the code. Gotchas
-  are what justify the skill.
+- A skill earns its existence from gotchas. If there are no gotchas to capture,
+  do not write it.
+
+### Body
+
+- Gotchas are the load-bearing content. Conventions are derivable from the code;
+  gotchas are what justify the skill.
 - Show, do not tell. A conformant example in `examples/` beats a paragraph
   describing the shape.
 - Inline shell with `!` injects real state. Prefer `!git diff HEAD` over "look
@@ -74,7 +49,17 @@ Content:
 - Check, do not guess. If the skill can verify a file exists or a command is on
   PATH, have it verify.
 
-Prose:
+### Structure
+
+- Default to a single `SKILL.md` inside a folder named after the skill. The
+  folder lets you add `templates/`, `examples/`, or reference docs later without
+  restructuring.
+- Split a section into its own file only when it is a standalone format spec, or
+  when the file would otherwise sprawl past ~150 lines. Otherwise keep it inline.
+- Create supporting files lazily, only when you have something to write.
+
+### Prose
+
 - Imperative second person. "Run the tests," not "you should consider running
   the tests".
 - No hedging or meta. No "I'll help you", no "this skill will".
