@@ -93,8 +93,8 @@ paths:
 ## Configuration Validation
 
 - Reserve variable `validation` blocks for uniquely restrictive input requirements beyond type checking; they run at plan time.
-- Encode assumptions (conditions that must hold for a resource to be usable) as `precondition` blocks and guarantees (behavior consumers rely on) as `postcondition` blocks, so violations fail early and in context with a clear `error_message`.
-- Use `check` blocks to verify resources behave as expected without blocking operations when the assertion fails.
+- Where an assumption (a condition that must hold for a resource to be usable) or a guarantee (behavior consumers rely on) is worth enforcing, consider a `precondition` or `postcondition` block so the violation fails early and in context with a clear `error_message`.
+- Consider a `check` block when a resource's expected behavior is worth verifying but a failure shouldn't block operations.
 - Choose a validation method by whether it should block operations and which workflow phase it runs in.
 
 ## Tests
