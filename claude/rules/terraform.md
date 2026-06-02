@@ -8,7 +8,8 @@ paths:
 
 - Use `snake_case` for all resource names, variable names, and output names.
 - Use descriptive names: `aws_s3_bucket.application_logs`, not `aws_s3_bucket.bucket1`.
-- Group related arguments logically. Separate groups with blank lines.
+- Group related arguments logically.
+- Separate argument groups with blank lines.
 - Use `#` comments sparingly. The code should be self-documenting.
 
 ## File Structure
@@ -39,7 +40,8 @@ paths:
 
 - Always include a `description` for every variable.
 - Use `type` constraints. Prefer specific types over `any`.
-- Set sensible `default` values where appropriate. Required variables have no default.
+- Set sensible `default` values where appropriate.
+- Give required variables no `default`.
 - Use `sensitive = true` for secrets.
 
 ## State Management
@@ -58,10 +60,12 @@ paths:
 
 ## Patterns
 
-- Use `count` for simple conditional resources. Use `for_each` for collections.
+- Use `count` for simple conditional resources.
+- Use `for_each` for collections.
 - Avoid `depends_on` unless absolutely necessary. Implicit dependencies are preferred.
 - Use `moved` blocks for resource renames to avoid destroy/recreate.
-- Root modules: pin provider versions to an exact version: `5.0.0`. Always use the latest version available.
+- Root modules: pin provider versions to an exact version (`5.0.0`).
+- Pin to the latest version available.
 - Shared modules: constrain only the minimum provider version with `>=`, so callers can select a newer version other parts of their configuration need.
 - Use `aws_iam_policy_document` data sources for IAM policies. They are type-safe, easier to read, and composable. Avoid inline `jsonencode` blocks for policy JSON.
 - Encode assumptions (conditions that must hold for a resource to be usable) as `precondition` blocks and guarantees (behavior consumers rely on) as `postcondition` blocks, so violations fail early and in context with a clear `error_message`.
