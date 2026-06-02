@@ -49,7 +49,7 @@ description: Use when a branch is ready for review to audit it against the rules
 ### Name
 
 - Name agents as nouns you address (`consistency-reviewer`, `pr-reviewer`), not
-  actions you invoke. This is the inverse of the verb-noun rule for skills.
+  actions you invoke.
 - Lowercase and hyphens (the schema requires that anyway).
 
 ### Description
