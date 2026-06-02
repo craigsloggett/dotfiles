@@ -27,6 +27,8 @@ paths:
 - Keep modules focused on a single concern.
 - Compose modules at the root, keeping the tree flat (one level of child modules); wire them together with expressions like `module.network.vpc_id` rather than nesting modules inside modules.
 - Pass a module's dependencies in as input variables instead of creating them inside the module, so the root can rewire modules or swap inputs for data sources without changing the module.
+- Don't write a module that detects whether an object exists and creates it conditionally; accept it as an input variable and let the caller pass either a managed `resource` or a `data` source.
+- Type such a dependency variable as an `object({...})` listing only the attributes the module uses, so either a resource or a data source satisfies it.
 - Document required vs optional variables with `description` and `default`.
 - Use `validation` blocks for input constraints.
 
