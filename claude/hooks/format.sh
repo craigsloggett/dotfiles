@@ -35,7 +35,7 @@ format_file() (
       gofmt -s -w "${file_path}" 2>&1
       ;;
     sh)
-      shfmt -i 2 -ci -w "${file_path}" 2>&1
+      shfmt -i 2 -ci -s -w "${file_path}" 2>&1
       ;;
   esac
 )
