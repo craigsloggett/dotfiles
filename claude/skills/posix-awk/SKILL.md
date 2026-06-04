@@ -1,12 +1,11 @@
 ---
 name: posix-awk
 description: >
-  Write strictly POSIX-conformant awk and flag any gawk/mawk extensions
-  (gensub, asort, length(array), systime/strftime, FIELDWIDTHS, IGNORECASE,
-  bitwise fns, coprocesses). Use whenever a task involves writing, editing,
-  or reviewing awk (including awk one-liners inside shell scripts, pipelines,
-  Makefiles, or CI), even if POSIX is not mentioned and even if the awk is a
-  single line. If awk appears, this skill applies.
+  Write strictly POSIX-conformant awk and flag gawk/mawk extensions
+  (gensub, asort, length(array), systime, FIELDWIDTHS, bitwise fns).
+  Invoke for any awk you write, edit, or review, including one-liners in
+  shell scripts, pipelines, Makefiles, or CI, and even when the awk is
+  incidental to a larger task. If awk appears, invoke this skill.
 ---
 
 ## POSIX Awk

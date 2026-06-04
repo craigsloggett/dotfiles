@@ -85,6 +85,7 @@ paths:
 - Keep positional argument lists to three or fewer.
 - Iterate over positional arguments with `for x in "$@"; do`. Never `for x in $@` (word-splits) or `utilities="$@"; for x in ${utilities}` (loses argument boundaries).
 - Prefer `case` over chained `if`/`elif` for fixed alternatives.
+- Bind a non-obvious pattern (a regex, glob, or format string) to a descriptively named variable so the name documents what it matches, rather than inlining the literal in a condition. A lone simple literal may stay inline.
 
 ## Formatting
 
