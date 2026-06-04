@@ -9,7 +9,7 @@ paths:
 - Shebang `#!/bin/sh`. Never `#!/bin/bash` or `#!/usr/bin/env bash`.
 - No bashisms: no `[[ ]]`, no `local`, no arrays, no `source` (use `.`), no `set -o pipefail`.
 - Use `[ ... ]` for tests, never `test`.
-- `while :`, never `while true`. `:` is a builtin in every shell; `true` is not guaranteed to be.
+- `while :`, never `while true` (`true` is not a guaranteed builtin).
 - Use `$(( ))` for arithmetic, never `expr`.
 - Use `printf` for all output, never `echo`.
 - Single-quote `printf` format strings; pass expansions as `%s` with separate double-quoted arguments: `printf '%s\n' "message: ${var}"`.
@@ -56,14 +56,17 @@ paths:
 - No predictable `.new`/`.tmp`/`.bak` suffixes.
 - Register cleanup via `trap` immediately after `mktemp`, before any failure path can leak the resource.
 - Set one trap covering all cleanup near the top of `main()` (or top-level for scripts without `main`), not one per resource. A second `trap` for the same signal silently disables the first.
-- Mark session resources `readonly` so the path the trap will `rm -rf` can't be reassigned.
+- Mark session variables `readonly` so the path the trap will `rm -rf` can't be reassigned.
 
 ## Prelude
 
 - The prelude runs after `set -euf` and before function definitions.
-- Include required-input checks (`${VAR:?msg}`).
+- Assert required inputs with the `:` no-op (validate, don't bind): `: "${INPUT_FILE:?file input is required}"`.
 - Include default assignments (`${VAR:=}`).
 - Include tool checks (`command -v`).
+- Place each validation in the scope where its variable is assigned, after the assignment; a check on an unset variable aborts under `set -u`.
+- With a `main()`, bind working variables there, not in the prelude: `file="${INPUT_FILE}"`.
+- Without a `main()`, combine assert and bind: `file="${INPUT_FILE:?file input is required}"`.
 - Add a `check_requirements` function called from `main()` when the script supports `--help`, parses arguments before deciding what to do, or might be sourced by tests.
 
 ## Script Structure
@@ -74,6 +77,7 @@ paths:
 - Open the script with a comment explaining what it does and why it exists or where it sits in a larger flow, not how it works line-by-line. The "how" belongs in inline comments or is self-evident from the code.
 - Document each function with a complete sentence beginning with the function's name, in a comment directly preceding the declaration with no intervening blank line.
 - Scope function-local variables with a subshell body `func() ( ... )` rather than `_`-prefixed names. Use a plain `{ ... }` body when the function must set a variable for the caller to read.
+  - `return` propagates function status correctly from subshell-body functions in both `/bin/sh` and `dash`.
 - Return via exit status (and optionally stdout), not by mutating caller variables.
 - State set once in `main()` may be global; don't use globals as a return channel from helpers.
 - Transformation helpers take inputs as positional arguments, assigned to named locals at the top (`file="${1:?file is required}"`).
