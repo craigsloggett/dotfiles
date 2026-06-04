@@ -65,7 +65,7 @@ paths:
 - Include default assignments (`${VAR:=}`).
 - Include tool checks (`command -v`).
 - Place each validation in the scope where its variable is assigned, after the assignment; a check on an unset variable aborts under `set -u`.
-- With a `main()`, bind working variables there, not in the prelude: `file="${INPUT_FILE}"`.
+- With a `main()`, bind working variables there, not in the prelude.
 - Without a `main()`, combine assert and bind: `file="${INPUT_FILE:?file input is required}"`.
 - Add a `check_requirements` function called from `main()` when the script supports `--help`, parses arguments before deciding what to do, or might be sourced by tests.
 
