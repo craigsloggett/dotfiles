@@ -1,6 +1,6 @@
 ---
 name: create-from-template
-description: Use when the user wants the full flow from a template repo, creating the GitHub repo, cloning it locally, cutting the initial release, settling open PRs, then cleaning up template scaffolding. Orchestrates the step skills.
+description: Use when the user wants the full flow from a template repo, creating the GitHub repo, cloning it locally, cutting the initial release, settling open PRs, cleaning up template scaffolding, then opening a cleanup PR. Orchestrates the step skills.
 arguments:
   - template
   - name
@@ -24,7 +24,8 @@ Run the step skills in order. Each is invocable on its own; this skill sequences
 3. Invoke the `create-initial-release` skill with `<owner>/<name>` so it can cut the `v0.0.1` prerelease that marks the pristine template state.
 4. Invoke the `settle-open-prs` skill on `~/Developer/GitHub/<owner>/<name>` so it can fix any dependabot PR titles, merge the green ones, and pull the default branch locally.
 5. Invoke the `cleanup-template-scaffolding` skill on `~/Developer/GitHub/<owner>/<name>` so it can scan for placeholders, apply replacements, and write a fresh README.
+6. Invoke the `open-pr` skill on `~/Developer/GitHub/<owner>/<name>` with branch `clean-up-template-scaffolding` and title `chore: Clean up template scaffolding`, so the cleanup lands on a branch and pull request rather than dirtying the working tree.
 
 ## Rules
 
-- Keep the order create, clone, release, settle PRs, cleanup. The release tags the unmodified template before any cleanup commits, so `v0.0.1` marks the pristine state, and PRs settle before cleanup so it starts from the merged default branch.
+- Keep the order create, clone, release, settle PRs, cleanup, open PR. The release tags the unmodified template before any cleanup commits, so `v0.0.1` marks the pristine state, PRs settle before cleanup so it starts from the merged default branch, and the cleanup lands as its own PR because the ruleset blocks direct pushes to the default branch.

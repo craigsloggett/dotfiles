@@ -1,0 +1,33 @@
+---
+name: open-pr
+description: Use when the user wants to commit the current working-tree changes onto a new branch and open a pull request, for a repo whose default branch requires PRs.
+arguments:
+  - dir
+  - branch
+  - title
+---
+
+## Arguments
+
+Positional and optional. Invoke as `/open-pr <dir> <branch> <title>`.
+
+- `dir`: path to the local clone. Blank uses the current directory.
+- `branch`: branch to create. Blank derives a short kebab-case name from the change.
+- `title`: commit subject and PR title. Blank derives a conventional-commit subject from the change.
+
+## Workflow
+
+Work in `<dir>` (the local clone; if `$dir` is blank, the current directory).
+
+1. Check for changes with `git -C <dir> status --porcelain`. If the tree is clean, report there is nothing to open a PR for and stop.
+2. Branch off the current default branch: `git -C <dir> checkout -b <branch>`. This carries the uncommitted changes onto the new branch, so the default branch keeps no direct commit.
+3. Stage and commit, signed: `git -C <dir> add -A` then `git -C <dir> commit -S -m "<title>"`. Default `<title>` to a conventional-commit subject (`type: Capitalized summary`) matching the target repo's convention. If signing fails, hand the session back to the user to unlock the GPG key; do not commit unsigned.
+4. Push: `git -C <dir> push -u origin <branch>`.
+5. Open the PR against the default branch: `gh pr create --title "<title>" --body "<brief summary>"` (run from `<dir>`; pass a body so it does not open an editor). Then invoke the `update-pr-description` skill on the new PR so the body is declarative.
+6. Report the PR URL. Leave the branch checked out with a clean tree.
+
+## Rules
+
+- Never commit to the default branch directly. The ruleset requires a pull request, so always branch first.
+- Sign the commit (`-S`); the ruleset requires signed commits.
+- Do not merge the PR here. Leave it open for review unless the caller asks otherwise.
