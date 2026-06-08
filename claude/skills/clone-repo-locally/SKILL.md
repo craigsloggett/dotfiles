@@ -19,14 +19,9 @@ Authenticated GitHub user, for owner-prefixing a bare repo name:
 
 !`gh api user --jq .login`
 
-1. Resolve `$repo` into `<owner>/<name>`. If `$repo` is a bare name, prefix it with the authenticated user above. If `$repo` is blank, ask.
-2. Block on local collisions. The destination is `$dest` if non-empty, else `~/Developer/GitHub/<owner>/<name>`. If it already exists, stop and ask the user to rename or remove it. Never delete it automatically.
-3. Clone over SSH.
-   - `mkdir -p` the destination's parent directory.
+1. Resolve `$repo` into `<owner>/<name>`; prefix a bare name with the authenticated user above. If `$repo` is blank, ask.
+2. The destination is `$dest` if non-empty, else `~/Developer/GitHub/<owner>/<name>`. If it already exists, stop and ask the user to rename or remove it; never delete it.
+3. Clone over SSH:
+   - `mkdir -p` the destination's parent.
    - `git clone git@github.com:<owner>/<name>.git <destination>`.
 4. Confirm with `git -C <destination> rev-parse HEAD`.
-
-## Rules
-
-- Clone over SSH (`git@github.com:<owner>/<name>.git`), not HTTPS.
-- Never delete or overwrite an existing destination. Stop and hand the collision back to the user.
