@@ -37,4 +37,3 @@ Open PRs on the current repo:
 - Only merge dependabot PRs that have passing checks.
 - When resolving conflicts in action version refs, prefer the newer version from dependabot.
 - When resolving conflicts between feature changes and dependabot changes, keep both (the feature change and the version bump).
-- Never merge the feature PR itself. Only report it as ready for review.
