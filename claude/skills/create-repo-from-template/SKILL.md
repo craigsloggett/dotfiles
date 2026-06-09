@@ -92,4 +92,3 @@ Existing descriptions, tagged with their topics:
 
 - Never modify or push to the template repo; it is read-only here.
 - The new repo's owner and the template's owner are independent. Never reuse the template's owner for the new repo unless the user asks.
-- Verify `gh` flags with `--help` rather than guessing; say "unverified" when uncertain.

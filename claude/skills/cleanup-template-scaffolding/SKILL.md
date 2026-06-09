@@ -44,4 +44,3 @@ Run hands-off: apply confidently-inferable replacements without prompting, keep 
 ## Rules
 
 - Surrounding context distinguishes a placeholder from a real value. `@craigsloggett` in `CODEOWNERS` is the real owner; `TODO` about future work is project notes, not a template artifact.
-- The `LICENSE` copyright is the authenticated GitHub name above and the current year above. Apply it without asking.

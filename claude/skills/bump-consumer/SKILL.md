@@ -26,10 +26,3 @@ Positional and optional. Invoke as `/bump-consumer <consumer> <upstreams>`.
    Replace with the new SHA and version from `$upstreams`.
 5. Show the full consumer diff. Confirm before pushing.
 6. Commit and push to the consumer's currently-checked-out branch. GPG-signed, conventional commit. Never force-push.
-
-## Rules
-
-- Match consumer refs on full `owner/repo`, never trailing name only.
-- Never `--force` push. Never push to `main` on the consumer.
-- GPG-sign every commit. On signing failure, hand the session back to the user.
-- No AI/Claude attribution in commit messages or PR bodies.

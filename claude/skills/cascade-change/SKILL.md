@@ -1,6 +1,6 @@
 ---
 name: cascade-change
-description: Use when the user wants to apply a change concurrently across a list of versioned upstream repos via auto-merging PRs and release each. Hands off to bump-consumer to pin the new versions in a consumer repo.
+description: Use when the user wants to apply a change concurrently across versioned upstream repos via auto-merging PRs and release each. Hands off to bump-consumer to pin the new versions in a consumer repo.
 arguments:
   - repos
   - change
@@ -42,7 +42,7 @@ Spawn one subagent per upstream repo in a single tool-call batch so they run in 
 Per-subagent pipeline:
 
 1. Sync main: `git checkout main && git pull && git gone`. Abort if the working tree is dirty.
-2. Apply the change. Same semantic edit as the canonical preview. Do not expand scope.
+2. Apply the change. Same semantic edit as the canonical preview.
 3. Branch, commit, push. Create a branch named `cascade/<short-kebab-slug-of-change>`. Commit with a conventional-commit subject derived from the change description (imperative, under 70 chars, no trailing period, GPG-signed). Push.
 4. Open the PR: `gh pr create` with a one-line body summarizing the change. Capture the PR number.
 5. Watch checks: `gh pr checks <number> --watch`.
@@ -72,6 +72,3 @@ Subagent contract:
 - Concurrent commits hit the GPG agent simultaneously. If any subagent's commit fails to sign, abort that subagent and surface the failure so the user can unlock the key before retrying.
 - The canonical preview is the only per-edit human review. Subagents cannot prompt the user, so do not add per-repo confirmation gates inside the concurrent fan-out.
 - Use the upstream repo's default merge style; do not override.
-- Never `--force` push.
-- GPG-sign every commit. On signing failure, hand the session back to the user.
-- No AI/Claude attribution in commit messages or PR bodies.

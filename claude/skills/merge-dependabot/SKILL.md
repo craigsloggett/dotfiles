@@ -22,7 +22,7 @@ Open PRs on the current repo:
    git rebase main
    ```
 
-5. Resolve conflicts if any arise. Take the newer dependabot versions for action refs while preserving the intent of the feature branch changes.
+5. Resolve conflicts: prefer the newer dependabot version for action refs, and keep both the feature change and the version bump.
 6. Force push the rebased branch:
 
    ```sh
@@ -31,9 +31,3 @@ Open PRs on the current repo:
 
 7. Verify checks using `gh pr checks <number> --watch`. If any fail, fix the issue, push, and re-check.
 8. Report that the PR is ready for review.
-
-## Rules
-
-- Only merge dependabot PRs that have passing checks.
-- When resolving conflicts in action version refs, prefer the newer version from dependabot.
-- When resolving conflicts between feature changes and dependabot changes, keep both (the feature change and the version bump).
