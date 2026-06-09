@@ -2,22 +2,24 @@
 name: cascade-change
 description: Use when the user wants to apply a change concurrently across a list of versioned upstream repos via auto-merging PRs and release each. Hands off to bump-consumer to pin the new versions in a consumer repo.
 arguments:
-  - name: upstream-repos
-    description: Either an explicit list of upstream repo paths/identifiers, or a discovery description (e.g., "all action repos in ~/Developer/GitHub/craigsloggett that define emit_state_log()"). When a description is given, the skill resolves it to a concrete list and confirms with the user before proceeding.
-    required: true
-  - name: change
-    description: Description of the change to apply to each upstream repo (provided in the invocation prompt).
-    required: true
-  - name: consumer-repo
-    description: Path to a consumer repo to re-pin after release. If provided, the skill hands off to bump-consumer with the captured versions. If omitted, the skill stops after aggregation and reports the new tags.
-    required: false
+  - repos
+  - change
+  - consumer
 ---
+
+## Arguments
+
+Positional and optional. Invoke as `/cascade-change <repos> <change> <consumer>`.
+
+- `repos`: explicit list of upstream repo paths, or a discovery description (e.g. "all action repos in ~/Developer/GitHub/craigsloggett that define emit_state_log()"), resolved to a concrete list and confirmed before fan-out. Blank asks.
+- `change`: description of the change to apply to each upstream repo. Blank asks.
+- `consumer`: path to a consumer repo to re-pin after release. Blank stops after aggregation and reports the new tags.
 
 ## Workflow
 
 ### Phase 0: Resolve the upstream List
 
-1. If `upstream-repos` is an explicit list, use it as-is.
+1. If `$repos` is an explicit list, use it as-is.
 2. If it is a discovery description, resolve it to a concrete list:
    - Identify the scope (e.g., a parent directory) from the description.
    - Use `grep`, `find`, or read repo contents to identify the repos that match the predicate.
@@ -29,7 +31,7 @@ arguments:
 Pick one upstream repo from the resolved list as the canonical example.
 
 1. Sync main: `git checkout main && git pull && git gone`. Refuse if the working tree is dirty.
-2. Apply the change. Locate the change site semantically per the invocation description and make the minimal edit. Do not expand scope.
+2. Apply the change. Locate the change site semantically per `$change` and make the minimal edit. Do not expand scope.
 3. Show the diff to the user and confirm it matches the invocation's intent. This is the only per-edit review; the same change pattern is applied to all remaining repos by subagents.
 4. Revert the edit: `git restore .` so the canonical repo starts Phase 2 from a clean main, like every other repo.
 
@@ -62,8 +64,8 @@ Subagent contract:
 
 ### Phase 4: Hand off
 
-1. If `consumer-repo` was provided, invoke the `bump-consumer` skill with the consumer path and the `{repo, new_tag, tag_sha}` list from Phase 3 so it can re-pin the references.
-2. If `consumer-repo` was omitted, report the captured `{repo, new_tag, tag_sha}` list and stop. The user can run `bump-consumer` later with that list.
+1. If `$consumer` was provided, invoke the `bump-consumer` skill with `$consumer` and the `{repo, new_tag, tag_sha}` list from Phase 3 so it can re-pin the references.
+2. If `$consumer` was omitted, report the captured `{repo, new_tag, tag_sha}` list and stop. The user can run `bump-consumer` later with that list.
 
 ## Rules
 

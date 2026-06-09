@@ -3,6 +3,8 @@ name: update-pr-description
 description: Use when the user asks to write or update a pull request description, especially to make it declarative (what the PR introduces) rather than a history of the commits or the work done.
 ---
 
+## Workflow
+
 The current PR number:
 
 !`gh pr view --json number --jq .number`
@@ -14,8 +16,6 @@ The current PR body:
 The diff this PR introduces, against its base branch:
 
 !`git diff "$(gh pr view --json baseRefName --jq .baseRefName)"...HEAD`
-
-## Workflow
 
 1. Confirm the target PR. The values above are the current branch's PR. If the user names a different number, fetch it instead before continuing (`gh pr view <number> --json number,body,baseRefName` and `git diff <base>...HEAD`).
 

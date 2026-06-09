@@ -2,14 +2,18 @@
 name: sync-conventions
 description: Use when the user asks to compare the current project against a source directory and align conventions, patterns, or configuration.
 arguments:
-  - name: source
-    description: Path to the source directory to sync from.
-    required: true
+  - source
 ---
+
+## Arguments
+
+Positional and optional. Invoke as `/sync-conventions <source>`.
+
+- `source`: path to the source directory to sync from. Blank asks.
 
 ## Workflow
 
-1. Identify the source and target. The source is the directory passed as an argument. The target is the current working directory.
+1. Identify the source and target. The source is `$source`. The target is the current working directory.
 2. Explore both directories. Launch Explore agents in parallel:
    - Source: read the directory structure, key configuration files, and recent git history (`git -C $source log --oneline -20`) to understand what has changed recently.
    - Target: read the directory structure and the same categories of files to understand the current state.
