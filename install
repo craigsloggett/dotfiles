@@ -122,14 +122,15 @@ _gpg() {
     chmod 700 "${XDG_DATA_HOME}/gnupg"
   fi
 
-  # GnuPG requires a special case for symlinking the dotfile.
-  if [ ! -e "${XDG_DATA_HOME}/gnupg/gpg.conf" ]; then
-    # TODO: Update the symlink if the location changed.
-    if [ -f "${dirname}/gnupg/gpg.conf" ]; then
-      ln -s "${dirname}/gnupg/gpg.conf" \
-        "${XDG_DATA_HOME}/gnupg/gpg.conf"
+  # GnuPG requires a special case for symlinking the dotfiles.
+  for conf in gpg.conf gpg-agent.conf; do
+    if [ ! -e "${XDG_DATA_HOME}/gnupg/${conf}" ]; then
+      if [ -f "${dirname}/gnupg/${conf}" ]; then
+        ln -s "${dirname}/gnupg/${conf}" \
+          "${XDG_DATA_HOME}/gnupg/${conf}"
+      fi
     fi
-  fi
+  done
 }
 
 _go() {
