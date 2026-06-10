@@ -40,13 +40,6 @@
     ],
     "defaultMode": "plan"
   },
-  "autoMode": {
-    "environment": [
-      "$defaults",
-      "Both github.com/craigsloggett and github.com/craigsloggett-lab belong to me. Treat every repo under them as my own internal source control."
-    ]
-  },
-  "model": "opus[1m]",
   "hooks": {
     "PostToolUse": [
       {
@@ -86,5 +79,11 @@
   "effortLevel": "xhigh",
   "voice": {
     "enabled": true
+  },
+  "autoMode": {
+    "environment": [
+      "$defaults",
+      "Both github.com/craigsloggett and github.com/craigsloggett-lab belong to me. Treat every repo under them as my own internal source control."
+    ]
   }
 }
