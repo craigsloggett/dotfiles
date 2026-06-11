@@ -31,21 +31,8 @@ so rebases target the latest default branch.
    still pending). All green: merge (step 6). A check failed: investigate (step 5).
 5. Investigate the failure with `gh run view <run-id> --log-failed` (run id from the
    failing check's link). Classify it:
-   - Mechanical (deterministic, no judgment): a stale terraform-docs README from a
-     provider or module bump, a format or lint autofix, a regenerated lockfile or
-     checksum, a check that passes once rebased onto a just-merged CI bump. Fix it on
-     the PR branch (`gh pr checkout <number>` if not already there). For a stale
-     terraform-docs README: confirm `command -v terraform-docs` (if missing, treat as
-     complex and stop), list changed files with `gh pr diff <number> --name-only`,
-     take the directories holding changed `.tf` files, and for each whose `README.md`
-     contains `<!-- BEGIN_TF_DOCS -->`, run `terraform-docs markdown table <dir> --output-file README.md --output-mode inject`. Commit signed, matching the target repo's commit convention (read its recent
-     `git log`); never include `[dependabot skip]`. Push with plain `git push` (or
-     `git push --force-with-lease` if a rebase was involved). Re-watch with `gh pr
-     checks <number> --watch`. Green: merge. Still failing: it was not mechanical, so
-     stop and ask.
-   - Complex (needs judgment): a real test failure, a breaking API change, a type
-     error, anything needing a code edit. Stop and report the PR, the failing check,
-     and the log excerpt; ask the user before touching it.
+   - Mechanical (deterministic, no judgment): a stale terraform-docs README from a provider or module bump, a format or lint autofix, a regenerated lockfile or checksum, a check that passes once rebased onto a just-merged CI bump. Fix it on the PR branch (`gh pr checkout <number>` if not already there). For a stale terraform-docs README: confirm `command -v terraform-docs` (if missing, treat as complex and stop), list changed files with `gh pr diff <number> --name-only`, take the directories holding changed `.tf` files, and for each whose `README.md` contains `<!-- BEGIN_TF_DOCS -->`, run `terraform-docs markdown table <dir> --output-file README.md --output-mode inject`. Commit signed, matching the target repo's commit convention (read its recent `git log`); never include `[dependabot skip]`. Push with plain `git push` (or `git push --force-with-lease` if a rebase was involved). Re-watch with `gh pr checks <number> --watch`. Green: merge. Still failing: it was not mechanical, so stop and ask.
+   - Complex (needs judgment): a real test failure, a breaking API change, a type error, anything needing a code edit. Stop and report the PR, the failing check, and the log excerpt; ask the user before touching it.
 6. Merge. Read the allowed styles from `gh api repos/<owner>/<repo>`
    (`merge_commit_allowed`, `squash_merge_allowed`, `rebase_merge_allowed`) and merge
    with the matching `gh pr merge <number> --merge | --squash | --rebase`.
