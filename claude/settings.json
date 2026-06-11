@@ -69,6 +69,26 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${HOME}\"/.claude/hooks/cleanup.sh"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${HOME}\"/.claude/hooks/cleanup.sh"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
