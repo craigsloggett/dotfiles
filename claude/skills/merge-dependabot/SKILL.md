@@ -38,13 +38,7 @@ so rebases target the latest default branch.
      terraform-docs README: confirm `command -v terraform-docs` (if missing, treat as
      complex and stop), list changed files with `gh pr diff <number> --name-only`,
      take the directories holding changed `.tf` files, and for each whose `README.md`
-     contains `<!-- BEGIN_TF_DOCS -->` run:
-
-     ```sh
-     terraform-docs markdown table <dir> --output-file README.md --output-mode inject
-     ```
-
-     Commit signed, matching the target repo's commit convention (read its recent
+     contains `<!-- BEGIN_TF_DOCS -->`, run `terraform-docs markdown table <dir> --output-file README.md --output-mode inject`. Commit signed, matching the target repo's commit convention (read its recent
      `git log`); never include `[dependabot skip]`. Push with plain `git push` (or
      `git push --force-with-lease` if a rebase was involved). Re-watch with `gh pr
      checks <number> --watch`. Green: merge. Still failing: it was not mechanical, so
