@@ -47,6 +47,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "\"${HOME}\"/.claude/hooks/track.sh"
+          },
+          {
+            "type": "command",
             "command": "\"${HOME}\"/.claude/hooks/format.sh"
           },
           {

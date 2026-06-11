@@ -2,7 +2,7 @@
 #
 # hooks/lint.sh
 #
-# Lint files after Claude finishes responding
+# Lint the files worked on after Claude finishes responding
 
 set -euf
 
@@ -27,6 +27,27 @@ block_with_reason() (
   jq -n --arg reason "${reason}" '{decision: "block", reason: $reason}'
 )
 
+# filter_worked_files reads paths on stdin and prints those that live under
+# project_dir and still exist, one per line.
+filter_worked_files() (
+  project_dir="$1"
+  while IFS= read -r file_path; do
+    case "${file_path}" in
+      "${project_dir}"/*)
+        [ -f "${file_path}" ] || continue
+        printf '%s\n' "${file_path}"
+        ;;
+    esac
+  done
+)
+
+# files_matching prints the worked files whose path matches regex, one per line.
+files_matching() (
+  files="$1"
+  regex="$2"
+  printf '%s\n' "${files}" | grep -E "${regex}" || true
+)
+
 lint_github_actions() (
   actionlint 2>&1
 )
@@ -42,9 +63,15 @@ lint_go() (
   fi
 )
 
+# lint_shell runs shellcheck on the given newline-separated shell files.
 lint_shell() (
-  find . \( -path '*/.git' -o -path '*/.local' \) -prune -o -name '*.sh' \
-    -exec shellcheck -x {} + 2>&1
+  files="$1"
+  IFS='
+'
+  # Split on newline IFS into positional parameters; set -f disables globbing.
+  # shellcheck disable=SC2086
+  set -- ${files}
+  shellcheck -x "$@" 2>&1
 )
 
 lint_terraform() (
@@ -55,9 +82,15 @@ lint_terraform() (
   tflint --recursive --format=compact 2>&1
 )
 
+# lint_yaml runs yamllint on the given newline-separated YAML files.
 lint_yaml() (
-  find . \( -path '*/.git' -o -path '*/.local' \) -prune -o \( -name '*.yaml' -o -name '*.yml' \) \
-    -exec yamllint {} + 2>&1
+  files="$1"
+  IFS='
+'
+  # Split on newline IFS into positional parameters; set -f disables globbing.
+  # shellcheck disable=SC2086
+  set -- ${files}
+  yamllint "$@" 2>&1
 )
 
 main() {
@@ -67,10 +100,31 @@ main() {
   [ -n "${CLAUDE_PROJECT_DIR:-}" ] || return 0
   cd "${CLAUDE_PROJECT_DIR}" || return 0
 
+  session_id="$(printf '%s' "${HOOK_INPUT}" | jq -r '.session_id // empty')"
+  [ -n "${session_id}" ] || return 0
+
+  state_file="${XDG_STATE_HOME:-${HOME}/.local/state}/claude/worked-files/${session_id}"
+  [ -f "${state_file}" ] || return 0
+
+  # Consume the list: dedupe and keep only existing project files, then drop the
+  # state file so the next turn lints only its own edits.
+  worked_files="$(sort -u "${state_file}" | filter_worked_files "${CLAUDE_PROJECT_DIR}")"
+  rm -f "${state_file}"
+
+  [ -n "${worked_files}" ] || return 0
+
+  workflow_path_regex='/\.github/workflows/[^/]+\.ya?ml$'
+
+  shell_files="$(files_matching "${worked_files}" '\.sh$')"
+  yaml_files="$(files_matching "${worked_files}" '\.ya?ml$')"
+  go_files="$(files_matching "${worked_files}" '\.go$')"
+  tf_files="$(files_matching "${worked_files}" '\.tf$')"
+  workflow_files="$(files_matching "${worked_files}" "${workflow_path_regex}")"
+
   combined_output=""
 
-  # GitHub Actions
-  if [ -d .github/workflows ]; then
+  # GitHub Actions (actionlint scans .github/workflows; run it if one changed)
+  if [ -n "${workflow_files}" ]; then
     if ! lint_github_actions_output="$(lint_github_actions)"; then
       combined_output="${combined_output}
 === GitHub Actions ===
@@ -78,8 +132,8 @@ ${lint_github_actions_output}"
     fi
   fi
 
-  # Go
-  if [ -f go.mod ]; then
+  # Go (golangci-lint resolves packages, so run project-scope when any .go changed)
+  if [ -n "${go_files}" ]; then
     if ! lint_go_output="$(lint_go)"; then
       combined_output="${combined_output}
 === Go ===
@@ -88,28 +142,26 @@ ${lint_go_output}"
   fi
 
   # Shell
-  if find . \( -path '*/.git' -o -path '*/.local' \) -prune -o -name '*.sh' -print -quit | grep -q .; then
-    if ! lint_shell_output="$(lint_shell)"; then
+  if [ -n "${shell_files}" ]; then
+    if ! lint_shell_output="$(lint_shell "${shell_files}")"; then
       combined_output="${combined_output}
 === Shell ===
 ${lint_shell_output}"
     fi
   fi
 
-  # Terraform
-  if [ -f .tflint.hcl ]; then
-    if find . -path '*/.terraform/*' -prune -o -name '*.tf' -print -quit | grep -q .; then
-      if ! lint_terraform_output="$(lint_terraform)"; then
-        combined_output="${combined_output}
+  # Terraform (tflint runs recursively; gate on a changed .tf and a config)
+  if [ -f .tflint.hcl ] && [ -n "${tf_files}" ]; then
+    if ! lint_terraform_output="$(lint_terraform)"; then
+      combined_output="${combined_output}
 === Terraform ===
 ${lint_terraform_output}"
-      fi
     fi
   fi
 
   # YAML
-  if find . \( -path '*/.git' -o -path '*/.local' \) -prune -o \( -name '*.yaml' -o -name '*.yml' \) -print -quit | grep -q .; then
-    if ! lint_yaml_output="$(lint_yaml)"; then
+  if [ -n "${yaml_files}" ]; then
+    if ! lint_yaml_output="$(lint_yaml "${yaml_files}")"; then
       combined_output="${combined_output}
 === YAML ===
 ${lint_yaml_output}"
