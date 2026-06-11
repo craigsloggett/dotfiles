@@ -10,7 +10,7 @@ paths:
 - Do not lead a bullet with a bold label. If `**Foo**: bar` is the whole bullet, write `Foo: bar` or drop the label.
 - Do not use `—` to describe a bullet point; migrate to a table in a new section if possible.
 - Keep lists tight: no blank lines between list items, or between a list and its introductory line.
-- Keep nested list items on a single line, with no fenced code block beneath them. Obsidian mis-renders wrapped text or a fence indented under a sub-bullet; inline a short command, or lift a multi-line block up to a top-level step.
+- Keep nested list items to a single line, with no fenced code block beneath them; Obsidian mis-renders text or a fence indented under a sub-bullet. Lift a multi-line block to the top level instead.
 - Indent with spaces, never tabs.
 - Use fenced code blocks, not indented code blocks.
 - The YAML frontmatter of a Markdown document must pass a `yamllint` check.
