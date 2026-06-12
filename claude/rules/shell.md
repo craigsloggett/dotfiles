@@ -86,6 +86,11 @@ paths:
 - Prefer `case` over chained `if`/`elif` for fixed alternatives.
 - Bind a non-obvious pattern (a regex, glob, or format string) to a descriptively named variable so the name documents what it matches, rather than inlining the literal in a condition. A lone simple literal may stay inline.
 
+## Example Files
+
+- In committed example files users copy and fill in (e.g. `environment.example.sh`), assign environment variables directly with placeholder values; never invoke user-specific tooling (`pass`, credential helpers, `eval "$(tool ...)"`).
+- When a tool would export variables on the user's behalf (e.g. `eval "$(doormat aws export ...)"`), list those variables with placeholders instead of calling the tool.
+
 ## Formatting
 
 - `shfmt -i 2 -ci -s`: 2-space indent, indented case bodies, simplify.
