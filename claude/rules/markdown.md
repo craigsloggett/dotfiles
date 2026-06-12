@@ -6,6 +6,7 @@ paths:
 ## Style
 
 - Use Title Case for headings.
+- Be clear and concise as possible by asking the question "if I remove this, will the reader misunderstand?", if they won't, remove it.
 - Set no line length limit on prose; never wrap to satisfy a character count, but keep wording clear and concise.
 - Do not lead a bullet with a bold label. If `**Foo**: bar` is the whole bullet, write `Foo: bar` or drop the label.
 - Do not use `—` to describe a bullet point; migrate to a table in a new section if possible.
