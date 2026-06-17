@@ -30,3 +30,5 @@ Work in `<dir>` (the local clone; blank means the current directory).
 
 - The default branch's ruleset requires a PR and signed commits, so always branch and sign; never commit to the default branch directly.
 - Do not merge the PR here; leave it open unless the caller asks otherwise.
+- The PR title and body should not have anything that doesn't declaratively state what is functionally changing in this branch.
+- If the reader looks at the PR, they should be able to understand at the highest level what is being added, but they can review the code for technical details.
