@@ -10,7 +10,7 @@ HOOK_INPUT="$(cat)"
 readonly HOOK_INPUT
 
 check_prerequisites() {
-  for utility in gofmt jq shfmt terraform yamlfmt; do
+  for utility in gofmt jq shfmt swiftformat terraform yamlfmt; do
     command -v "${utility}" >/dev/null 2>&1 || return 1
   done
 }
@@ -36,6 +36,9 @@ format_file() (
       ;;
     sh)
       shfmt -i 2 -ci -s -w "${file_path}" 2>&1
+      ;;
+    swift)
+      swiftformat "${file_path}" 2>&1
       ;;
   esac
 )

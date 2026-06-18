@@ -17,7 +17,7 @@ check_stop_hook_active_field() (
 )
 
 check_prerequisites() {
-  for utility in actionlint golangci-lint jq shellcheck tflint yamllint; do
+  for utility in actionlint golangci-lint jq shellcheck swiftlint tflint yamllint; do
     command -v "${utility}" >/dev/null 2>&1 || return 1
   done
 }
@@ -74,6 +74,17 @@ lint_shell() (
   shellcheck -x "$@" 2>&1
 )
 
+# lint_swift runs swiftlint on the given newline-separated Swift files.
+lint_swift() (
+  files="$1"
+  IFS='
+'
+  # Split on newline IFS into positional parameters; set -f disables globbing.
+  # shellcheck disable=SC2086
+  set -- ${files}
+  swiftlint lint --quiet "$@" 2>&1
+)
+
 lint_terraform() (
   tflint_plugin_dir="${TFLINT_PLUGIN_DIR:-.tflint.d}"
 
@@ -116,6 +127,7 @@ main() {
   workflow_path_regex='/\.github/workflows/[^/]+\.ya?ml$'
 
   shell_files="$(files_matching "${worked_files}" '\.sh$')"
+  swift_files="$(files_matching "${worked_files}" '\.swift$')"
   yaml_files="$(files_matching "${worked_files}" '\.ya?ml$')"
   go_files="$(files_matching "${worked_files}" '\.go$')"
   tf_files="$(files_matching "${worked_files}" '\.tf$')"
@@ -147,6 +159,15 @@ ${lint_go_output}"
       combined_output="${combined_output}
 === Shell ===
 ${lint_shell_output}"
+    fi
+  fi
+
+  # Swift
+  if [ -n "${swift_files}" ]; then
+    if ! lint_swift_output="$(lint_swift "${swift_files}")"; then
+      combined_output="${combined_output}
+=== Swift ===
+${lint_swift_output}"
     fi
   fi
 
