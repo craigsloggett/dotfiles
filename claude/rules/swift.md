@@ -55,6 +55,10 @@ paths:
 - Lay out a SwiftPM package as `Sources/<Target>/` and `Tests/<Target>Tests/`; pin `swift-tools-version` in `Package.swift`.
 - Document symbols with `///` comments using the standard `- Parameter`, `- Returns`, and `- Throws` fields.
 
+## Dependencies
+
+- Reference a dependency's public constants directly instead of mirroring them in local literals, and pin each value you rely on with a test so an upstream change on a version bump fails CI instead of drifting silently.
+
 ## Formatting and Linting
 
 - SwiftFormat owns formatting: run `swiftformat .` to format, `swiftformat --lint .` in CI; keep settings in `.swiftformat` and pin `--swift-version`.
