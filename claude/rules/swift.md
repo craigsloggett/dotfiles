@@ -34,6 +34,10 @@ paths:
 - Model mutually exclusive states as an `enum` with associated values, not parallel optionals or boolean flags.
 - Prefer protocols and generics over class inheritance for polymorphism.
 
+## Expressions
+
+- Split a dense expression by naming intermediate subexpressions with `let`, not by wrapping the single expression across lines; the name documents intent where a line break does not.
+
 ## Concurrency
 
 - Target the Swift 6 language mode with strict concurrency checking on; resolve data-race warnings rather than suppressing them.
