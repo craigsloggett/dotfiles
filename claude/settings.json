@@ -102,6 +102,7 @@
   },
   "spinnerTipsEnabled": false,
   "effortLevel": "xhigh",
+  "tui": "fullscreen",
   "voice": {
     "enabled": true
   },
@@ -111,5 +112,5 @@
       "Both github.com/craigsloggett and github.com/craigsloggett-lab belong to me. Treat every repo under them as my own internal source control."
     ]
   },
-  "tui": "fullscreen"
+  "model": "claude-fable-5[1m]"
 }
