@@ -40,6 +40,7 @@
     ],
     "defaultMode": "plan"
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "PostToolUse": [
       {
@@ -111,6 +112,5 @@
       "$defaults",
       "Both github.com/craigsloggett and github.com/craigsloggett-lab belong to me. Treat every repo under them as my own internal source control."
     ]
-  },
-  "model": "claude-fable-5[1m]"
+  }
 }
