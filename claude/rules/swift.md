@@ -57,7 +57,7 @@ paths:
 - One primary type per file, named after that type (`UserSession.swift`).
 - Split protocol conformances into dedicated `extension`s, one per protocol.
 - Lay out a SwiftPM package as `Sources/<Target>/` and `Tests/<Target>Tests/`; pin `swift-tools-version` in `Package.swift`.
-- Document symbols with `///` comments using the standard `- Parameter`, `- Returns`, and `- Throws` fields.
+- Document symbols with `///` comments: a one-sentence summary fragment ending in a period, a blank `///` line before any discussion, and `- Parameter(s):`, `- Returns:`, or `- Throws:` fields only when they add information the summary and signature don't already carry.
 
 ## Dependencies
 
