@@ -16,7 +16,7 @@ paths:
 
 - Never force-unwrap (`!`), force-try (`try!`), or force-cast (`as!`); each crashes on bad input. The sole exception is a value a local precondition guarantees, with a comment saying why.
 - Use `guard let value else { ... }` for early exit and `if let value` for the narrow branch; both take the shorthand that omits `= value`.
-- Coalesce with `??` and chain with `?.` instead of unwrapping then branching.
+- Chain with `?.` instead of unwrapping then branching. Prefer `if let` with a defaulted `var` over `??` embedded mid-expression (`(f(x) ?? 0) + 1`); a bare trailing default (`name ?? "Unknown"`) is fine.
 - Avoid implicitly unwrapped optionals (`String!`) outside Interface Builder outlets.
 
 ## Error Handling
@@ -37,6 +37,7 @@ paths:
 ## Expressions
 
 - Split a dense expression by naming intermediate subexpressions with `let`, not by wrapping the single expression across lines; the name documents intent where a line break does not.
+- Prefer an explicit loop with an early exit (`for x in xs where cond { return ... }`) over predicate closures (`first(where: { $0 ... })`, `contains(where:)`); the loop names its element and reads top to bottom.
 
 ## Concurrency
 
@@ -55,6 +56,9 @@ paths:
 ## Structure
 
 - One primary type per file, named after that type (`UserSession.swift`).
+- Declare a struct's stored properties in the order the memberwise initializer should read at the call site: identity, then defining facts, then content, then omittable overlays last. A `var` with a default becomes an omittable trailing parameter; a `let` with a default leaves the initializer entirely, which is how you forbid callers from supplying one.
+- Order a type's members as state, then knowledge, then behavior: stored properties first so the whole state space is visible at a glance, computed properties next, methods last.
+- When grouping-by-concept fights call-site readability, prefer the call site: every caller sees the initializer's order, only the file sees the grouping, and `let`/`var` already mark each line's role.
 - Split protocol conformances into dedicated `extension`s, one per protocol.
 - Lay out a SwiftPM package as `Sources/<Target>/` and `Tests/<Target>Tests/`; pin `swift-tools-version` in `Package.swift`.
 - Document symbols with `///` comments: a one-sentence summary fragment ending in a period, a blank `///` line before any discussion, and `- Parameter(s):`, `- Returns:`, or `- Throws:` fields only when they add information the summary and signature don't already carry.
