@@ -38,7 +38,7 @@
       "Bash(aws s3 rm *)",
       "Bash(aws s3 sync *)"
     ],
-    "defaultMode": "plan"
+    "defaultMode": "auto"
   },
   "model": "opus[1m]",
   "hooks": {
