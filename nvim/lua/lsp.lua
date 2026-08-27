@@ -1,12 +1,14 @@
 vim.lsp.enable({
+  "basedpyright",
   "gopls",
   "lua_ls",
+  "ruff",
   "terraform-ls",
   "tflint"
 })
 
 vim.diagnostic.config({
-  virtual_lines = true,
+  virtual_lines = { current_line = true },
   float         = { source = true }
 })
 

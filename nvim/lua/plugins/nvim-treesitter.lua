@@ -9,7 +9,7 @@ vim.pack.add({
 -- vim, query) auto-start via their ftplugins. For everything else, the FileType
 -- autocommand below starts treesitter if the parser exists, or installs it
 -- asynchronously if it doesn't. Reopen the file after install to get highlighting.
-local parsers = { "bash", "gitcommit", "gitignore", "hcl", "terraform", "yaml" }
+local parsers = { "bash", "gitcommit", "gitignore", "hcl", "python", "terraform", "yaml" }
 
 vim.api.nvim_create_autocmd("FileType", {
   callback = function(args)

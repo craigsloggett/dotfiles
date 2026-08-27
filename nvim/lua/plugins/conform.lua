@@ -9,6 +9,7 @@ require("conform").setup {
   formatters_by_ft = {
     hcl = { "terraform_fmt" },
     json = { "jq" },
+    python = { "ruff_format" },
     sh = { "shfmt" },
     yaml = { "yamlfmt" },
     zsh = { "shfmt" },
