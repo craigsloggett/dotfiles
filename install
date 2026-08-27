@@ -380,6 +380,48 @@ _npm() {
   fi
 }
 
+_docker() {
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+  mkdir -p "${XDG_STATE_HOME}/docker/buildx"
+
+  # Migrate existing config if it exists.
+  if [ -d "${HOME}/.docker" ]; then
+    mv "${HOME}/.docker" "${XDG_CONFIG_HOME}/docker"
+  fi
+
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles docker
+
+  # Remove the ~/.docker directory if it is empty.
+  if [ -d "${HOME}/.docker" ]; then
+    if [ -z "$(ls -A "${HOME}/.docker")" ]; then
+      rmdir "${HOME}/.docker"
+    fi
+  fi
+}
+
+_colima() {
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+  mkdir -p "${XDG_DATA_HOME}/lima"
+
+  # Migrate existing config if it exists.
+  if [ -d "${HOME}/.colima" ]; then
+    mv "${HOME}/.colima" "${XDG_CONFIG_HOME}/colima"
+  fi
+
+  # Symlink dotfiles to the git repository.
+  symlink_dotfiles colima
+
+  # Remove the ~/.colima directory if it is empty.
+  if [ -d "${HOME}/.colima" ]; then
+    if [ -z "$(ls -A "${HOME}/.colima")" ]; then
+      rmdir "${HOME}/.colima"
+    fi
+  fi
+}
+
 _bash() {
   # Create the /etc/bash.bashrc file to specify Bash
   # configuration for interactive shells.
@@ -423,7 +465,7 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
   *Darwin*)
-    utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude irssi rustup cargo npm"
+    utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude irssi rustup cargo npm docker colima"
     ;;
 
   *)
