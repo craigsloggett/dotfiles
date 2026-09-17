@@ -57,6 +57,7 @@ paths:
 
 - One primary type per file, named after that type (`UserSession.swift`).
 - Declare a struct's stored properties in the order the memberwise initializer should read at the call site: identity, then defining facts, then content, then omittable overlays last. A `var` with a default becomes an omittable trailing parameter; a `let` with a default leaves the initializer entirely, which is how you forbid callers from supplying one.
+- Order every parameter list a caller reads, whether a function, an explicit initializer, or a struct's stored properties (its memberwise initializer): data before closures, required before optional within the data, defaulted last. Closures include view-builder slots, so trailing-closure syntax survives; a required parameter never follows an optional one.
 - Order a type's members as state, then knowledge, then behavior: stored properties first so the whole state space is visible at a glance, computed properties next, methods last.
 - When grouping-by-concept fights call-site readability, prefer the call site: every caller sees the initializer's order, only the file sees the grouping, and `let`/`var` already mark each line's role.
 - Split protocol conformances into dedicated `extension`s, one per protocol.
