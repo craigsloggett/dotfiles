@@ -380,6 +380,25 @@ _npm() {
   fi
 }
 
+_bun() {
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+  mkdir -p "${XDG_CACHE_HOME}/bun"
+  mkdir -p "${XDG_DATA_HOME}"
+
+  # Migrate existing data, otherwise setup the directory.
+  if [ -d "${HOME}/.bun" ]; then
+    mv "${HOME}/.bun" "${XDG_DATA_HOME}/bun"
+  else
+    mkdir -p "${XDG_DATA_HOME}/bun"
+  fi
+
+  # Migrate existing global config.
+  if [ -f "${HOME}/.bunfig.toml" ]; then
+    mv "${HOME}/.bunfig.toml" "${XDG_CONFIG_HOME}/.bunfig.toml"
+  fi
+}
+
 _docker() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
@@ -465,11 +484,11 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
   *Darwin*)
-    utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude irssi rustup cargo npm docker colima"
+    utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude irssi rustup cargo npm bun docker colima"
     ;;
 
   *)
-    utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go claude irssi rustup cargo"
+    utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go claude irssi rustup cargo bun"
     ;;
 esac
 
