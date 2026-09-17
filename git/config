@@ -10,6 +10,8 @@
 	rebase = false
 [fetch]
 	pruneTags = true
+[rerere]
+	enabled = true
 [include]
 	path = ~/.config/git/config-personal
 [alias]
