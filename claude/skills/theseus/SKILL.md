@@ -98,13 +98,18 @@ History workflow:
 The takeover landed 2026-08-23: there is no Theseus folder, window, or scene. `macOS/Sources/`
 holds the entry point `HarkApp.swift` (the composition root, above every capability), the
 Foundation-only helpers consumed by three or more capabilities (`Logger+Hark.swift`,
-`Duration+TimeInterval.swift`), and six umbrellas in a ring order: `Models/` (Foundation only;
-value types, IDs, enums), `Analysis/` (Foundation and Accelerate; the pure computations over
-Models and every calibrated constant, the future test target: `Regrouping/`, `Text/`,
+`Probe.swift`, `ContinuousClock.Instant+SecondsElapsed.swift`), and six umbrellas in a ring
+order: `Models/` (Foundation only; value types, IDs, enums), `Analysis/` (Foundation and
+Accelerate; the pure computations over Models and every constant Analysis reads, on the
+`Calibration` sheet, as Engine's are on `Tuning` and UI's on `Theme`: a constant lives on the
+sheet of the layer that reads it; the future test target: `Regrouping/`, `Text/`,
 `Identity/`, `Diarization/`, `Importing/`), `Storage/` and `Engine/` (siblings; both import
 Models and Analysis, neither the other; Engine is one folder per mechanism that touches the
-world, `Audio/`, `Diarization/`, `Importing/`, `Playback/`, `Recording/`, `Transcription/`, and
-its passes and sessions take file URLs and values, never a folder), `App/` (what touches the app
+world, `Audio/`, `Diarization/`, `Importing/`, `LiveTranscription/`, `Playback/`, `Recording/`,
+`Transcription/`, and its passes and sessions take file URLs and values, never a folder; a
+session is begun with `begin` and its caller owns the ending, a pass runs to completion under
+its domain verb and returns its product; a model is named only inside its engine folder, whose
+pass or session is the model-free door), `App/` (what touches the app
 object plus the orchestrators that drive the engine over the store: `Orchestration/` with
 Diarizer, Transcriber, and Importer, `Transport/`, `Lifecycle/`, `Notifications/`), and `UI/`.
 Anything narrower than three capabilities lives in its consumer's folder. A log line carries the
@@ -119,7 +124,7 @@ or App type, either it is not pure and belongs in Engine or App, or the value ar
 parameter. Packages are not split during Theseus; the folder boundary is the package boundary
 later.
 
-Boundaries, enforced by seventeen custom rules in `.swiftlint.yml` that `make lint` runs with
+Boundaries, enforced by twenty-one custom rules in `.swiftlint.yml` that `make lint` runs with
 `--strict`. The import rules take the negated form `^import (?!Foundation$)`, which names what
 a folder may import and rejects everything else: `Models/` imports Foundation alone; `Analysis/`
 Foundation and Accelerate alone; `UI/Presentation/` Foundation and Observation alone (Pipeline
@@ -128,8 +133,13 @@ SwiftUI only in `UI/` and `HarkApp.swift`; AppKit only in `UI/` and `App/` (the 
 running apps and the quit guard is the app's delegate, neither is UI); UserNotifications only in
 `App/Notifications/`; AVFoundation, Speech, FluidAudio, and CoreMedia only in `Engine/` (the
 layers above ask a stage, never a framework; the microphone permission is
-`RecordingDevice.requestAccess()`, the model warm-ups are `SpeechModels.download()` and
-`ParakeetModels.download()`); Accelerate only in `Analysis/` and `Engine/`; CoreAudio only in
+`RecordingDevice.requestAccess()`, the model warm-ups are `TranscriptionPass.downloadModels()`
+and `LiveTranscriptionSession.downloadModels()`), and inside it Speech only in
+`Engine/LiveTranscription/` and FluidAudio only in `Engine/Transcription/`,
+`Engine/Diarization/`, and `Engine/Tuning.swift`, with `ParakeetModels` and
+`ParakeetTranscription` named only in `Engine/Transcription/` and `SpeechModels` and
+`SpeechLiveTranscription` only in `Engine/LiveTranscription/`; Accelerate only in `Analysis/`
+and `Engine/`; CoreAudio only in
 `Engine/Recording/AudioHardware.swift`. The name rules are `(?x)`-wrapped rosters of top-level
 type names with `match_kinds` identifier and typeidentifier, so a comment or string stays
 silent; a new type in Analysis, Storage, Engine, or App must be added to the rosters by hand,
