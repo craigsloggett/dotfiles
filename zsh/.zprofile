@@ -13,6 +13,9 @@ export XDG_BIN_HOME="${XDG_BIN_HOME:-${HOME}/.local/bin}"
 # $ZDOTDIR/.zsh_sessions.
 export SHELL_SESSIONS_DISABLE=1
 
+# Opt out of telemetry in every utility that honors the convention.
+export DO_NOT_TRACK=1
+
 # Add XDG_BIN_HOME to PATH variable.
 typeset -U path
 path+=("${XDG_BIN_HOME}")
