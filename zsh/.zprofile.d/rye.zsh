@@ -4,4 +4,4 @@
 
 export RYE_HOME="${XDG_DATA_HOME}/rye"
 
-. "${RYE_HOME}/env"
+[ -f "${RYE_HOME}/env" ] && . "${RYE_HOME}/env"
