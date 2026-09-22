@@ -13,7 +13,6 @@ dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
 readonly dirname
 
 symlink_dotfiles() {
-  # A single operand is used to denote the utility to symlink.
   util="${1}"
 
   if [ ! -e "${XDG_CONFIG_HOME}/${util}" ]; then
@@ -135,7 +134,20 @@ _gpg() {
 
 _go() {
   # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}/go"
+  mkdir -p "${XDG_DATA_HOME}/go/bin"
   mkdir -p "${XDG_CACHE_HOME}/go"
+
+  if [ -d "${XDG_CACHE_HOME}/go/bin" ]; then
+    for binary in "${XDG_CACHE_HOME}/go/bin"/*; do
+      [ -f "${binary}" ] || continue
+      mv "${binary}" "${XDG_DATA_HOME}/go/bin"
+    done
+
+    if [ -z "$(ls -A "${XDG_CACHE_HOME}/go/bin")" ]; then
+      rmdir "${XDG_CACHE_HOME}/go/bin"
+    fi
+  fi
 }
 
 _pass() {
@@ -166,6 +178,18 @@ _python() {
   # Preserve existing history file.
   if [ -f "${HOME}/.python_history" ]; then
     mv "${HOME}/.python_history" "${XDG_STATE_HOME}/python/history"
+  fi
+}
+
+_rye() {
+  # Setup directories.
+  mkdir -p "${XDG_DATA_HOME}"
+
+  # Migrate existing data, otherwise setup the directory.
+  if [ -d "${HOME}/.rye" ] && [ ! -e "${XDG_DATA_HOME}/rye" ]; then
+    mv "${HOME}/.rye" "${XDG_DATA_HOME}/rye"
+  else
+    mkdir -p "${XDG_DATA_HOME}/rye"
   fi
 }
 
@@ -250,67 +274,59 @@ _ghostty() {
 }
 
 _claude() {
+  # Migrate an existing installation.
+  if [ -d "${HOME}/.claude" ] && [ ! -h "${HOME}/.claude" ]; then
+    if [ -e "${XDG_CONFIG_HOME}/claude" ]; then
+      printf '%s\n' "Both ${HOME}/.claude and ${XDG_CONFIG_HOME}/claude exist, merge them by hand." >&2
+      return 1
+    fi
+
+    mkdir -p "${XDG_CONFIG_HOME}"
+    mv "${HOME}/.claude" "${XDG_CONFIG_HOME}/claude"
+  fi
+
+  if [ -f "${HOME}/.claude.json" ] && [ ! -e "${XDG_CONFIG_HOME}/claude/.claude.json" ]; then
+    mkdir -p "${XDG_CONFIG_HOME}/claude"
+    mv "${HOME}/.claude.json" "${XDG_CONFIG_HOME}/claude/.claude.json"
+  fi
+
+  if [ -d "${XDG_CONFIG_HOME}/claude/plugins" ] && [ ! -e "${XDG_DATA_HOME}/claude/plugins" ]; then
+    mkdir -p "${XDG_DATA_HOME}/claude"
+    mv "${XDG_CONFIG_HOME}/claude/plugins" "${XDG_DATA_HOME}/claude/plugins"
+  fi
+
   # Setup directories.
-  mkdir -p "${HOME}/.claude" # Claude doesn't respect XDG directories.
+  mkdir -p "${XDG_CONFIG_HOME}/claude"
+  mkdir -p "${XDG_DATA_HOME}/claude/plugins"
 
-  # Migrate existing config.
-  if [ -f "${HOME}/.claude/settings.json" ]; then
-    if [ ! -h "${HOME}/.claude/settings.json" ]; then
-      if [ -f "${dirname}/claude/settings.json" ]; then
-        mv "${HOME}/.claude/settings.json" "${dirname}/claude/settings.json.backup"
+  # Preserve configuration that is not already symlinked to the repository.
+  for conf in settings.json CLAUDE.md; do
+    if [ -f "${XDG_CONFIG_HOME}/claude/${conf}" ] && [ ! -h "${XDG_CONFIG_HOME}/claude/${conf}" ]; then
+      if [ -f "${dirname}/claude/${conf}" ]; then
+        mv "${XDG_CONFIG_HOME}/claude/${conf}" "${dirname}/claude/${conf}.backup"
       else
-        mv "${HOME}/.claude/settings.json" "${dirname}/claude/settings.json"
+        mv "${XDG_CONFIG_HOME}/claude/${conf}" "${dirname}/claude/${conf}"
       fi
     fi
-  fi
+  done
 
-  # Migrate existing CLAUDE.md.
-  if [ -f "${HOME}/.claude/CLAUDE.md" ]; then
-    if [ ! -h "${HOME}/.claude/CLAUDE.md" ]; then
-      if [ -f "${dirname}/claude/CLAUDE.md" ]; then
-        mv "${HOME}/.claude/CLAUDE.md" "${dirname}/claude/CLAUDE.md.backup"
-      else
-        mv "${HOME}/.claude/CLAUDE.md" "${dirname}/claude/CLAUDE.md"
-      fi
+  # Symlink the configuration to the git repository.
+  for conf in settings.json CLAUDE.md statusline-command.sh; do
+    if [ -f "${dirname}/claude/${conf}" ]; then
+      ln -sf "${dirname}/claude/${conf}" "${XDG_CONFIG_HOME}/claude/${conf}"
     fi
-  fi
+  done
 
-  # Claude requires a special case for symlinking the dotfile.
-  if [ -f "${dirname}/claude/settings.json" ]; then
-    ln -sf "${dirname}/claude/settings.json" "${HOME}/.claude/settings.json"
-  fi
-  if [ -f "${dirname}/claude/CLAUDE.md" ]; then
-    ln -sf "${dirname}/claude/CLAUDE.md" "${HOME}/.claude/CLAUDE.md"
-  fi
+  for conf in agents hooks rules skills; do
+    [ -d "${dirname}/claude/${conf}" ] || continue
 
-  # Symlink hooks.
-  if [ -d "${dirname}/claude/hooks" ]; then
-    ln -sfn "${dirname}/claude/hooks" "${HOME}/.claude/hooks"
-  fi
+    if [ -d "${XDG_CONFIG_HOME}/claude/${conf}" ] && [ ! -h "${XDG_CONFIG_HOME}/claude/${conf}" ]; then
+      printf '%s\n' "${XDG_CONFIG_HOME}/claude/${conf} is a directory, merge it into ${dirname}/claude/${conf} by hand." >&2
+      return 1
+    fi
 
-  # Symlink statusline command.
-  if [ -f "${dirname}/claude/statusline-command.sh" ]; then
-    ln -sf "${dirname}/claude/statusline-command.sh" "${HOME}/.claude/statusline-command.sh"
-  fi
-
-  # Symlink agents.
-  if [ -d "${dirname}/claude/agents" ]; then
-    ln -sfn "${dirname}/claude/agents" "${HOME}/.claude/agents"
-  fi
-
-  # Symlink skills.
-  if [ -d "${dirname}/claude/skills" ]; then
-    ln -sfn "${dirname}/claude/skills" "${HOME}/.claude/skills"
-  fi
-
-  # Symlink rules.
-  if [ -d "${dirname}/claude/rules" ]; then
-    ln -sfn "${dirname}/claude/rules" "${HOME}/.claude/rules"
-  fi
-
-  # Clean up legacy guideline symlinks.
-  rm -f "${HOME}/.claude/go-guidelines.md"
-  rm -f "${HOME}/.claude/terraform-guidelines.md"
+    ln -sfn "${dirname}/claude/${conf}" "${XDG_CONFIG_HOME}/claude/${conf}"
+  done
 }
 
 _irssi() {
@@ -441,6 +457,41 @@ _colima() {
   fi
 }
 
+_aws() {
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+
+  # Migrate existing credentials, otherwise setup the directory.
+  if [ -d "${HOME}/.aws" ] && [ ! -e "${XDG_CONFIG_HOME}/aws" ]; then
+    mv "${HOME}/.aws" "${XDG_CONFIG_HOME}/aws"
+  else
+    mkdir -p "${XDG_CONFIG_HOME}/aws"
+  fi
+}
+
+_kubectl() {
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}/kube"
+  mkdir -p "${XDG_CACHE_HOME}/kube"
+
+  # Migrate an existing kubeconfig.
+  if [ -f "${HOME}/.kube/config" ] && [ ! -e "${XDG_CONFIG_HOME}/kube/config" ]; then
+    mv "${HOME}/.kube/config" "${XDG_CONFIG_HOME}/kube/config"
+  fi
+}
+
+_codex() {
+  # Setup directories.
+  mkdir -p "${XDG_CONFIG_HOME}"
+
+  # Migrate existing configuration, otherwise setup the directory.
+  if [ -d "${HOME}/.codex" ] && [ ! -e "${XDG_CONFIG_HOME}/codex" ]; then
+    mv "${HOME}/.codex" "${XDG_CONFIG_HOME}/codex"
+  else
+    mkdir -p "${XDG_CONFIG_HOME}/codex"
+  fi
+}
+
 _bash() {
   # Create the /etc/bash.bashrc file to specify Bash
   # configuration for interactive shells.
@@ -484,11 +535,11 @@ _bash() {
 # Specify which dotfiles to install based on the OS.
 case "$(uname -s)" in
   *Darwin*)
-    utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty claude irssi rustup cargo npm bun docker colima"
+    utilities="zsh vim nvim git gpg pass python rye less tmux terraform tflint yamlfmt yamllint ruff go ghostty codex irssi rustup cargo npm bun docker colima aws kubectl claude"
     ;;
 
   *)
-    utilities="bash vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go claude irssi rustup cargo bun"
+    utilities="bash vim nvim git gpg pass python rye less tmux terraform tflint yamlfmt yamllint ruff go claude codex irssi rustup cargo bun aws kubectl"
     ;;
 esac
 
