@@ -33,7 +33,7 @@ main() {
   check_prerequisites || return 0
 
   now="$(date +%s)"
-  settings="${HOME}/.claude/settings.json"
+  settings="${CLAUDE_CONFIG_DIR}/settings.json"
   effort_level="$(jq -r '.effortLevel // empty' "${settings}" 2>/dev/null)"
 
   model_display_name="$(printf '%s' "${STATUSLINE_INPUT}" | jq -r '.model.display_name // empty')"
