@@ -11,6 +11,7 @@
       "Read(//tmp/**)",
       "Read(//Users/Craig/Developer/**)",
       "Read(//Users/Craig/.claude/**)",
+      "Read(//Users/Craig/.config/claude/**)",
       "Edit(//Users/Craig/Developer/**)",
       "WebFetch(*)",
       "WebSearch(*)",
@@ -49,15 +50,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${HOME}\"/.claude/hooks/track.sh"
+            "command": "\"${CLAUDE_CONFIG_DIR}\"/hooks/track.sh"
           },
           {
             "type": "command",
-            "command": "\"${HOME}\"/.claude/hooks/format.sh"
+            "command": "\"${CLAUDE_CONFIG_DIR}\"/hooks/format.sh"
           },
           {
             "type": "command",
-            "command": "\"${HOME}\"/.claude/hooks/docs.sh"
+            "command": "\"${CLAUDE_CONFIG_DIR}\"/hooks/docs.sh"
           }
         ]
       }
@@ -67,7 +68,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${HOME}\"/.claude/hooks/lint.sh"
+            "command": "\"${CLAUDE_CONFIG_DIR}\"/hooks/lint.sh"
           }
         ]
       }
@@ -77,7 +78,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${HOME}\"/.claude/hooks/cleanup.sh"
+            "command": "\"${CLAUDE_CONFIG_DIR}\"/hooks/cleanup.sh"
           }
         ]
       }
@@ -87,7 +88,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${HOME}\"/.claude/hooks/cleanup.sh"
+            "command": "\"${CLAUDE_CONFIG_DIR}\"/hooks/cleanup.sh"
           }
         ]
       }
@@ -95,7 +96,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "\"${HOME}\"/.claude/statusline-command.sh"
+    "command": "\"${CLAUDE_CONFIG_DIR}\"/statusline-command.sh"
   },
   "enabledPlugins": {
     "lua-lsp@claude-plugins-official": true,
