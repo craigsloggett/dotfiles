@@ -1,0 +1,180 @@
+#!/bin/sh
+#
+# macos
+#
+# Apply macOS settings, one function per System Settings pane. Safe to re-run:
+# only settings that differ are written, and only the processes owning a
+# changed pane are restarted. Run with CHECK=1 to report drift without writing.
+#
+# To find the key behind a toggle, diff the defaults around flipping it:
+#
+#   defaults read >"${TMPDIR}/before"
+#   defaults read >"${TMPDIR}/after"
+#   diff "${TMPDIR}/before" "${TMPDIR}/after"
+
+set -euf
+
+: "${CHECK:=}"
+
+die() {
+  printf '%s\n' "$1" >&2
+  exit 1
+}
+
+# setting writes a default when its type or value differs, printing the change.
+# The type is compared too, because a bool and an int both read as 1.
+setting() (
+  domain="$1"
+  key="$2"
+  flag="$3"
+  value="$4"
+
+  case "${flag}" in
+    -bool) type='boolean' ;;
+    -int) type='integer' ;;
+    -float) type='float' ;;
+    -string) type='string' ;;
+    *) die "Unsupported type ${flag} for ${domain} ${key}." ;;
+  esac
+
+  case "${flag}:${value}" in
+    -bool:true) expected=1 ;;
+    -bool:false) expected=0 ;;
+    *) expected="${value}" ;;
+  esac
+
+  current_type="$(defaults read-type "${domain}" "${key}" 2>/dev/null)" || :
+  current="$(defaults read "${domain}" "${key}" 2>/dev/null)" || :
+
+  if [ "${current_type}" = "Type is ${type}" ] && [ "${current}" = "${expected}" ]; then
+    return 0
+  fi
+
+  printf '%s\n' "${domain} ${key}: ${current:-unset} -> ${value}"
+  [ -z "${CHECK}" ] || return 0
+
+  case "${domain}" in
+    /Library/*) sudo defaults write "${domain}" "${key}" "${flag}" "${value}" ;;
+    *) defaults write "${domain}" "${key}" "${flag}" "${value}" ;;
+  esac
+)
+
+# restart relaunches a process so it rereads its preferences. A process that
+# is not running has nothing to reread, so killall failing is not an error.
+restart() {
+  [ -z "${CHECK}" ] || return 0
+  killall "$1" 2>/dev/null || :
+}
+
+# host_names sets every name the machine is advertised under, so Sharing,
+# Bonjour and the shell prompt agree.
+host_names() (
+  for name in ComputerName HostName LocalHostName; do
+    current="$(scutil --get "${name}" 2>/dev/null)" || :
+    [ "${current}" != "${COMPUTER_NAME}" ] || continue
+
+    printf '%s\n' "scutil ${name}: ${current:-unset} -> ${COMPUTER_NAME}"
+    [ -z "${CHECK}" ] || continue
+
+    sudo scutil --set "${name}" "${COMPUTER_NAME}"
+  done
+)
+
+general() (
+  changes="$(
+    host_names
+    setting /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "${COMPUTER_NAME}"
+    setting /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true
+    setting /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
+    setting /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
+    setting /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
+    setting /Library/Preferences/com.apple.commerce AutoUpdate -bool true
+    setting com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
+  )"
+
+  [ -n "${changes}" ] || return 0
+  printf '%s\n' "${changes}"
+)
+
+network() (
+  socketfilterfw='/usr/libexec/ApplicationFirewall/socketfilterfw'
+
+  changes="$(
+    if ! "${socketfilterfw}" --getglobalstate | grep -q 'enabled'; then
+      printf '%s\n' 'firewall: off -> on'
+      [ -n "${CHECK}" ] || sudo "${socketfilterfw}" --setglobalstate on >/dev/null
+    fi
+
+    if ! "${socketfilterfw}" --getstealthmode | grep -q 'is on'; then
+      printf '%s\n' 'firewall stealth mode: off -> on'
+      [ -n "${CHECK}" ] || sudo "${socketfilterfw}" --setstealthmode on >/dev/null
+    fi
+  )"
+
+  [ -n "${changes}" ] || return 0
+  printf '%s\n' "${changes}"
+)
+
+desktop_and_dock() (
+  changes="$(
+    setting com.apple.dock autohide -bool true
+    setting com.apple.dock tilesize -float 43
+    setting com.apple.dock show-recents -bool false
+  )"
+
+  [ -n "${changes}" ] || return 0
+  printf '%s\n' "${changes}"
+  restart Dock
+)
+
+keyboard() (
+  changes="$(
+    setting NSGlobalDomain InitialKeyRepeat -int 25
+    setting NSGlobalDomain KeyRepeat -int 2
+  )"
+
+  [ -n "${changes}" ] || return 0
+  printf '%s\n' "${changes}" 'Log out for keyboard changes to take effect.'
+)
+
+finder() (
+  changes="$(
+    setting com.apple.finder NewWindowTarget -string PfHm
+    setting com.apple.finder _FXSortFoldersFirst -bool true
+  )"
+
+  [ -n "${changes}" ] || return 0
+  printf '%s\n' "${changes}"
+  restart Finder
+)
+
+# manual_steps lists what cannot be scripted, mostly because it needs a
+# password, an Apple Account, or a privacy grant only a person can give.
+manual_steps() {
+  cat <<-'EOF'
+		Manual steps:
+		  - Privacy & Security: turn on FileVault, store the recovery key in pass.
+		  - Apple Account: sign in, sync only Reminders and Notes.
+		  - Control Center: show Bluetooth and Sound in the menu bar.
+		  - Privacy & Security: grant access as apps ask for it.
+	EOF
+}
+
+main() {
+  [ "$(uname -s)" = 'Darwin' ] || die 'This script only runs on macOS.'
+
+  COMPUTER_NAME="${COMPUTER_NAME:-$(scutil --get LocalHostName)}"
+
+  [ -n "${CHECK}" ] || sudo -v
+
+  # System Settings sidebar order, then applications.
+  general
+  network
+  desktop_and_dock
+  keyboard
+  finder
+
+  [ -n "${CHECK}" ] || manual_steps
+}
+
+main "$@"
