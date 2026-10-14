@@ -84,6 +84,14 @@ remove() {
   done
 }
 
+ask() (
+  prompt="${1:?a prompt is required}"
+
+  printf '%s: ' "${prompt}" >&2
+  read -r answer || answer=''
+  printf '%s\n' "${answer}"
+)
+
 zshenv() {
   cat <<'EOF'
 export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
@@ -130,10 +138,24 @@ configure_nvim() {
   symlink "${dirname}/nvim" "${XDG_CONFIG_HOME}/nvim"
 }
 
-configure_git() {
+configure_git() (
+  personal="${XDG_CONFIG_HOME}/git/config-personal"
+
   symlink "${dirname}/git" "${XDG_CONFIG_HOME}/git"
-  migrate "${HOME}/.gitconfig" "${XDG_CONFIG_HOME}/git/config-personal"
-}
+  migrate "${HOME}/.gitconfig" "${personal}"
+
+  [ -z "$(git config --file "${personal}" user.email)" ] || return 0
+
+  email="$(ask 'Email address for Git commits')"
+
+  if [ -z "${email}" ]; then
+    conflict "No Git email set, add user.email to ${personal}."
+    return 0
+  fi
+
+  git config --file "${personal}" user.email "${email}"
+  printf '%s\n' "Set user.email in ${personal}."
+)
 
 configure_gpg() {
   migrate "${HOME}/.gnupg" "${XDG_DATA_HOME}/gnupg"
