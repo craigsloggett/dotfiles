@@ -29,6 +29,39 @@ symlink() (
   printf '%s\n' "Linked ${target} to ${source}."
 )
 
+make_dirs() {
+  for dir in "$@"; do
+    if [ ! -d "${dir}" ]; then
+      mkdir -p "${dir}"
+      printf '%s\n' "Created ${dir}."
+    fi
+  done
+}
+
+merge_history() (
+  source="${1:?a history source is required}"
+  target="${2:?a history target is required}"
+
+  [ -e "${source}" ] || return 0
+
+  if [ -e "${target}" ]; then
+    cat "${target}" >>"${source}"
+  fi
+
+  mkdir -p "${target%/*}"
+  mv "${source}" "${target}"
+  printf '%s\n' "Merged ${source} into ${target}."
+)
+
+remove() {
+  for file in "$@"; do
+    if [ -e "${file}" ]; then
+      rm -rf "${file}"
+      printf '%s\n' "Removed ${file}."
+    fi
+  done
+}
+
 zshenv() {
   cat <<'EOF'
 export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
@@ -41,29 +74,10 @@ configure_zsh() {
     printf '%s\n' "Wrote /etc/zshenv."
   fi
 
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_CACHE_HOME}/zsh"
-  mkdir -p "${XDG_STATE_HOME}/zsh"
-
-  # Update permissions on existing system files.
-  if [ -d /usr/local/share/zsh ]; then
-    chmod 755 /usr/local/share/zsh
-    chmod 755 /usr/local/share/zsh/site-functions
-  fi
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/zsh" "${XDG_CONFIG_HOME}/zsh"
-
-  # Cleanup
-  # TODO: Preserve existing files and merge/prompt.
-  # TODO: Set history file to new location before deleting.
-  rm -f "${HOME}/.zsh_history"
-  rm -f "${HOME}/.zcompdump"
-  rm -f "${HOME}/.zprofile"
-  rm -f "${HOME}/.zshrc"
-  rm -rf "${HOME}/.zsh_sessions"
-  rm -rf "${ZDOTDIR}/.zsh_sessions"
+  make_dirs "${XDG_STATE_HOME}/zsh" "${XDG_CACHE_HOME}/zsh"
+  merge_history "${HOME}/.zsh_history" "${XDG_STATE_HOME}/zsh/history"
+  remove "${HOME}/.zcompdump" "${HOME}/.zsh_sessions" "${HOME}/.zprofile" "${HOME}/.zshrc"
 }
 
 configure_vim() {
