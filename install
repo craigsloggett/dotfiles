@@ -131,16 +131,8 @@ configure_nvim() {
 }
 
 configure_git() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/git" "${XDG_CONFIG_HOME}/git"
-
-  # Migrate existing git configuration.
-  if [ -f "${HOME}/.gitconfig" ]; then
-    mv "${HOME}/.gitconfig" "${XDG_CONFIG_HOME}/git/config"
-  fi
+  migrate "${HOME}/.gitconfig" "${XDG_CONFIG_HOME}/git/config-personal"
 }
 
 configure_gpg() {
