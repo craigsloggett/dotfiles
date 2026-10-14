@@ -12,39 +12,34 @@
 dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
 readonly dirname
 
-symlink_dotfiles() {
-  util="${1}"
+symlink() (
+  source="${1:?a symlink source is required}"
+  target="${2:?a symlink target is required}"
 
-  if [ ! -e "${XDG_CONFIG_HOME}/${util}" ]; then
-    # TODO: Update the symlink if the location changed.
-    if [ -d "${dirname}/${util}" ]; then
-      ln -s "${dirname}/${util}" "${XDG_CONFIG_HOME}/${util}"
-    fi
+  [ -e "${source}" ] || return 0
+  [ "$(readlink "${target}")" != "${source}" ] || return 0
+
+  if [ -e "${target}" ] && [ ! -L "${target}" ]; then
+    printf '%s\n' "Not linking ${target}, it already exists." >&2
+    return 1
   fi
+
+  mkdir -p "${target%/*}"
+  ln -sfn "${source}" "${target}"
+  printf '%s\n' "Linked ${target} to ${source}."
+)
+
+zshenv() {
+  cat <<'EOF'
+export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
+EOF
 }
 
 _zsh() {
-  # Create the /etc/zshenv file to specify $ZDOTDIR.
-  printf '%s\n' "Writing to /etc/zshenv using sudo..."
-
-  cat <<-'EOF' | sudo tee /etc/zshenv >/dev/null
-		# /etc/zshenv: system-wide .zshenv file for zsh(1).
-		#
-		# This file is sourced on all invocations of the shell.
-		# If the -f flag is present or if the NO_RCS option is
-		# set within this file, all other initialization files
-		# are skipped.
-		#
-		# This file should contain commands to set the command
-		# search path, plus other important environment variables.
-		# This file should not contain commands that produce
-		# output or assume the shell is attached to a tty.
-		#
-		# Global Order: zshenv, zprofile, zshrc, zlogin
-
-		# Use XDG Base Directory Specification
-		export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
-	EOF
+  if [ "$(cat /etc/zshenv 2>/dev/null)" != "$(zshenv)" ]; then
+    zshenv | sudo tee /etc/zshenv >/dev/null
+    printf '%s\n' "Wrote /etc/zshenv."
+  fi
 
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
@@ -58,7 +53,7 @@ _zsh() {
   fi
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles zsh
+  symlink "${dirname}/zsh" "${XDG_CONFIG_HOME}/zsh"
 
   # Cleanup
   # TODO: Preserve existing files and merge/prompt.
@@ -82,7 +77,7 @@ _vim() {
   mkdir -p "${XDG_CACHE_HOME}/vim/undo"
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles vim
+  symlink "${dirname}/vim" "${XDG_CONFIG_HOME}/vim"
 
   # Cleanup
   rm -f "${HOME}/.viminfo"
@@ -96,7 +91,7 @@ _nvim() {
   mkdir -p "${XDG_CACHE_HOME}/nvim"
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles nvim
+  symlink "${dirname}/nvim" "${XDG_CONFIG_HOME}/nvim"
 }
 
 _git() {
@@ -104,7 +99,7 @@ _git() {
   mkdir -p "${XDG_CONFIG_HOME}"
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles git
+  symlink "${dirname}/git" "${XDG_CONFIG_HOME}/git"
 
   # Migrate existing git configuration.
   if [ -f "${HOME}/.gitconfig" ]; then
@@ -123,12 +118,7 @@ _gpg() {
 
   # GnuPG requires a special case for symlinking the dotfiles.
   for conf in gpg.conf gpg-agent.conf; do
-    if [ ! -e "${XDG_DATA_HOME}/gnupg/${conf}" ]; then
-      if [ -f "${dirname}/gnupg/${conf}" ]; then
-        ln -s "${dirname}/gnupg/${conf}" \
-          "${XDG_DATA_HOME}/gnupg/${conf}"
-      fi
-    fi
+    symlink "${dirname}/gnupg/${conf}" "${XDG_DATA_HOME}/gnupg/${conf}"
   done
 }
 
@@ -186,7 +176,7 @@ _tmux() {
   mkdir -p "${XDG_CONFIG_HOME}"
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles tmux
+  symlink "${dirname}/tmux" "${XDG_CONFIG_HOME}/tmux"
 }
 
 _terraform() {
@@ -195,7 +185,7 @@ _terraform() {
   mkdir -p "${XDG_CACHE_HOME}/terraform"
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles terraform
+  symlink "${dirname}/terraform" "${XDG_CONFIG_HOME}/terraform"
 }
 
 _tflint() {
@@ -210,7 +200,7 @@ _tflint() {
   fi
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles tflint
+  symlink "${dirname}/tflint" "${XDG_CONFIG_HOME}/tflint"
 }
 
 _yamllint() {
@@ -218,7 +208,7 @@ _yamllint() {
   mkdir -p "${XDG_CONFIG_HOME}"
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles yamllint
+  symlink "${dirname}/yamllint" "${XDG_CONFIG_HOME}/yamllint"
 }
 
 _yamlfmt() {
@@ -226,7 +216,7 @@ _yamlfmt() {
   mkdir -p "${XDG_CONFIG_HOME}"
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles yamlfmt
+  symlink "${dirname}/yamlfmt" "${XDG_CONFIG_HOME}/yamlfmt"
 }
 
 _ruff() {
@@ -240,7 +230,7 @@ _ghostty() {
   mkdir -p "${XDG_CONFIG_HOME}"
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles ghostty
+  symlink "${dirname}/ghostty" "${XDG_CONFIG_HOME}/ghostty"
 
   # Migrate existing data, otherwise setup the directory.
   if [ -d "${HOME}/.terminfo" ]; then
@@ -249,16 +239,9 @@ _ghostty() {
     mkdir -p "${XDG_DATA_HOME}/terminfo"
   fi
 
-  # Symlink the terminfo files in XDG_DATA_HOME.
-  macOS_resources_directory='/Applications/Ghostty.app/Contents/Resources'
-  if [ -d "${macOS_resources_directory}" ]; then
-    if [ ! -e "${XDG_DATA_HOME}/terminfo/67" ]; then
-      ln -s "${macOS_resources_directory}/terminfo/67" "${XDG_DATA_HOME}/terminfo/67"
-    fi
-    if [ ! -e "${XDG_DATA_HOME}/terminfo/78" ]; then
-      ln -s "${macOS_resources_directory}/terminfo/78" "${XDG_DATA_HOME}/terminfo/78"
-    fi
-  fi
+  for terminfo in 67 78; do
+    symlink "/Applications/Ghostty.app/Contents/Resources/terminfo/${terminfo}" "${XDG_DATA_HOME}/terminfo/${terminfo}"
+  done
 }
 
 _claude() {
@@ -323,7 +306,7 @@ _irssi() {
   mkdir -p "${XDG_CONFIG_HOME}"
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles irssi
+  symlink "${dirname}/irssi" "${XDG_CONFIG_HOME}/irssi"
 
   # Migrate existing configuration, otherwise setup the directory.
   if [ -d "${HOME}/.irssi" ]; then
@@ -374,7 +357,7 @@ _npm() {
   fi
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles npm
+  symlink "${dirname}/npm" "${XDG_CONFIG_HOME}/npm"
 
   # Remove the ~/.npm directory if it is empty.
   if [ -d "${HOME}/.npm" ]; then
@@ -414,7 +397,7 @@ _docker() {
   fi
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles docker
+  symlink "${dirname}/docker" "${XDG_CONFIG_HOME}/docker"
 
   # Remove the ~/.docker directory if it is empty.
   if [ -d "${HOME}/.docker" ]; then
@@ -435,7 +418,7 @@ _colima() {
   fi
 
   # Symlink dotfiles to the git repository.
-  symlink_dotfiles colima
+  symlink "${dirname}/colima" "${XDG_CONFIG_HOME}/colima"
 
   # Remove the ~/.colima directory if it is empty.
   if [ -d "${HOME}/.colima" ]; then
