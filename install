@@ -85,6 +85,15 @@ remove() {
   done
 }
 
+remove_empty() {
+  for dir in "$@"; do
+    if [ -d "${dir}" ] && [ -z "$(ls -A "${dir}")" ]; then
+      rmdir "${dir}"
+      printf '%s\n' "Removed ${dir}."
+    fi
+  done
+}
+
 ask() (
   prompt="${1:?a prompt is required}"
 
@@ -171,10 +180,7 @@ configure_go() {
     migrate "${binary}" "${GOBIN}/${binary##*/}"
   done
 
-  if [ -d "${GOPATH}/bin" ] && [ -z "$(ls -A "${GOPATH}/bin")" ]; then
-    rmdir "${GOPATH}/bin"
-    printf '%s\n' "Removed ${GOPATH}/bin."
-  fi
+  remove_empty "${GOPATH}/bin"
 }
 
 configure_pass() {
@@ -190,6 +196,13 @@ configure_python() {
   migrate "${HOME}/.python_history" "${PYTHON_HISTORY}"
   migrate "${HOME}/.matplotlib" "${MPLCONFIGDIR}"
   make_dirs "${PYTHON_HISTORY%/*}"
+}
+
+configure_bundle() {
+  migrate "${HOME}/.bundle/cache" "${BUNDLE_USER_CACHE}"
+  migrate "${HOME}/.bundle/config" "${BUNDLE_USER_CONFIG}"
+  migrate "${HOME}/.bundle/plugin" "${BUNDLE_USER_PLUGIN}"
+  remove_empty "${HOME}/.bundle"
 }
 
 configure_tmux() {
@@ -312,6 +325,7 @@ main() {
   configure_pass
   configure_less
   configure_python
+  configure_bundle
   configure_tmux
   configure_terraform
   configure_tflint
