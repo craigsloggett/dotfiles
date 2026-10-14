@@ -315,24 +315,8 @@ configure_bun() {
 }
 
 configure_docker() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_STATE_HOME}/docker/buildx"
-
-  # Migrate existing config if it exists.
-  if [ -d "${HOME}/.docker" ]; then
-    mv "${HOME}/.docker" "${XDG_CONFIG_HOME}/docker"
-  fi
-
-  # Symlink dotfiles to the git repository.
-  symlink "${dirname}/docker" "${XDG_CONFIG_HOME}/docker"
-
-  # Remove the ~/.docker directory if it is empty.
-  if [ -d "${HOME}/.docker" ]; then
-    if [ -z "$(ls -A "${HOME}/.docker")" ]; then
-      rmdir "${HOME}/.docker"
-    fi
-  fi
+  migrate "${HOME}/.docker" "${DOCKER_CONFIG}"
+  migrate "${DOCKER_CONFIG}/buildx" "${BUILDX_CONFIG}"
 }
 
 configure_colima() {
