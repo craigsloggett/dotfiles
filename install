@@ -212,6 +212,8 @@ configure_tmux() {
 configure_terraform() {
   symlink "${dirname}/terraform" "${XDG_CONFIG_HOME}/terraform"
   make_dirs "${XDG_CACHE_HOME}/terraform"
+  remove "${HOME}/.terraform.d/checkpoint_cache" "${HOME}/.terraform.d/checkpoint_signature"
+  remove_empty "${HOME}/.terraform.d"
 }
 
 configure_tflint() {
