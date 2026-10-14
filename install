@@ -9,6 +9,7 @@ set -eu
 : "${XDG_CACHE_HOME:=${HOME}/.cache}"
 : "${XDG_STATE_HOME:=${HOME}/.local/state}"
 : "${XDG_DATA_HOME:=${HOME}/.local/share}"
+: "${XDG_BIN_HOME:=${HOME}/.local/bin}"
 
 # Get the full path of the current working directory.
 dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
@@ -92,6 +93,13 @@ ask() (
   printf '%s\n' "${answer}"
 )
 
+load_environment() {
+  for file in "${dirname}"/zsh/.zprofile.d/*.sh; do
+    # shellcheck source=/dev/null
+    . "${file}"
+  done
+}
+
 zshenv() {
   cat <<'EOF'
 export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
@@ -174,34 +182,17 @@ configure_go() {
 }
 
 configure_pass() {
-  # Migrate existing password store, otherwise setup the directory.
-  if [ -d "${HOME}/.password-store" ]; then
-    mv "${HOME}/.password-store" "${XDG_DATA_HOME}/pass"
-  else
-    mkdir -p "${XDG_DATA_HOME}/pass"
-  fi
+  migrate "${HOME}/.password-store" "${PASSWORD_STORE_DIR}"
 }
 
 configure_less() {
-  # Setup directories.
-  mkdir -p "${XDG_STATE_HOME}/less"
-
-  # Preserve existing history file.
-  if [ -f "${HOME}/.lesshst" ]; then
-    mv "${HOME}/.lesshst" "${XDG_STATE_HOME}/less/lesshst"
-  fi
+  migrate "${HOME}/.lesshst" "${LESSHISTFILE}"
+  make_dirs "${LESSHISTFILE%/*}"
 }
 
 configure_python() {
-  # Setup directories.
-  mkdir -p "${XDG_STATE_HOME}/python"
-  mkdir -p "${XDG_CACHE_HOME}/python"
-  mkdir -p "${XDG_DATA_HOME}/python"
-
-  # Preserve existing history file.
-  if [ -f "${HOME}/.python_history" ]; then
-    mv "${HOME}/.python_history" "${XDG_STATE_HOME}/python/history"
-  fi
+  migrate "${HOME}/.python_history" "${PYTHON_HISTORY}"
+  make_dirs "${PYTHON_HISTORY%/*}"
 }
 
 configure_tmux() {
@@ -225,11 +216,6 @@ configure_yamllint() {
 
 configure_yamlfmt() {
   symlink "${dirname}/yamlfmt" "${XDG_CONFIG_HOME}/yamlfmt"
-}
-
-configure_ruff() {
-  # Setup directories.
-  mkdir -p "${XDG_CACHE_HOME}/ruff"
 }
 
 configure_ghostty() {
@@ -309,21 +295,11 @@ configure_claude() {
 }
 
 configure_rustup() {
-  # Setup directories.
-  mkdir -p "${XDG_DATA_HOME}"
-
-  # Migrate existing data, otherwise create the data directory.
-  if [ -d "${HOME}/.rustup" ]; then
-    mv "${HOME}/.rustup" "${XDG_DATA_HOME}/rustup"
-    rm -rf "${HOME}/.rustup"
-  else
-    mkdir -p "${XDG_DATA_HOME}/rustup"
-  fi
+  migrate "${HOME}/.rustup" "${RUSTUP_HOME}"
 }
 
 configure_cargo() {
-  # Create the data directory.
-  mkdir -p "${XDG_DATA_HOME}/cargo"
+  migrate "${HOME}/.cargo" "${CARGO_HOME}"
 }
 
 configure_npm() {
@@ -405,26 +381,13 @@ configure_aws() {
 }
 
 configure_kubectl() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}/kube"
-  mkdir -p "${XDG_CACHE_HOME}/kube"
-
-  # Migrate an existing kubeconfig.
-  if [ -f "${HOME}/.kube/config" ] && [ ! -e "${XDG_CONFIG_HOME}/kube/config" ]; then
-    mv "${HOME}/.kube/config" "${XDG_CONFIG_HOME}/kube/config"
-  fi
+  migrate "${HOME}/.kube/config" "${KUBECONFIG}"
+  make_dirs "${KUBECONFIG%/*}" "${KUBECACHEDIR}"
 }
 
 configure_codex() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Migrate existing configuration, otherwise setup the directory.
-  if [ -d "${HOME}/.codex" ] && [ ! -e "${XDG_CONFIG_HOME}/codex" ]; then
-    mv "${HOME}/.codex" "${XDG_CONFIG_HOME}/codex"
-  else
-    mkdir -p "${XDG_CONFIG_HOME}/codex"
-  fi
+  migrate "${HOME}/.codex" "${CODEX_HOME}"
+  make_dirs "${CODEX_HOME}"
 }
 
 main() {
@@ -432,6 +395,8 @@ main() {
   readonly conflicts
   trap 'rm -f "${conflicts}"' EXIT
   trap 'exit 1' INT TERM HUP
+
+  load_environment
 
   configure_zsh
   configure_vim
@@ -447,7 +412,6 @@ main() {
   configure_tflint
   configure_yamllint
   configure_yamlfmt
-  configure_ruff
   configure_ghostty
   configure_claude
   configure_rustup
