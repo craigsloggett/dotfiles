@@ -365,15 +365,7 @@ configure_colima() {
 }
 
 configure_aws() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Migrate existing credentials, otherwise setup the directory.
-  if [ -d "${HOME}/.aws" ] && [ ! -e "${XDG_CONFIG_HOME}/aws" ]; then
-    mv "${HOME}/.aws" "${XDG_CONFIG_HOME}/aws"
-  else
-    mkdir -p "${XDG_CONFIG_HOME}/aws"
-  fi
+  migrate "${HOME}/.aws" "${AWS_CONFIG_FILE%/*}"
 }
 
 configure_kubectl() {
