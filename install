@@ -215,22 +215,11 @@ configure_yamlfmt() {
 }
 
 configure_ghostty() {
-  # Setup directories.
-  mkdir -p "${XDG_DATA_HOME}"
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/ghostty" "${XDG_CONFIG_HOME}/ghostty"
+  migrate "${HOME}/.terminfo" "${TERMINFO}"
 
-  # Migrate existing data, otherwise setup the directory.
-  if [ -d "${HOME}/.terminfo" ]; then
-    mv "${HOME}/.terminfo" "${XDG_DATA_HOME}/terminfo"
-  else
-    mkdir -p "${XDG_DATA_HOME}/terminfo"
-  fi
-
-  for terminfo in 67 78; do
-    symlink "/Applications/Ghostty.app/Contents/Resources/terminfo/${terminfo}" "${XDG_DATA_HOME}/terminfo/${terminfo}"
+  for entry in /Applications/Ghostty.app/Contents/Resources/terminfo/*; do
+    symlink "${entry}" "${TERMINFO}/${entry##*/}"
   done
 }
 
