@@ -164,20 +164,16 @@ configure_gpg() {
 }
 
 configure_go() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}/go"
-  mkdir -p "${XDG_DATA_HOME}/go/bin"
-  mkdir -p "${XDG_CACHE_HOME}/go"
+  migrate "${HOME}/go" "${GOPATH}"
 
-  if [ -d "${XDG_CACHE_HOME}/go/bin" ]; then
-    for binary in "${XDG_CACHE_HOME}/go/bin"/*; do
-      [ -f "${binary}" ] || continue
-      mv "${binary}" "${XDG_DATA_HOME}/go/bin"
-    done
+  for binary in "${GOPATH}"/bin/*; do
+    [ -e "${binary}" ] || continue
+    migrate "${binary}" "${GOBIN}/${binary##*/}"
+  done
 
-    if [ -z "$(ls -A "${XDG_CACHE_HOME}/go/bin")" ]; then
-      rmdir "${XDG_CACHE_HOME}/go/bin"
-    fi
+  if [ -d "${GOPATH}/bin" ] && [ -z "$(ls -A "${GOPATH}/bin")" ]; then
+    rmdir "${GOPATH}/bin"
+    printf '%s\n' "Removed ${GOPATH}/bin."
   fi
 }
 
