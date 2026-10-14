@@ -35,7 +35,7 @@ export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
 EOF
 }
 
-_zsh() {
+configure_zsh() {
   if [ "$(cat /etc/zshenv 2>/dev/null)" != "$(zshenv)" ]; then
     zshenv | sudo tee /etc/zshenv >/dev/null
     printf '%s\n' "Wrote /etc/zshenv."
@@ -66,7 +66,7 @@ _zsh() {
   rm -rf "${ZDOTDIR}/.zsh_sessions"
 }
 
-_vim() {
+configure_vim() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
   mkdir -p "${XDG_STATE_HOME}/vim"
@@ -83,7 +83,7 @@ _vim() {
   rm -f "${HOME}/.viminfo"
 }
 
-_nvim() {
+configure_nvim() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
   mkdir -p "${XDG_STATE_HOME}/nvim"
@@ -94,7 +94,7 @@ _nvim() {
   symlink "${dirname}/nvim" "${XDG_CONFIG_HOME}/nvim"
 }
 
-_git() {
+configure_git() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
 
@@ -107,7 +107,7 @@ _git() {
   fi
 }
 
-_gpg() {
+configure_gpg() {
   # Migrate existing GnuPG keys, otherwise setup directory.
   if [ -d "${HOME}/.gnupg" ]; then
     mv "${HOME}/.gnupg" "${XDG_DATA_HOME}/gnupg"
@@ -122,7 +122,7 @@ _gpg() {
   done
 }
 
-_go() {
+configure_go() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}/go"
   mkdir -p "${XDG_DATA_HOME}/go/bin"
@@ -140,7 +140,7 @@ _go() {
   fi
 }
 
-_pass() {
+configure_pass() {
   # Migrate existing password store, otherwise setup the directory.
   if [ -d "${HOME}/.password-store" ]; then
     mv "${HOME}/.password-store" "${XDG_DATA_HOME}/pass"
@@ -149,7 +149,7 @@ _pass() {
   fi
 }
 
-_less() {
+configure_less() {
   # Setup directories.
   mkdir -p "${XDG_STATE_HOME}/less"
 
@@ -159,7 +159,7 @@ _less() {
   fi
 }
 
-_python() {
+configure_python() {
   # Setup directories.
   mkdir -p "${XDG_STATE_HOME}/python"
   mkdir -p "${XDG_CACHE_HOME}/python"
@@ -171,7 +171,7 @@ _python() {
   fi
 }
 
-_tmux() {
+configure_tmux() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
 
@@ -179,7 +179,7 @@ _tmux() {
   symlink "${dirname}/tmux" "${XDG_CONFIG_HOME}/tmux"
 }
 
-_terraform() {
+configure_terraform() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
   mkdir -p "${XDG_CACHE_HOME}/terraform"
@@ -188,7 +188,7 @@ _terraform() {
   symlink "${dirname}/terraform" "${XDG_CONFIG_HOME}/terraform"
 }
 
-_tflint() {
+configure_tflint() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
 
@@ -203,7 +203,7 @@ _tflint() {
   symlink "${dirname}/tflint" "${XDG_CONFIG_HOME}/tflint"
 }
 
-_yamllint() {
+configure_yamllint() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
 
@@ -211,7 +211,7 @@ _yamllint() {
   symlink "${dirname}/yamllint" "${XDG_CONFIG_HOME}/yamllint"
 }
 
-_yamlfmt() {
+configure_yamlfmt() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
 
@@ -219,12 +219,12 @@ _yamlfmt() {
   symlink "${dirname}/yamlfmt" "${XDG_CONFIG_HOME}/yamlfmt"
 }
 
-_ruff() {
+configure_ruff() {
   # Setup directories.
   mkdir -p "${XDG_CACHE_HOME}/ruff"
 }
 
-_ghostty() {
+configure_ghostty() {
   # Setup directories.
   mkdir -p "${XDG_DATA_HOME}"
   mkdir -p "${XDG_CONFIG_HOME}"
@@ -244,7 +244,7 @@ _ghostty() {
   done
 }
 
-_claude() {
+configure_claude() {
   # Migrate an existing installation.
   if [ -d "${HOME}/.claude" ] && [ ! -h "${HOME}/.claude" ]; then
     if [ -e "${XDG_CONFIG_HOME}/claude" ]; then
@@ -300,7 +300,7 @@ _claude() {
   done
 }
 
-_irssi() {
+configure_irssi() {
   # Setup directories.
   mkdir -p "${XDG_DATA_HOME}"
   mkdir -p "${XDG_CONFIG_HOME}"
@@ -320,7 +320,7 @@ _irssi() {
   mkdir -p "${XDG_DATA_HOME}/irssi"
 }
 
-_rustup() {
+configure_rustup() {
   # Setup directories.
   mkdir -p "${XDG_DATA_HOME}"
 
@@ -331,18 +331,14 @@ _rustup() {
   else
     mkdir -p "${XDG_DATA_HOME}/rustup"
   fi
-
-  # Cargo requires rustup in $PATH before it can be configured.
-  export PATH
-  PATH="$(brew --prefix rustup)/bin":"${PATH}"
 }
 
-_cargo() {
+configure_cargo() {
   # Create the data directory.
   mkdir -p "${XDG_DATA_HOME}/cargo"
 }
 
-_npm() {
+configure_npm() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
   mkdir -p "${XDG_DATA_HOME}/npm"
@@ -367,7 +363,7 @@ _npm() {
   fi
 }
 
-_bun() {
+configure_bun() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
   mkdir -p "${XDG_CACHE_HOME}/bun"
@@ -386,7 +382,7 @@ _bun() {
   fi
 }
 
-_docker() {
+configure_docker() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
   mkdir -p "${XDG_STATE_HOME}/docker/buildx"
@@ -407,7 +403,7 @@ _docker() {
   fi
 }
 
-_colima() {
+configure_colima() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
   mkdir -p "${XDG_DATA_HOME}/lima"
@@ -428,7 +424,7 @@ _colima() {
   fi
 }
 
-_aws() {
+configure_aws() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
 
@@ -440,7 +436,7 @@ _aws() {
   fi
 }
 
-_kubectl() {
+configure_kubectl() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}/kube"
   mkdir -p "${XDG_CACHE_HOME}/kube"
@@ -451,7 +447,7 @@ _kubectl() {
   fi
 }
 
-_codex() {
+configure_codex() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
 
@@ -463,13 +459,34 @@ _codex() {
   fi
 }
 
-utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty codex irssi rustup cargo npm bun docker colima aws kubectl claude"
+main() {
+  configure_zsh
+  configure_vim
+  configure_nvim
+  configure_git
+  configure_gpg
+  configure_go
+  configure_pass
+  configure_less
+  configure_python
+  configure_tmux
+  configure_terraform
+  configure_tflint
+  configure_yamllint
+  configure_yamlfmt
+  configure_ruff
+  configure_ghostty
+  configure_claude
+  configure_irssi
+  configure_rustup
+  configure_cargo
+  configure_npm
+  configure_bun
+  configure_docker
+  configure_colima
+  configure_aws
+  configure_kubectl
+  configure_codex
+}
 
-for util in ${utilities}; do
-  if command -v "${util}" >/dev/null; then
-    printf '%s\n' "Installing ${util}..."
-    "_${util}"
-  else
-    printf '%s\n' "Skipping ${util}..."
-  fi
-done
+main "$@"
