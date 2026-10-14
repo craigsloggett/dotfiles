@@ -19,9 +19,10 @@ path=(
   /Applications/Ghostty.app/Contents/MacOS(N-/)
   $path
   ${XDG_BIN_HOME}(N-/)
+  ${XDG_DATA_HOME}/go/bin(N-/)
 )
 
-for file in "${ZDOTDIR}"/.zprofile.d/*.zsh(N); do
+for file in "${ZDOTDIR}"/.zprofile.d/*.sh(N); do
   command -v "${file:t:r}" >/dev/null || continue
 
   source "${file}"
