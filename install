@@ -111,30 +111,18 @@ configure_zsh() {
 }
 
 configure_vim() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_STATE_HOME}/vim"
-  mkdir -p "${XDG_DATA_HOME}/vim/spell"
-  mkdir -p "${XDG_DATA_HOME}/vim/view"
-  mkdir -p "${XDG_CACHE_HOME}/vim/backup"
-  mkdir -p "${XDG_CACHE_HOME}/vim/swap"
-  mkdir -p "${XDG_CACHE_HOME}/vim/undo"
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/vim" "${XDG_CONFIG_HOME}/vim"
-
-  # Cleanup
-  rm -f "${HOME}/.viminfo"
+  migrate "${HOME}/.viminfo" "${XDG_STATE_HOME}/vim/viminfo"
+  make_dirs \
+    "${XDG_STATE_HOME}/vim" \
+    "${XDG_DATA_HOME}/vim/spell" \
+    "${XDG_DATA_HOME}/vim/view" \
+    "${XDG_CACHE_HOME}/vim/backup" \
+    "${XDG_CACHE_HOME}/vim/swap" \
+    "${XDG_CACHE_HOME}/vim/undo"
 }
 
 configure_nvim() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_STATE_HOME}/nvim"
-  mkdir -p "${XDG_DATA_HOME}/nvim"
-  mkdir -p "${XDG_CACHE_HOME}/nvim"
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/nvim" "${XDG_CONFIG_HOME}/nvim"
 }
 
@@ -217,50 +205,25 @@ configure_python() {
 }
 
 configure_tmux() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/tmux" "${XDG_CONFIG_HOME}/tmux"
 }
 
 configure_terraform() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_CACHE_HOME}/terraform"
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/terraform" "${XDG_CONFIG_HOME}/terraform"
+  make_dirs "${XDG_CACHE_HOME}/terraform"
 }
 
 configure_tflint() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Migrate existing data, otherwise setup the directory.
-  if [ -d "${HOME}/.tflint.d" ]; then
-    mv "${HOME}/.tflint.d" "${XDG_DATA_HOME}/tflint"
-  else
-    mkdir -p "${XDG_DATA_HOME}/tflint"
-  fi
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/tflint" "${XDG_CONFIG_HOME}/tflint"
+  migrate "${HOME}/.tflint.d" "${XDG_DATA_HOME}/tflint"
+  make_dirs "${XDG_DATA_HOME}/tflint"
 }
 
 configure_yamllint() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/yamllint" "${XDG_CONFIG_HOME}/yamllint"
 }
 
 configure_yamlfmt() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/yamlfmt" "${XDG_CONFIG_HOME}/yamlfmt"
 }
 
@@ -346,23 +309,9 @@ configure_claude() {
 }
 
 configure_irssi() {
-  # Setup directories.
-  mkdir -p "${XDG_DATA_HOME}"
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/irssi" "${XDG_CONFIG_HOME}/irssi"
-
-  # Migrate existing configuration, otherwise setup the directory.
-  if [ -d "${HOME}/.irssi" ]; then
-    if [ -f "${HOME}/.irssi/config" ]; then
-      mv "${HOME}/.irssi/config" "${XDG_CONFIG_HOME}/irssi"
-      rm -rf "${HOME}/.irssi"
-    fi
-  fi
-
-  # Create the data directory.
-  mkdir -p "${XDG_DATA_HOME}/irssi"
+  migrate "${HOME}/.irssi" "${XDG_DATA_HOME}/irssi"
+  make_dirs "${XDG_DATA_HOME}/irssi"
 }
 
 configure_rustup() {
@@ -384,28 +333,8 @@ configure_cargo() {
 }
 
 configure_npm() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_DATA_HOME}/npm"
-  mkdir -p "${XDG_CACHE_HOME}/npm"
-  mkdir -p "${XDG_STATE_HOME}/npm"
-
-  # Migrate existing logs, otherwise create the logs directory.
-  if [ -d "${HOME}/.npm/_logs" ]; then
-    mv "${HOME}/.npm/_logs" "${XDG_STATE_HOME}/npm/logs"
-  else
-    mkdir -p "${XDG_STATE_HOME}/npm/logs"
-  fi
-
-  # Symlink dotfiles to the git repository.
   symlink "${dirname}/npm" "${XDG_CONFIG_HOME}/npm"
-
-  # Remove the ~/.npm directory if it is empty.
-  if [ -d "${HOME}/.npm" ]; then
-    if [ -z "$(ls -A "${HOME}/.npm")" ]; then
-      rm -rf "${HOME}/.npm"
-    fi
-  fi
+  remove "${HOME}/.npm"
 }
 
 configure_bun() {
