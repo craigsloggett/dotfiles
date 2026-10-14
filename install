@@ -308,12 +308,6 @@ configure_claude() {
   done
 }
 
-configure_irssi() {
-  symlink "${dirname}/irssi" "${XDG_CONFIG_HOME}/irssi"
-  migrate "${HOME}/.irssi" "${XDG_DATA_HOME}/irssi"
-  make_dirs "${XDG_DATA_HOME}/irssi"
-}
-
 configure_rustup() {
   # Setup directories.
   mkdir -p "${XDG_DATA_HOME}"
@@ -456,7 +450,6 @@ main() {
   configure_ruff
   configure_ghostty
   configure_claude
-  configure_irssi
   configure_rustup
   configure_cargo
   configure_npm
