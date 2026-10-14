@@ -320,24 +320,16 @@ configure_docker() {
 }
 
 configure_colima() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_DATA_HOME}/lima"
-
-  # Migrate existing config if it exists.
-  if [ -d "${HOME}/.colima" ]; then
-    mv "${HOME}/.colima" "${XDG_CONFIG_HOME}/colima"
-  fi
-
-  # Symlink dotfiles to the git repository.
-  symlink "${dirname}/colima" "${XDG_CONFIG_HOME}/colima"
-
-  # Remove the ~/.colima directory if it is empty.
-  if [ -d "${HOME}/.colima" ]; then
-    if [ -z "$(ls -A "${HOME}/.colima")" ]; then
-      rmdir "${HOME}/.colima"
+  if [ -e "${HOME}/.colima" ] || [ -e "${HOME}/.lima" ]; then
+    if pgrep -q -x limactl; then
+      conflict "Not moving ${HOME}/.colima or ${HOME}/.lima while a VM is running, stop it first."
+      return 0
     fi
   fi
+
+  migrate "${HOME}/.colima" "${COLIMA_HOME}"
+  migrate "${COLIMA_HOME}/_lima" "${LIMA_HOME}"
+  migrate "${HOME}/.lima" "${LIMA_HOME}"
 }
 
 configure_aws() {
