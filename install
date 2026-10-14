@@ -188,6 +188,7 @@ configure_less() {
 
 configure_python() {
   migrate "${HOME}/.python_history" "${PYTHON_HISTORY}"
+  migrate "${HOME}/.matplotlib" "${MPLCONFIGDIR}"
   make_dirs "${PYTHON_HISTORY%/*}"
 }
 
