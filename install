@@ -304,22 +304,14 @@ configure_npm() {
 }
 
 configure_bun() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_CACHE_HOME}/bun"
-  mkdir -p "${XDG_DATA_HOME}"
+  migrate "${HOME}/.bun" "${BUN_INSTALL}"
+  migrate "${HOME}/.bunfig.toml" "${XDG_CONFIG_HOME}/.bunfig.toml"
+  remove "${BUN_INSTALL}/install/cache"
 
-  # Migrate existing data, otherwise setup the directory.
-  if [ -d "${HOME}/.bun" ]; then
-    mv "${HOME}/.bun" "${XDG_DATA_HOME}/bun"
-  else
-    mkdir -p "${XDG_DATA_HOME}/bun"
-  fi
-
-  # Migrate existing global config.
-  if [ -f "${HOME}/.bunfig.toml" ]; then
-    mv "${HOME}/.bunfig.toml" "${XDG_CONFIG_HOME}/.bunfig.toml"
-  fi
+  for link in "${BUN_INSTALL}"/bin/*; do
+    [ -L "${link}" ] || continue
+    symlink "$(readlink -f "${link}")" "${BUN_INSTALL_BIN}/${link##*/}"
+  done
 }
 
 configure_docker() {
