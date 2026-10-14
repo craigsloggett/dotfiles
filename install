@@ -2,6 +2,8 @@
 #
 # install dot files
 
+set -eu
+
 # Global Variables
 : "${XDG_CONFIG_HOME:=${HOME}/.config}"
 : "${XDG_CACHE_HOME:=${HOME}/.cache}"
@@ -12,6 +14,10 @@
 dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
 readonly dirname
 
+conflict() {
+  printf '%s\n' "$*" | tee -a "${conflicts}" >&2
+}
+
 symlink() (
   source="${1:?a symlink source is required}"
   target="${2:?a symlink target is required}"
@@ -20,8 +26,8 @@ symlink() (
   [ "$(readlink "${target}")" != "${source}" ] || return 0
 
   if [ -e "${target}" ] && [ ! -L "${target}" ]; then
-    printf '%s\n' "Not linking ${target}, it already exists." >&2
-    return 1
+    conflict "Not linking ${target}, it already exists."
+    return 0
   fi
 
   mkdir -p "${target%/*}"
@@ -45,8 +51,8 @@ migrate() (
   [ -e "${source}" ] || return 0
 
   if [ -e "${target}" ]; then
-    printf '%s\n' "Not moving ${source}, ${target} already exists." >&2
-    return 1
+    conflict "Not moving ${source}, ${target} already exists."
+    return 0
   fi
 
   mkdir -p "${target%/*}"
@@ -273,8 +279,8 @@ configure_claude() {
   # Migrate an existing installation.
   if [ -d "${HOME}/.claude" ] && [ ! -h "${HOME}/.claude" ]; then
     if [ -e "${XDG_CONFIG_HOME}/claude" ]; then
-      printf '%s\n' "Both ${HOME}/.claude and ${XDG_CONFIG_HOME}/claude exist, merge them by hand." >&2
-      return 1
+      conflict "Both ${HOME}/.claude and ${XDG_CONFIG_HOME}/claude exist, merge them by hand."
+      return 0
     fi
 
     mkdir -p "${XDG_CONFIG_HOME}"
@@ -317,8 +323,8 @@ configure_claude() {
     [ -d "${dirname}/claude/${conf}" ] || continue
 
     if [ -d "${XDG_CONFIG_HOME}/claude/${conf}" ] && [ ! -h "${XDG_CONFIG_HOME}/claude/${conf}" ]; then
-      printf '%s\n' "${XDG_CONFIG_HOME}/claude/${conf} is a directory, merge it into ${dirname}/claude/${conf} by hand." >&2
-      return 1
+      conflict "${XDG_CONFIG_HOME}/claude/${conf} is a directory, merge it into ${dirname}/claude/${conf} by hand."
+      return 0
     fi
 
     ln -sfn "${dirname}/claude/${conf}" "${XDG_CONFIG_HOME}/claude/${conf}"
@@ -485,6 +491,11 @@ configure_codex() {
 }
 
 main() {
+  conflicts="$(mktemp)"
+  readonly conflicts
+  trap 'rm -f "${conflicts}"' EXIT
+  trap 'exit 1' INT TERM HUP
+
   configure_zsh
   configure_vim
   configure_nvim
@@ -512,6 +523,12 @@ main() {
   configure_aws
   configure_kubectl
   configure_codex
+
+  if [ -s "${conflicts}" ]; then
+    printf '\n%s\n' "Resolve these by hand, then run install again:" >&2
+    cat "${conflicts}" >&2
+    return 1
+  fi
 }
 
 main "$@"
