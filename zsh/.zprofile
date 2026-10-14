@@ -22,13 +22,7 @@ path=(
 )
 
 for file in "${ZDOTDIR}"/.zprofile.d/*.zsh(N); do
-  util="${file:t:r}"
-
-  command -v "${util}" >/dev/null || continue
+  command -v "${file:t:r}" >/dev/null || continue
 
   source "${file}"
-
-  if [ -d "${ZDOTDIR}/.zfunctions/completions/${util}" ]; then
-    fpath+=("${ZDOTDIR}/.zfunctions/completions/${util}")
-  fi
 done

@@ -1,0 +1,1 @@
+alias nvim='VIMINIT="" nvim'

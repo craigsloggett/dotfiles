@@ -2,6 +2,11 @@
 # $ZDOTDIR/.zshrc
 #
 
+fpath+=(
+  /opt/homebrew/share/zsh/site-functions(N-/)
+  "${ZDOTDIR}"/.zfunctions/completions/*(N-/)
+)
+
 # Enable auto completion.
 autoload -Uz compinit
 compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
@@ -44,8 +49,11 @@ source "${ZDOTDIR}/.zfunctions/zsh-autosuggestions"
 source "${ZDOTDIR}/.zfunctions/claude-kkp-reset"
 precmd_functions+=(_claude_kkp_reset)
 
-# Source the alias file.
-source "${ZDOTDIR}/aliases"
+for file in "${ZDOTDIR}"/.zshrc.d/*.zsh(N); do
+  command -v "${file:t:r}" >/dev/null || continue
+
+  source "${file}"
+done
 
 # Turn on case insensitive globbing.
 setopt NO_CASE_GLOB
