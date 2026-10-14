@@ -6,7 +6,6 @@ This script is idempotent such that it can be run any number of times producing 
 
 ## Installed Utilities
 
-- `tmux`
 - `pass`
 - `git`
 - `neovim`

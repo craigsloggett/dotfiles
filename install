@@ -235,10 +235,6 @@ configure_bundle() {
   remove_empty "${HOME}/.bundle"
 }
 
-configure_tmux() {
-  symlink "${dirname}/tmux" "${XDG_CONFIG_HOME}/tmux"
-}
-
 configure_terraform() {
   symlink "${dirname}/terraform" "${XDG_CONFIG_HOME}/terraform"
   make_dirs "${XDG_CACHE_HOME}/terraform"
@@ -359,7 +355,6 @@ main() {
   configure_less
   configure_python
   configure_bundle
-  configure_tmux
   configure_terraform
   configure_tflint
   configure_yamllint
