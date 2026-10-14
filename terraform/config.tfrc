@@ -4,8 +4,8 @@ disable_checkpoint_signature = true
 
 provider_installation {
   dev_overrides {
-    "craigsloggett/github"            = "${GOPATH}/bin"
-    "craigsloggett/utility-functions" = "${GOPATH}/bin"
+    "craigsloggett/github"            = "${GOBIN}"
+    "craigsloggett/utility-functions" = "${GOBIN}"
   }
 
   direct {}
