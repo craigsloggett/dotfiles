@@ -2,52 +2,33 @@
 # $ZDOTDIR/.zprofile
 #
 
-# XDG Base Directory Specification variables.
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-${HOME}/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-${HOME}/.local/state}"
 export XDG_BIN_HOME="${XDG_BIN_HOME:-${HOME}/.local/bin}"
 
-# If enabled, Apple's Terminal will create session files in
-# $ZDOTDIR/.zsh_sessions.
 export SHELL_SESSIONS_DISABLE=1
-
-# Opt out of telemetry in every utility that honors the convention.
 export DO_NOT_TRACK=1
 
-# Add XDG_BIN_HOME to PATH variable.
 typeset -U path
-path+=("${XDG_BIN_HOME}")
+path=(
+  /opt/homebrew/bin(N-/)
+  /opt/homebrew/sbin(N-/)
+  /opt/homebrew/opt/rustup/bin(N-/)
+  /Applications/Ghostty.app/Contents/MacOS(N-/)
+  $path
+  ${XDG_BIN_HOME}(N-/)
+)
 
-# Utility specific environment variables.
-if [ -d "${ZDOTDIR}/.zprofile.d" ]; then
-  # Homebrew is sourced first to find utilities installed by Homebrew.
-  source "${ZDOTDIR}/.zprofile.d/brew.zsh"
+for file in "${ZDOTDIR}"/.zprofile.d/*.zsh(N); do
+  util="${file:t:r}"
 
-  # Homebrew leverages npm to install some packages, even if it isn't installed.
-  if command -v brew >/dev/null; then
-    source "${ZDOTDIR}/.zprofile.d/npm.zsh"
+  command -v "${util}" >/dev/null || continue
+
+  source "${file}"
+
+  if [ -d "${ZDOTDIR}/.zfunctions/completions/${util}" ]; then
+    fpath+=("${ZDOTDIR}/.zfunctions/completions/${util}")
   fi
-
-  # Similarly, rustup provides binaries as well.
-  if command -v rustup >/dev/null; then
-    source "${ZDOTDIR}/.zprofile.d/rustup.zsh"
-  fi
-
-  for file in "${ZDOTDIR}/.zprofile.d/"*.zsh; do
-    [ -f "${file}" ] || continue
-
-    basename="${file##*/}"
-    util="${basename%.zsh}"
-
-    if command -v "${util}" >/dev/null; then
-      source "${file}"
-
-      # Add any completions for this command, if they exist.
-      if [ -d "${ZDOTDIR}/.zfunctions/completions/${util}" ]; then
-        fpath+=("${ZDOTDIR}/.zfunctions/completions/${util}")
-      fi
-    fi
-  done
-fi
+done
