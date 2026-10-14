@@ -1,0 +1,4 @@
+brew "jq"
+brew "neovim"
+brew "shellcheck"
+brew "shfmt"
