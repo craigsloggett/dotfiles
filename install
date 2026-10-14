@@ -224,58 +224,17 @@ configure_ghostty() {
 }
 
 configure_claude() {
-  # Migrate an existing installation.
-  if [ -d "${HOME}/.claude" ] && [ ! -h "${HOME}/.claude" ]; then
-    if [ -e "${XDG_CONFIG_HOME}/claude" ]; then
-      conflict "Both ${HOME}/.claude and ${XDG_CONFIG_HOME}/claude exist, merge them by hand."
-      return 0
-    fi
+  migrate "${HOME}/.claude" "${CLAUDE_CONFIG_DIR}"
+  migrate "${HOME}/.claude.json" "${CLAUDE_CONFIG_DIR}/.claude.json"
 
-    mkdir -p "${XDG_CONFIG_HOME}"
-    mv "${HOME}/.claude" "${XDG_CONFIG_HOME}/claude"
-  fi
-
-  if [ -f "${HOME}/.claude.json" ] && [ ! -e "${XDG_CONFIG_HOME}/claude/.claude.json" ]; then
-    mkdir -p "${XDG_CONFIG_HOME}/claude"
-    mv "${HOME}/.claude.json" "${XDG_CONFIG_HOME}/claude/.claude.json"
-  fi
-
-  if [ -d "${XDG_CONFIG_HOME}/claude/plugins" ] && [ ! -e "${XDG_DATA_HOME}/claude/plugins" ]; then
-    mkdir -p "${XDG_DATA_HOME}/claude"
-    mv "${XDG_CONFIG_HOME}/claude/plugins" "${XDG_DATA_HOME}/claude/plugins"
-  fi
-
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}/claude"
-  mkdir -p "${XDG_DATA_HOME}/claude/plugins"
-
-  # Preserve configuration that is not already symlinked to the repository.
-  for conf in settings.json CLAUDE.md; do
-    if [ -f "${XDG_CONFIG_HOME}/claude/${conf}" ] && [ ! -h "${XDG_CONFIG_HOME}/claude/${conf}" ]; then
-      if [ -f "${dirname}/claude/${conf}" ]; then
-        mv "${XDG_CONFIG_HOME}/claude/${conf}" "${dirname}/claude/${conf}.backup"
-      else
-        mv "${XDG_CONFIG_HOME}/claude/${conf}" "${dirname}/claude/${conf}"
-      fi
-    fi
+  for entry in "${CLAUDE_CONFIG_DIR}"/plugins/*; do
+    [ -e "${entry}" ] || continue
+    [ "${entry##*/}" != synced ] || continue
+    migrate "${entry}" "${CLAUDE_CODE_PLUGIN_CACHE_DIR}/${entry##*/}"
   done
 
-  # Symlink the configuration to the git repository.
-  for conf in settings.json CLAUDE.md statusline-command.sh; do
-    if [ -f "${dirname}/claude/${conf}" ]; then
-      ln -sf "${dirname}/claude/${conf}" "${XDG_CONFIG_HOME}/claude/${conf}"
-    fi
-  done
-
-  for conf in agents hooks rules skills; do
-    [ -d "${dirname}/claude/${conf}" ] || continue
-
-    if [ -d "${XDG_CONFIG_HOME}/claude/${conf}" ] && [ ! -h "${XDG_CONFIG_HOME}/claude/${conf}" ]; then
-      conflict "${XDG_CONFIG_HOME}/claude/${conf} is a directory, merge it into ${dirname}/claude/${conf} by hand."
-      return 0
-    fi
-
-    ln -sfn "${dirname}/claude/${conf}" "${XDG_CONFIG_HOME}/claude/${conf}"
+  for conf in settings.json CLAUDE.md statusline-command.sh agents hooks rules skills; do
+    symlink "${dirname}/claude/${conf}" "${CLAUDE_CONFIG_DIR}/${conf}"
   done
 }
 
