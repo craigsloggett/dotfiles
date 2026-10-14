@@ -145,6 +145,21 @@ configure_host() (
   symlink "${dirname}/hosts/${profile}/Brewfile" "${brewfile}"
 )
 
+configure_homebrew() {
+  brew='/opt/homebrew/bin/brew'
+
+  if [ ! -x "${brew}" ]; then
+    sudo -v
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+
+  [ -e "${XDG_CONFIG_HOME}/homebrew/Brewfile" ] || return 0
+
+  if ! HOMEBREW_NO_AUTO_UPDATE=1 "${brew}" bundle check --global >/dev/null 2>&1; then
+    "${brew}" bundle install --global --no-upgrade
+  fi
+}
+
 configure_zsh() {
   if [ "$(cat /etc/zshenv 2>/dev/null)" != "$(zshenv)" ]; then
     zshenv | sudo tee /etc/zshenv >/dev/null
@@ -345,6 +360,7 @@ main() {
   load_environment
 
   configure_host
+  configure_homebrew
   configure_zsh
   configure_vim
   configure_nvim
