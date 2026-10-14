@@ -38,6 +38,22 @@ make_dirs() {
   done
 }
 
+migrate() (
+  source="${1:?a migration source is required}"
+  target="${2:?a migration target is required}"
+
+  [ -e "${source}" ] || return 0
+
+  if [ -e "${target}" ]; then
+    printf '%s\n' "Not moving ${source}, ${target} already exists." >&2
+    return 1
+  fi
+
+  mkdir -p "${target%/*}"
+  mv "${source}" "${target}"
+  printf '%s\n' "Moved ${source} to ${target}."
+)
+
 merge_history() (
   source="${1:?a history source is required}"
   target="${2:?a history target is required}"
@@ -122,15 +138,10 @@ configure_git() {
 }
 
 configure_gpg() {
-  # Migrate existing GnuPG keys, otherwise setup directory.
-  if [ -d "${HOME}/.gnupg" ]; then
-    mv "${HOME}/.gnupg" "${XDG_DATA_HOME}/gnupg"
-  else
-    mkdir -p "${XDG_DATA_HOME}/gnupg"
-    chmod 700 "${XDG_DATA_HOME}/gnupg"
-  fi
+  migrate "${HOME}/.gnupg" "${XDG_DATA_HOME}/gnupg"
+  make_dirs "${XDG_DATA_HOME}/gnupg"
+  chmod 700 "${XDG_DATA_HOME}/gnupg"
 
-  # GnuPG requires a special case for symlinking the dotfiles.
   for conf in gpg.conf gpg-agent.conf; do
     symlink "${dirname}/gnupg/${conf}" "${XDG_DATA_HOME}/gnupg/${conf}"
   done
