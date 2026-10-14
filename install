@@ -115,6 +115,36 @@ export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
 EOF
 }
 
+configure_host() (
+  brewfile="${XDG_CONFIG_HOME}/homebrew/Brewfile"
+
+  [ ! -L "${brewfile}" ] || return 0
+
+  profiles=''
+  for dir in "${dirname}"/hosts/*/; do
+    dir="${dir%/}"
+    profiles="${profiles:+${profiles}, }${dir##*/}"
+  done
+
+  profile="$(ask "Profile for this Mac (${profiles})")"
+
+  if [ ! -f "${dirname}/hosts/${profile}/Brewfile" ]; then
+    conflict "No profile named '${profile}' in ${dirname}/hosts."
+    return 0
+  fi
+
+  host_name="$(ask 'Hostname for this Mac')"
+
+  if [ -n "${host_name}" ]; then
+    for key in ComputerName LocalHostName HostName; do
+      sudo scutil --set "${key}" "${host_name}"
+    done
+    printf '%s\n' "Set the hostname to ${host_name}."
+  fi
+
+  symlink "${dirname}/hosts/${profile}/Brewfile" "${brewfile}"
+)
+
 configure_zsh() {
   if [ "$(cat /etc/zshenv 2>/dev/null)" != "$(zshenv)" ]; then
     zshenv | sudo tee /etc/zshenv >/dev/null
@@ -318,6 +348,7 @@ main() {
 
   load_environment
 
+  configure_host
   configure_zsh
   configure_vim
   configure_nvim
