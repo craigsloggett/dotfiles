@@ -181,18 +181,6 @@ _python() {
   fi
 }
 
-_rye() {
-  # Setup directories.
-  mkdir -p "${XDG_DATA_HOME}"
-
-  # Migrate existing data, otherwise setup the directory.
-  if [ -d "${HOME}/.rye" ] && [ ! -e "${XDG_DATA_HOME}/rye" ]; then
-    mv "${HOME}/.rye" "${XDG_DATA_HOME}/rye"
-  else
-    mkdir -p "${XDG_DATA_HOME}/rye"
-  fi
-}
-
 _tmux() {
   # Setup directories.
   mkdir -p "${XDG_CONFIG_HOME}"
@@ -492,69 +480,13 @@ _codex() {
   fi
 }
 
-_bash() {
-  # Create the /etc/bash.bashrc file to specify Bash
-  # configuration for interactive shells.
-  printf '%s\n' "Writing to /etc/bash.bashrc using sudo..."
+utilities="zsh vim nvim git gpg pass python less tmux terraform tflint yamlfmt yamllint ruff go ghostty codex irssi rustup cargo npm bun docker colima aws kubectl claude"
 
-  cat <<-'EOF' | sudo tee /etc/bash.bashrc >/dev/null
-		# /etc/bash.bashrc: system-wide .bashrc file for the
-		# Bourne Again shell (bash(1)).
-
-		# If not running interactively, don't do anything.
-		[ -z "$PS1" ] && return
-
-		# Use XDG Base Directory Specification
-		XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-
-		if [ -f "${XDG_CONFIG_HOME}/bash/profile" ]; then
-		        . "${XDG_CONFIG_HOME}/bash/profile"
-		fi
-	EOF
-
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_STATE_HOME}/bash"
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles bash
-
-  # Preserve existing history file.
-  if [ -f "${HOME}/.bash_history" ]; then
-    mv "${HOME}/.bash_history" "${XDG_STATE_HOME}/bash/history"
-  fi
-
-  # Cleanup
-  # TODO: Preserve existing files and merge/prompt.
-  # TODO: Set history file to new location before deleting.
-  rm -f "${HOME}/.bash_logout"
-  rm -f "${HOME}/.bashrc"
-  rm -f "${HOME}/.profile"
-}
-
-# Specify which dotfiles to install based on the OS.
-case "$(uname -s)" in
-  *Darwin*)
-    utilities="zsh vim nvim git gpg pass python rye less tmux terraform tflint yamlfmt yamllint ruff go ghostty codex irssi rustup cargo npm bun docker colima aws kubectl claude"
-    ;;
-
-  *)
-    utilities="bash vim nvim git gpg pass python rye less tmux terraform tflint yamlfmt yamllint ruff go claude codex irssi rustup cargo bun aws kubectl"
-    ;;
-esac
-
-# Configure only the utilities that have been installed.
 for util in ${utilities}; do
   if command -v "${util}" >/dev/null; then
     printf '%s\n' "Installing ${util}..."
     "_${util}"
   else
-    # npm is used by Homebrew even if it isn't installed.
-    if [ "${util}" = "npm" ]; then
-      printf '%s\n' "Installing ${util}..."
-      "_${util}"
-    else
-      printf '%s\n' "Skipping ${util}..."
-    fi
+    printf '%s\n' "Skipping ${util}..."
   fi
 done

@@ -17,7 +17,3 @@ This script is idempotent such that it can be run any number of times producing 
 - `hashicorp/tap/terraform`
 - `terraform`
 - `tflint`
-
-### Python
-
-- `rye`
