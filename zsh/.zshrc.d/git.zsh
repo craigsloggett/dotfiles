@@ -1,4 +1,4 @@
-[[ -r /opt/homebrew/etc/bash_completion.d/git-prompt.sh ]] || return
+[ -r /opt/homebrew/etc/bash_completion.d/git-prompt.sh ] || return
 
 setopt PROMPT_SUBST
 source /opt/homebrew/etc/bash_completion.d/git-prompt.sh

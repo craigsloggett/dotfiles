@@ -21,7 +21,7 @@ promptinit
 
 PROMPT=' %(!.%F{red}%B.%F{green}%B)%b%f %~ %(!.#.$) '
 
-if [[ -r /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+if [ -r /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
   source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
 
