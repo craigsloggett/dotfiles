@@ -11,6 +11,7 @@ require("conform").setup {
     json = { "jq" },
     python = { "ruff_format" },
     sh = { "shfmt" },
+    terraform = { "terraform_fmt" },
     yaml = { "yamlfmt" },
     zsh = { "shfmt" },
     ["*"] = { "trim_whitespace", "trim_newlines" }
@@ -22,11 +23,11 @@ require("conform").setup {
       stdin = true
     },
     shfmt = {
-      prepend_args = { "-i", "2", "-ci" }
+      prepend_args = { "-i", "2", "-ci", "-s" }
     }
   },
   format_on_save = {
     timeout_ms = 500,
-    lsp_format = "first"
+    lsp_format = "fallback"
   }
 }

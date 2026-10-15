@@ -1,5 +1,0 @@
-#
-# $ZDOTDIR/aliases.d/bat
-#
-
-alias cat='bat'

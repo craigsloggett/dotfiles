@@ -1,5 +1,0 @@
-#
-# $ZDOTDIR/aliases.d/nvim
-#
-
-alias nvim='VIMINIT="" nvim'

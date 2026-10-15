@@ -1,0 +1,6 @@
+brew "git"
+brew "jq"
+brew "neovim"
+brew "shellcheck"
+brew "shfmt"
+brew "zsh-autosuggestions"

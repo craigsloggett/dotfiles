@@ -1,560 +1,448 @@
 #!/bin/sh
-#
-# install dot files
 
-# Global Variables
-: "${XDG_CONFIG_HOME:=${HOME}/.config}"
-: "${XDG_CACHE_HOME:=${HOME}/.cache}"
-: "${XDG_STATE_HOME:=${HOME}/.local/state}"
-: "${XDG_DATA_HOME:=${HOME}/.local/share}"
+set -eu
 
-# Get the full path of the current working directory.
-dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-${HOME}/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-${HOME}/.local/state}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}"
+export XDG_BIN_HOME="${XDG_BIN_HOME:-${HOME}/.local/bin}"
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/rustup/bin:/Applications/Ghostty.app/Contents/MacOS:${PATH}:${XDG_BIN_HOME}"
+
+if [ -f "${0}" ]; then
+  dirname="$(cd "$(dirname -- "${0}")" && printf '%s\n' "${PWD}")"
+else
+  dirname="${HOME}/Developer/GitHub/craigsloggett/dotfiles"
+fi
 readonly dirname
 
-symlink_dotfiles() {
-  util="${1}"
+conflict() {
+  printf '%s\n' "$*" | tee -a "${conflicts}" >&2
+}
 
-  if [ ! -e "${XDG_CONFIG_HOME}/${util}" ]; then
-    # TODO: Update the symlink if the location changed.
-    if [ -d "${dirname}/${util}" ]; then
-      ln -s "${dirname}/${util}" "${XDG_CONFIG_HOME}/${util}"
+symlink() (
+  source="${1:?a symlink source is required}"
+  target="${2:?a symlink target is required}"
+
+  [ -e "${source}" ] || return 0
+  [ "$(readlink "${target}")" != "${source}" ] || return 0
+
+  if [ -e "${target}" ] && [ ! -L "${target}" ]; then
+    conflict "Not linking ${target}, it already exists."
+    return 0
+  fi
+
+  mkdir -p "${target%/*}"
+  ln -sfn "${source}" "${target}"
+  printf '%s\n' "Linked ${target} to ${source}."
+)
+
+make_dirs() {
+  for dir in "$@"; do
+    if [ ! -d "${dir}" ]; then
+      mkdir -p "${dir}"
+      printf '%s\n' "Created ${dir}."
     fi
-  fi
+  done
 }
 
-_zsh() {
-  # Create the /etc/zshenv file to specify $ZDOTDIR.
-  printf '%s\n' "Writing to /etc/zshenv using sudo..."
+migrate() (
+  source="${1:?a migration source is required}"
+  target="${2:?a migration target is required}"
 
-  cat <<-'EOF' | sudo tee /etc/zshenv >/dev/null
-		# /etc/zshenv: system-wide .zshenv file for zsh(1).
-		#
-		# This file is sourced on all invocations of the shell.
-		# If the -f flag is present or if the NO_RCS option is
-		# set within this file, all other initialization files
-		# are skipped.
-		#
-		# This file should contain commands to set the command
-		# search path, plus other important environment variables.
-		# This file should not contain commands that produce
-		# output or assume the shell is attached to a tty.
-		#
-		# Global Order: zshenv, zprofile, zshrc, zlogin
+  [ -e "${source}" ] || return 0
 
-		# Use XDG Base Directory Specification
-		export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
-	EOF
-
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_CACHE_HOME}/zsh"
-  mkdir -p "${XDG_STATE_HOME}/zsh"
-
-  # Update permissions on existing system files.
-  if [ -d /usr/local/share/zsh ]; then
-    chmod 755 /usr/local/share/zsh
-    chmod 755 /usr/local/share/zsh/site-functions
+  if [ -e "${target}" ]; then
+    conflict "Not moving ${source}, ${target} already exists."
+    return 0
   fi
 
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles zsh
+  mkdir -p "${target%/*}"
+  mv "${source}" "${target}"
+  printf '%s\n' "Moved ${source} to ${target}."
+)
 
-  # Cleanup
-  # TODO: Preserve existing files and merge/prompt.
-  # TODO: Set history file to new location before deleting.
-  rm -f "${HOME}/.zsh_history"
-  rm -f "${HOME}/.zcompdump"
-  rm -f "${HOME}/.zprofile"
-  rm -f "${HOME}/.zshrc"
-  rm -rf "${HOME}/.zsh_sessions"
-  rm -rf "${ZDOTDIR}/.zsh_sessions"
-}
+merge_history() (
+  source="${1:?a history source is required}"
+  target="${2:?a history target is required}"
 
-_vim() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_STATE_HOME}/vim"
-  mkdir -p "${XDG_DATA_HOME}/vim/spell"
-  mkdir -p "${XDG_DATA_HOME}/vim/view"
-  mkdir -p "${XDG_CACHE_HOME}/vim/backup"
-  mkdir -p "${XDG_CACHE_HOME}/vim/swap"
-  mkdir -p "${XDG_CACHE_HOME}/vim/undo"
+  [ -e "${source}" ] || return 0
 
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles vim
-
-  # Cleanup
-  rm -f "${HOME}/.viminfo"
-}
-
-_nvim() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_STATE_HOME}/nvim"
-  mkdir -p "${XDG_DATA_HOME}/nvim"
-  mkdir -p "${XDG_CACHE_HOME}/nvim"
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles nvim
-}
-
-_git() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles git
-
-  # Migrate existing git configuration.
-  if [ -f "${HOME}/.gitconfig" ]; then
-    mv "${HOME}/.gitconfig" "${XDG_CONFIG_HOME}/git/config"
-  fi
-}
-
-_gpg() {
-  # Migrate existing GnuPG keys, otherwise setup directory.
-  if [ -d "${HOME}/.gnupg" ]; then
-    mv "${HOME}/.gnupg" "${XDG_DATA_HOME}/gnupg"
-  else
-    mkdir -p "${XDG_DATA_HOME}/gnupg"
-    chmod 700 "${XDG_DATA_HOME}/gnupg"
+  if [ -e "${target}" ]; then
+    cat "${target}" >>"${source}"
   fi
 
-  # GnuPG requires a special case for symlinking the dotfiles.
+  mkdir -p "${target%/*}"
+  mv "${source}" "${target}"
+  printf '%s\n' "Merged ${source} into ${target}."
+)
+
+remove() {
+  for file in "$@"; do
+    if [ -e "${file}" ]; then
+      rm -rf "${file}"
+      printf '%s\n' "Removed ${file}."
+    fi
+  done
+}
+
+remove_empty() {
+  for dir in "$@"; do
+    if [ -d "${dir}" ] && [ -z "$(ls -A "${dir}")" ]; then
+      rmdir "${dir}"
+      printf '%s\n' "Removed ${dir}."
+    fi
+  done
+}
+
+ask() (
+  prompt="${1:?a prompt is required}"
+
+  printf '%s: ' "${prompt}" >&2
+  read -r answer || answer=''
+  printf '%s\n' "${answer}"
+)
+
+load_environment() {
+  for file in "${dirname}"/zsh/.zprofile.d/*.sh; do
+    # shellcheck source=/dev/null
+    . "${file}"
+  done
+}
+
+zshenv() {
+  cat <<'EOF'
+export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
+EOF
+}
+
+set_hostname() (
+  name="${1:?a hostname is required}"
+  smb='/Library/Preferences/SystemConfiguration/com.apple.smb.server'
+
+  for key in ComputerName LocalHostName HostName; do
+    [ "$(scutil --get "${key}" 2>/dev/null)" != "${name}" ] || continue
+    sudo scutil --set "${key}" "${name}"
+    printf '%s\n' "Set ${key} to ${name}."
+  done
+
+  [ "${#name}" -le 15 ] || return 0
+  [ "$(defaults read "${smb}" NetBIOSName 2>/dev/null)" != "${name}" ] || return 0
+  sudo defaults write "${smb}" NetBIOSName -string "${name}"
+  printf '%s\n' "Set NetBIOSName to ${name}."
+)
+
+configure_host() (
+  brewfile="${XDG_CONFIG_HOME}/homebrew/Brewfile"
+
+  if [ -L "${brewfile}" ] && [ -e "${brewfile}" ]; then
+    return 0
+  fi
+
+  current="$(scutil --get ComputerName)"
+
+  profiles=''
+  for file in "${dirname}"/homebrew/*.Brewfile; do
+    name="${file##*/}"
+    profiles="${profiles:+${profiles}, }${name%.Brewfile}"
+  done
+
+  default=''
+  [ ! -f "${dirname}/homebrew/${current}.Brewfile" ] || default="${current}"
+
+  profile="$(ask "Profile for this Mac (${profiles})${default:+ [${default}]}")"
+  profile="${profile:-${default}}"
+
+  if [ -z "${profile}" ]; then
+    conflict "No profile chosen, pick one of: ${profiles}."
+    return 0
+  fi
+
+  if [ ! -f "${dirname}/homebrew/${profile}.Brewfile" ]; then
+    conflict "No profile named '${profile}' in ${dirname}/homebrew."
+    return 0
+  fi
+
+  host_name="$(ask "Hostname for this Mac [${current}]")"
+
+  if [ -n "${host_name}" ] && [ "${host_name}" != "${current}" ]; then
+    case "${host_name}" in
+      -* | *- | *[!A-Za-z0-9-]*)
+        conflict "Not setting the hostname to '${host_name}', use only letters, digits and inner hyphens."
+        return 0
+        ;;
+    esac
+
+    set_hostname "${host_name}"
+  fi
+
+  symlink "${dirname}/homebrew/${profile}.Brewfile" "${brewfile}"
+)
+
+install_homebrew() {
+  [ ! -x /opt/homebrew/bin/brew ] || return 0
+
+  sudo -v
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+}
+
+clone_dotfiles() {
+  [ ! -d "${dirname}/.git" ] || return 0
+
+  install_homebrew
+  git clone https://github.com/craigsloggett/dotfiles.git "${dirname}"
+}
+
+configure_homebrew() {
+  install_homebrew
+  symlink "${dirname}/homebrew/brew.env" "${XDG_CONFIG_HOME}/homebrew/brew.env"
+
+  [ -e "${XDG_CONFIG_HOME}/homebrew/Brewfile" ] || return 0
+
+  if ! HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew bundle check --global --no-upgrade >/dev/null 2>&1; then
+    /opt/homebrew/bin/brew bundle install --global --no-upgrade
+  fi
+
+  HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew bundle cleanup --global --force
+}
+
+configure_zsh() {
+  if [ "$(cat /etc/zshenv 2>/dev/null)" != "$(zshenv)" ]; then
+    zshenv | sudo tee /etc/zshenv >/dev/null
+    printf '%s\n' "Wrote /etc/zshenv."
+  fi
+
+  symlink "${dirname}/zsh" "${XDG_CONFIG_HOME}/zsh"
+  make_dirs "${XDG_STATE_HOME}/zsh" "${XDG_CACHE_HOME}/zsh"
+  merge_history "${HOME}/.zsh_history" "${XDG_STATE_HOME}/zsh/history"
+  remove "${HOME}/.zcompdump" "${HOME}/.zsh_sessions" "${HOME}/.zprofile" "${HOME}/.zshrc"
+}
+
+configure_vim() {
+  symlink "${dirname}/vim" "${XDG_CONFIG_HOME}/vim"
+  migrate "${HOME}/.viminfo" "${XDG_STATE_HOME}/vim/viminfo"
+  make_dirs \
+    "${XDG_STATE_HOME}/vim" \
+    "${XDG_DATA_HOME}/vim/spell" \
+    "${XDG_DATA_HOME}/vim/view" \
+    "${XDG_CACHE_HOME}/vim/backup" \
+    "${XDG_CACHE_HOME}/vim/swap" \
+    "${XDG_CACHE_HOME}/vim/undo"
+}
+
+configure_nvim() {
+  symlink "${dirname}/nvim" "${XDG_CONFIG_HOME}/nvim"
+}
+
+configure_git() (
+  personal="${XDG_CONFIG_HOME}/git/config-personal"
+
+  symlink "${dirname}/git" "${XDG_CONFIG_HOME}/git"
+  migrate "${HOME}/.gitconfig" "${personal}"
+
+  [ -z "$(git config --file "${personal}" user.email)" ] || return 0
+
+  email="$(ask 'Email address for Git commits')"
+
+  if [ -z "${email}" ]; then
+    conflict "No Git email set, add user.email to ${personal}."
+    return 0
+  fi
+
+  git config --file "${personal}" user.email "${email}"
+  printf '%s\n' "Set user.email in ${personal}."
+)
+
+configure_gpg() {
+  migrate "${HOME}/.gnupg" "${XDG_DATA_HOME}/gnupg"
+  make_dirs "${XDG_DATA_HOME}/gnupg"
+  chmod 700 "${XDG_DATA_HOME}/gnupg"
+
   for conf in gpg.conf gpg-agent.conf; do
-    if [ ! -e "${XDG_DATA_HOME}/gnupg/${conf}" ]; then
-      if [ -f "${dirname}/gnupg/${conf}" ]; then
-        ln -s "${dirname}/gnupg/${conf}" \
-          "${XDG_DATA_HOME}/gnupg/${conf}"
-      fi
-    fi
+    symlink "${dirname}/gnupg/${conf}" "${XDG_DATA_HOME}/gnupg/${conf}"
   done
 }
 
-_go() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}/go"
-  mkdir -p "${XDG_DATA_HOME}/go/bin"
-  mkdir -p "${XDG_CACHE_HOME}/go"
+configure_go() {
+  migrate "${HOME}/go" "${GOPATH}"
 
-  if [ -d "${XDG_CACHE_HOME}/go/bin" ]; then
-    for binary in "${XDG_CACHE_HOME}/go/bin"/*; do
-      [ -f "${binary}" ] || continue
-      mv "${binary}" "${XDG_DATA_HOME}/go/bin"
-    done
-
-    if [ -z "$(ls -A "${XDG_CACHE_HOME}/go/bin")" ]; then
-      rmdir "${XDG_CACHE_HOME}/go/bin"
-    fi
-  fi
-}
-
-_pass() {
-  # Migrate existing password store, otherwise setup the directory.
-  if [ -d "${HOME}/.password-store" ]; then
-    mv "${HOME}/.password-store" "${XDG_DATA_HOME}/pass"
-  else
-    mkdir -p "${XDG_DATA_HOME}/pass"
-  fi
-}
-
-_less() {
-  # Setup directories.
-  mkdir -p "${XDG_STATE_HOME}/less"
-
-  # Preserve existing history file.
-  if [ -f "${HOME}/.lesshst" ]; then
-    mv "${HOME}/.lesshst" "${XDG_STATE_HOME}/less/lesshst"
-  fi
-}
-
-_python() {
-  # Setup directories.
-  mkdir -p "${XDG_STATE_HOME}/python"
-  mkdir -p "${XDG_CACHE_HOME}/python"
-  mkdir -p "${XDG_DATA_HOME}/python"
-
-  # Preserve existing history file.
-  if [ -f "${HOME}/.python_history" ]; then
-    mv "${HOME}/.python_history" "${XDG_STATE_HOME}/python/history"
-  fi
-}
-
-_rye() {
-  # Setup directories.
-  mkdir -p "${XDG_DATA_HOME}"
-
-  # Migrate existing data, otherwise setup the directory.
-  if [ -d "${HOME}/.rye" ] && [ ! -e "${XDG_DATA_HOME}/rye" ]; then
-    mv "${HOME}/.rye" "${XDG_DATA_HOME}/rye"
-  else
-    mkdir -p "${XDG_DATA_HOME}/rye"
-  fi
-}
-
-_tmux() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles tmux
-}
-
-_terraform() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_CACHE_HOME}/terraform"
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles terraform
-}
-
-_tflint() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Migrate existing data, otherwise setup the directory.
-  if [ -d "${HOME}/.tflint.d" ]; then
-    mv "${HOME}/.tflint.d" "${XDG_DATA_HOME}/tflint"
-  else
-    mkdir -p "${XDG_DATA_HOME}/tflint"
-  fi
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles tflint
-}
-
-_yamllint() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles yamllint
-}
-
-_yamlfmt() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles yamlfmt
-}
-
-_ruff() {
-  # Setup directories.
-  mkdir -p "${XDG_CACHE_HOME}/ruff"
-}
-
-_ghostty() {
-  # Setup directories.
-  mkdir -p "${XDG_DATA_HOME}"
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles ghostty
-
-  # Migrate existing data, otherwise setup the directory.
-  if [ -d "${HOME}/.terminfo" ]; then
-    mv "${HOME}/.terminfo" "${XDG_DATA_HOME}/terminfo"
-  else
-    mkdir -p "${XDG_DATA_HOME}/terminfo"
-  fi
-
-  # Symlink the terminfo files in XDG_DATA_HOME.
-  macOS_resources_directory='/Applications/Ghostty.app/Contents/Resources'
-  if [ -d "${macOS_resources_directory}" ]; then
-    if [ ! -e "${XDG_DATA_HOME}/terminfo/67" ]; then
-      ln -s "${macOS_resources_directory}/terminfo/67" "${XDG_DATA_HOME}/terminfo/67"
-    fi
-    if [ ! -e "${XDG_DATA_HOME}/terminfo/78" ]; then
-      ln -s "${macOS_resources_directory}/terminfo/78" "${XDG_DATA_HOME}/terminfo/78"
-    fi
-  fi
-}
-
-_claude() {
-  # Migrate an existing installation.
-  if [ -d "${HOME}/.claude" ] && [ ! -h "${HOME}/.claude" ]; then
-    if [ -e "${XDG_CONFIG_HOME}/claude" ]; then
-      printf '%s\n' "Both ${HOME}/.claude and ${XDG_CONFIG_HOME}/claude exist, merge them by hand." >&2
-      return 1
-    fi
-
-    mkdir -p "${XDG_CONFIG_HOME}"
-    mv "${HOME}/.claude" "${XDG_CONFIG_HOME}/claude"
-  fi
-
-  if [ -f "${HOME}/.claude.json" ] && [ ! -e "${XDG_CONFIG_HOME}/claude/.claude.json" ]; then
-    mkdir -p "${XDG_CONFIG_HOME}/claude"
-    mv "${HOME}/.claude.json" "${XDG_CONFIG_HOME}/claude/.claude.json"
-  fi
-
-  if [ -d "${XDG_CONFIG_HOME}/claude/plugins" ] && [ ! -e "${XDG_DATA_HOME}/claude/plugins" ]; then
-    mkdir -p "${XDG_DATA_HOME}/claude"
-    mv "${XDG_CONFIG_HOME}/claude/plugins" "${XDG_DATA_HOME}/claude/plugins"
-  fi
-
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}/claude"
-  mkdir -p "${XDG_DATA_HOME}/claude/plugins"
-
-  # Preserve configuration that is not already symlinked to the repository.
-  for conf in settings.json CLAUDE.md; do
-    if [ -f "${XDG_CONFIG_HOME}/claude/${conf}" ] && [ ! -h "${XDG_CONFIG_HOME}/claude/${conf}" ]; then
-      if [ -f "${dirname}/claude/${conf}" ]; then
-        mv "${XDG_CONFIG_HOME}/claude/${conf}" "${dirname}/claude/${conf}.backup"
-      else
-        mv "${XDG_CONFIG_HOME}/claude/${conf}" "${dirname}/claude/${conf}"
-      fi
-    fi
+  for binary in "${GOPATH}"/bin/*; do
+    [ -e "${binary}" ] || continue
+    migrate "${binary}" "${GOBIN}/${binary##*/}"
   done
 
-  # Symlink the configuration to the git repository.
-  for conf in settings.json CLAUDE.md statusline-command.sh; do
-    if [ -f "${dirname}/claude/${conf}" ]; then
-      ln -sf "${dirname}/claude/${conf}" "${XDG_CONFIG_HOME}/claude/${conf}"
-    fi
-  done
+  remove_empty "${GOPATH}/bin"
+}
 
-  for conf in agents hooks rules skills; do
-    [ -d "${dirname}/claude/${conf}" ] || continue
+configure_pass() {
+  migrate "${HOME}/.password-store" "${PASSWORD_STORE_DIR}"
+}
 
-    if [ -d "${XDG_CONFIG_HOME}/claude/${conf}" ] && [ ! -h "${XDG_CONFIG_HOME}/claude/${conf}" ]; then
-      printf '%s\n' "${XDG_CONFIG_HOME}/claude/${conf} is a directory, merge it into ${dirname}/claude/${conf} by hand." >&2
-      return 1
-    fi
+configure_less() {
+  migrate "${HOME}/.lesshst" "${LESSHISTFILE}"
+  make_dirs "${LESSHISTFILE%/*}"
+}
 
-    ln -sfn "${dirname}/claude/${conf}" "${XDG_CONFIG_HOME}/claude/${conf}"
+configure_python3() {
+  migrate "${HOME}/.python_history" "${PYTHON_HISTORY}"
+  migrate "${HOME}/.matplotlib" "${MPLCONFIGDIR}"
+  make_dirs "${PYTHON_HISTORY%/*}"
+}
+
+configure_bundle() {
+  migrate "${HOME}/.bundle/cache" "${BUNDLE_USER_CACHE}"
+  migrate "${HOME}/.bundle/config" "${BUNDLE_USER_CONFIG}"
+  migrate "${HOME}/.bundle/plugin" "${BUNDLE_USER_PLUGIN}"
+  remove_empty "${HOME}/.bundle"
+}
+
+configure_terraform() {
+  symlink "${dirname}/terraform" "${XDG_CONFIG_HOME}/terraform"
+  make_dirs "${XDG_CACHE_HOME}/terraform"
+  remove "${HOME}/.terraform.d/checkpoint_cache" "${HOME}/.terraform.d/checkpoint_signature"
+  remove_empty "${HOME}/.terraform.d"
+}
+
+configure_tflint() {
+  symlink "${dirname}/tflint" "${XDG_CONFIG_HOME}/tflint"
+  migrate "${HOME}/.tflint.d" "${XDG_DATA_HOME}/tflint"
+  make_dirs "${XDG_DATA_HOME}/tflint"
+}
+
+configure_yamllint() {
+  symlink "${dirname}/yamllint" "${XDG_CONFIG_HOME}/yamllint"
+}
+
+configure_yamlfmt() {
+  symlink "${dirname}/yamlfmt" "${XDG_CONFIG_HOME}/yamlfmt"
+}
+
+configure_ghostty() {
+  symlink "${dirname}/ghostty" "${XDG_CONFIG_HOME}/ghostty"
+  migrate "${HOME}/.terminfo" "${TERMINFO}"
+
+  for entry in /Applications/Ghostty.app/Contents/Resources/terminfo/*; do
+    symlink "${entry}" "${TERMINFO}/${entry##*/}"
   done
 }
 
-_irssi() {
-  # Setup directories.
-  mkdir -p "${XDG_DATA_HOME}"
-  mkdir -p "${XDG_CONFIG_HOME}"
+configure_claude() {
+  migrate "${HOME}/.claude" "${CLAUDE_CONFIG_DIR}"
+  migrate "${HOME}/.claude.json" "${CLAUDE_CONFIG_DIR}/.claude.json"
 
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles irssi
+  for entry in "${CLAUDE_CONFIG_DIR}"/plugins/*; do
+    [ -e "${entry}" ] || continue
+    [ "${entry##*/}" != synced ] || continue
+    migrate "${entry}" "${CLAUDE_CODE_PLUGIN_CACHE_DIR}/${entry##*/}"
+  done
 
-  # Migrate existing configuration, otherwise setup the directory.
-  if [ -d "${HOME}/.irssi" ]; then
-    if [ -f "${HOME}/.irssi/config" ]; then
-      mv "${HOME}/.irssi/config" "${XDG_CONFIG_HOME}/irssi"
-      rm -rf "${HOME}/.irssi"
+  for conf in settings.json CLAUDE.md statusline-command.sh agents hooks rules skills; do
+    symlink "${dirname}/claude/${conf}" "${CLAUDE_CONFIG_DIR}/${conf}"
+  done
+}
+
+configure_rustup() {
+  migrate "${HOME}/.rustup" "${RUSTUP_HOME}"
+}
+
+configure_cargo() {
+  migrate "${HOME}/.cargo" "${CARGO_HOME}"
+}
+
+configure_npm() {
+  symlink "${dirname}/npm" "${XDG_CONFIG_HOME}/npm"
+  remove "${HOME}/.npm"
+}
+
+configure_bun() {
+  migrate "${HOME}/.bun" "${BUN_INSTALL}"
+  migrate "${HOME}/.bunfig.toml" "${XDG_CONFIG_HOME}/.bunfig.toml"
+  remove "${BUN_INSTALL}/install/cache"
+
+  for link in "${BUN_INSTALL}"/bin/*; do
+    [ -L "${link}" ] || continue
+    symlink "$(readlink -f "${link}")" "${BUN_INSTALL_BIN}/${link##*/}"
+  done
+}
+
+configure_docker() {
+  migrate "${HOME}/.docker" "${DOCKER_CONFIG}"
+  migrate "${DOCKER_CONFIG}/buildx" "${BUILDX_CONFIG}"
+}
+
+configure_colima() {
+  if [ -e "${HOME}/.colima" ] || [ -e "${HOME}/.lima" ]; then
+    if pgrep -q -x limactl; then
+      conflict "Not moving ${HOME}/.colima or ${HOME}/.lima while a VM is running, stop it first."
+      return 0
     fi
   fi
 
-  # Create the data directory.
-  mkdir -p "${XDG_DATA_HOME}/irssi"
+  migrate "${HOME}/.colima" "${COLIMA_HOME}"
+  migrate "${COLIMA_HOME}/_lima" "${LIMA_HOME}"
+  migrate "${HOME}/.lima" "${LIMA_HOME}"
 }
 
-_rustup() {
-  # Setup directories.
-  mkdir -p "${XDG_DATA_HOME}"
+configure_aws() {
+  migrate "${HOME}/.aws" "${AWS_CONFIG_FILE%/*}"
+}
 
-  # Migrate existing data, otherwise create the data directory.
-  if [ -d "${HOME}/.rustup" ]; then
-    mv "${HOME}/.rustup" "${XDG_DATA_HOME}/rustup"
-    rm -rf "${HOME}/.rustup"
+configure_kubectl() {
+  migrate "${HOME}/.kube/config" "${KUBECONFIG}"
+  make_dirs "${KUBECONFIG%/*}" "${KUBECACHEDIR}"
+}
+
+configure_codex() {
+  migrate "${HOME}/.codex" "${CODEX_HOME}"
+  make_dirs "${CODEX_HOME}"
+}
+
+configure_ssh() (
+  key="${HOME}/.ssh/id_ed25519"
+  remote='git@github.com:craigsloggett/dotfiles.git'
+
+  [ "$(git -C "${dirname}" remote get-url origin)" != "${remote}" ] || return 0
+
+  if [ ! -f "${key}" ]; then
+    make_dirs "${key%/*}"
+    chmod 700 "${key%/*}"
+    ssh-keygen -t ed25519 -f "${key}"
+  fi
+
+  if ssh -T -o StrictHostKeyChecking=accept-new git@github.com 2>&1 | grep -q 'successfully authenticated'; then
+    git -C "${dirname}" remote set-url origin "${remote}"
+    printf '%s\n' "Set origin to ${remote}."
   else
-    mkdir -p "${XDG_DATA_HOME}/rustup"
+    pbcopy <"${key}.pub"
+    conflict "Add the SSH key in your clipboard at https://github.com/settings/ssh/new, then run install again."
   fi
+)
 
-  # Cargo requires rustup in $PATH before it can be configured.
-  export PATH
-  PATH="$(brew --prefix rustup)/bin":"${PATH}"
-}
+main() {
+  conflicts="$(mktemp)"
+  readonly conflicts
+  trap 'rm -f "${conflicts}"' EXIT
+  trap 'exit 1' INT TERM HUP
 
-_cargo() {
-  # Create the data directory.
-  mkdir -p "${XDG_DATA_HOME}/cargo"
-}
+  clone_dotfiles
+  load_environment
 
-_npm() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_DATA_HOME}/npm"
-  mkdir -p "${XDG_CACHE_HOME}/npm"
-  mkdir -p "${XDG_STATE_HOME}/npm"
+  configure_host
+  configure_homebrew
+  configure_zsh
 
-  # Migrate existing logs, otherwise create the logs directory.
-  if [ -d "${HOME}/.npm/_logs" ]; then
-    mv "${HOME}/.npm/_logs" "${XDG_STATE_HOME}/npm/logs"
-  else
-    mkdir -p "${XDG_STATE_HOME}/npm/logs"
-  fi
+  for tool in vim nvim git gpg go pass less python3 bundle terraform tflint yamllint yamlfmt ghostty claude rustup cargo npm bun docker colima aws kubectl codex; do
+    command -v "${tool}" >/dev/null || continue
+    "configure_${tool}"
+  done
 
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles npm
+  configure_ssh
 
-  # Remove the ~/.npm directory if it is empty.
-  if [ -d "${HOME}/.npm" ]; then
-    if [ -z "$(ls -A "${HOME}/.npm")" ]; then
-      rm -rf "${HOME}/.npm"
-    fi
+  if [ -s "${conflicts}" ]; then
+    printf '\n%s\n' "Resolve these by hand, then run install again:" >&2
+    cat "${conflicts}" >&2
+    return 1
   fi
 }
 
-_bun() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_CACHE_HOME}/bun"
-  mkdir -p "${XDG_DATA_HOME}"
-
-  # Migrate existing data, otherwise setup the directory.
-  if [ -d "${HOME}/.bun" ]; then
-    mv "${HOME}/.bun" "${XDG_DATA_HOME}/bun"
-  else
-    mkdir -p "${XDG_DATA_HOME}/bun"
-  fi
-
-  # Migrate existing global config.
-  if [ -f "${HOME}/.bunfig.toml" ]; then
-    mv "${HOME}/.bunfig.toml" "${XDG_CONFIG_HOME}/.bunfig.toml"
-  fi
-}
-
-_docker() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_STATE_HOME}/docker/buildx"
-
-  # Migrate existing config if it exists.
-  if [ -d "${HOME}/.docker" ]; then
-    mv "${HOME}/.docker" "${XDG_CONFIG_HOME}/docker"
-  fi
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles docker
-
-  # Remove the ~/.docker directory if it is empty.
-  if [ -d "${HOME}/.docker" ]; then
-    if [ -z "$(ls -A "${HOME}/.docker")" ]; then
-      rmdir "${HOME}/.docker"
-    fi
-  fi
-}
-
-_colima() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_DATA_HOME}/lima"
-
-  # Migrate existing config if it exists.
-  if [ -d "${HOME}/.colima" ]; then
-    mv "${HOME}/.colima" "${XDG_CONFIG_HOME}/colima"
-  fi
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles colima
-
-  # Remove the ~/.colima directory if it is empty.
-  if [ -d "${HOME}/.colima" ]; then
-    if [ -z "$(ls -A "${HOME}/.colima")" ]; then
-      rmdir "${HOME}/.colima"
-    fi
-  fi
-}
-
-_aws() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Migrate existing credentials, otherwise setup the directory.
-  if [ -d "${HOME}/.aws" ] && [ ! -e "${XDG_CONFIG_HOME}/aws" ]; then
-    mv "${HOME}/.aws" "${XDG_CONFIG_HOME}/aws"
-  else
-    mkdir -p "${XDG_CONFIG_HOME}/aws"
-  fi
-}
-
-_kubectl() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}/kube"
-  mkdir -p "${XDG_CACHE_HOME}/kube"
-
-  # Migrate an existing kubeconfig.
-  if [ -f "${HOME}/.kube/config" ] && [ ! -e "${XDG_CONFIG_HOME}/kube/config" ]; then
-    mv "${HOME}/.kube/config" "${XDG_CONFIG_HOME}/kube/config"
-  fi
-}
-
-_codex() {
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-
-  # Migrate existing configuration, otherwise setup the directory.
-  if [ -d "${HOME}/.codex" ] && [ ! -e "${XDG_CONFIG_HOME}/codex" ]; then
-    mv "${HOME}/.codex" "${XDG_CONFIG_HOME}/codex"
-  else
-    mkdir -p "${XDG_CONFIG_HOME}/codex"
-  fi
-}
-
-_bash() {
-  # Create the /etc/bash.bashrc file to specify Bash
-  # configuration for interactive shells.
-  printf '%s\n' "Writing to /etc/bash.bashrc using sudo..."
-
-  cat <<-'EOF' | sudo tee /etc/bash.bashrc >/dev/null
-		# /etc/bash.bashrc: system-wide .bashrc file for the
-		# Bourne Again shell (bash(1)).
-
-		# If not running interactively, don't do anything.
-		[ -z "$PS1" ] && return
-
-		# Use XDG Base Directory Specification
-		XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-
-		if [ -f "${XDG_CONFIG_HOME}/bash/profile" ]; then
-		        . "${XDG_CONFIG_HOME}/bash/profile"
-		fi
-	EOF
-
-  # Setup directories.
-  mkdir -p "${XDG_CONFIG_HOME}"
-  mkdir -p "${XDG_STATE_HOME}/bash"
-
-  # Symlink dotfiles to the git repository.
-  symlink_dotfiles bash
-
-  # Preserve existing history file.
-  if [ -f "${HOME}/.bash_history" ]; then
-    mv "${HOME}/.bash_history" "${XDG_STATE_HOME}/bash/history"
-  fi
-
-  # Cleanup
-  # TODO: Preserve existing files and merge/prompt.
-  # TODO: Set history file to new location before deleting.
-  rm -f "${HOME}/.bash_logout"
-  rm -f "${HOME}/.bashrc"
-  rm -f "${HOME}/.profile"
-}
-
-# Specify which dotfiles to install based on the OS.
-case "$(uname -s)" in
-  *Darwin*)
-    utilities="zsh vim nvim git gpg pass python rye less tmux terraform tflint yamlfmt yamllint ruff go ghostty codex irssi rustup cargo npm bun docker colima aws kubectl claude"
-    ;;
-
-  *)
-    utilities="bash vim nvim git gpg pass python rye less tmux terraform tflint yamlfmt yamllint ruff go claude codex irssi rustup cargo bun aws kubectl"
-    ;;
-esac
-
-# Configure only the utilities that have been installed.
-for util in ${utilities}; do
-  if command -v "${util}" >/dev/null; then
-    printf '%s\n' "Installing ${util}..."
-    "_${util}"
-  else
-    # npm is used by Homebrew even if it isn't installed.
-    if [ "${util}" = "npm" ]; then
-      printf '%s\n' "Installing ${util}..."
-      "_${util}"
-    else
-      printf '%s\n' "Skipping ${util}..."
-    fi
-  fi
-done
+main "$@"
