@@ -201,6 +201,8 @@ configure_homebrew() {
   if ! HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew bundle check --global --no-upgrade >/dev/null 2>&1; then
     /opt/homebrew/bin/brew bundle install --global --no-upgrade
   fi
+
+  HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew bundle cleanup --global --force
 }
 
 configure_zsh() {
