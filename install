@@ -115,6 +115,22 @@ export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
 EOF
 }
 
+set_hostname() (
+  name="${1:?a hostname is required}"
+  smb='/Library/Preferences/SystemConfiguration/com.apple.smb.server'
+
+  for key in ComputerName LocalHostName HostName; do
+    [ "$(scutil --get "${key}" 2>/dev/null)" != "${name}" ] || continue
+    sudo scutil --set "${key}" "${name}"
+    printf '%s\n' "Set ${key} to ${name}."
+  done
+
+  [ "${#name}" -le 15 ] || return 0
+  [ "$(defaults read "${smb}" NetBIOSName 2>/dev/null)" != "${name}" ] || return 0
+  sudo defaults write "${smb}" NetBIOSName -string "${name}"
+  printf '%s\n' "Set NetBIOSName to ${name}."
+)
+
 configure_host() (
   brewfile="${XDG_CONFIG_HOME}/homebrew/Brewfile"
 
@@ -135,13 +151,18 @@ configure_host() (
     return 0
   fi
 
-  host_name="$(ask 'Hostname for this Mac')"
+  current="$(scutil --get ComputerName)"
+  host_name="$(ask "Hostname for this Mac (${current})")"
 
-  if [ -n "${host_name}" ]; then
-    for key in ComputerName LocalHostName HostName; do
-      sudo scutil --set "${key}" "${host_name}"
-    done
-    printf '%s\n' "Set the hostname to ${host_name}."
+  if [ -n "${host_name}" ] && [ "${host_name}" != "${current}" ]; then
+    case "${host_name}" in
+      -* | *- | *[!A-Za-z0-9-]*)
+        conflict "Not setting the hostname to '${host_name}', use only letters, digits and inner hyphens."
+        return 0
+        ;;
+    esac
+
+    set_hostname "${host_name}"
   fi
 
   symlink "${dirname}/homebrew/${profile}.Brewfile" "${brewfile}"
