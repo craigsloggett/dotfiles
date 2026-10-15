@@ -28,9 +28,9 @@ From an existing clone:
 
 Anything that needs a person (adding the SSH key to GitHub, a conflict between an old and a new location) is listed at the end. Resolve it and run `install` again.
 
-## Hosts
+## Profiles
 
-Each profile is a folder in `hosts/` with a `Brewfile`. The chosen profile is linked to `$XDG_CONFIG_HOME/homebrew/Brewfile`, so `brew bundle --global` works by hand too.
+Each profile is a `homebrew/<profile>.Brewfile`. The chosen profile is linked to `$XDG_CONFIG_HOME/homebrew/Brewfile`, so `brew bundle --global` works by hand too.
 
 ## Environment
 

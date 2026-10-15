@@ -118,18 +118,20 @@ EOF
 configure_host() (
   brewfile="${XDG_CONFIG_HOME}/homebrew/Brewfile"
 
-  [ ! -L "${brewfile}" ] || return 0
+  if [ -L "${brewfile}" ] && [ -e "${brewfile}" ]; then
+    return 0
+  fi
 
   profiles=''
-  for dir in "${dirname}"/hosts/*/; do
-    dir="${dir%/}"
-    profiles="${profiles:+${profiles}, }${dir##*/}"
+  for file in "${dirname}"/homebrew/*.Brewfile; do
+    name="${file##*/}"
+    profiles="${profiles:+${profiles}, }${name%.Brewfile}"
   done
 
   profile="$(ask "Profile for this Mac (${profiles})")"
 
-  if [ ! -f "${dirname}/hosts/${profile}/Brewfile" ]; then
-    conflict "No profile named '${profile}' in ${dirname}/hosts."
+  if [ ! -f "${dirname}/homebrew/${profile}.Brewfile" ]; then
+    conflict "No profile named '${profile}' in ${dirname}/homebrew."
     return 0
   fi
 
@@ -142,7 +144,7 @@ configure_host() (
     printf '%s\n' "Set the hostname to ${host_name}."
   fi
 
-  symlink "${dirname}/hosts/${profile}/Brewfile" "${brewfile}"
+  symlink "${dirname}/homebrew/${profile}.Brewfile" "${brewfile}"
 )
 
 install_homebrew() {
