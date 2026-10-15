@@ -163,6 +163,7 @@ clone_dotfiles() {
 
 configure_homebrew() {
   install_homebrew
+  symlink "${dirname}/homebrew/brew.env" "${XDG_CONFIG_HOME}/homebrew/brew.env"
 
   [ -e "${XDG_CONFIG_HOME}/homebrew/Brewfile" ] || return 0
 
