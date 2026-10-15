@@ -4,15 +4,17 @@
 
 set -eu
 
-# Global Variables
 : "${XDG_CONFIG_HOME:=${HOME}/.config}"
 : "${XDG_CACHE_HOME:=${HOME}/.cache}"
 : "${XDG_STATE_HOME:=${HOME}/.local/state}"
 : "${XDG_DATA_HOME:=${HOME}/.local/share}"
 : "${XDG_BIN_HOME:=${HOME}/.local/bin}"
 
-# Get the full path of the current working directory.
-dirname="$(cd "${0%/*}" && printf '%s\n' "${PWD}")"
+if [ -f "${0}" ]; then
+  dirname="$(cd "$(dirname -- "${0}")" && printf '%s\n' "${PWD}")"
+else
+  dirname="${HOME}/Developer/GitHub/craigsloggett/dotfiles"
+fi
 readonly dirname
 
 conflict() {
@@ -145,18 +147,27 @@ configure_host() (
   symlink "${dirname}/hosts/${profile}/Brewfile" "${brewfile}"
 )
 
-configure_homebrew() {
-  brew='/opt/homebrew/bin/brew'
+install_homebrew() {
+  [ ! -x /opt/homebrew/bin/brew ] || return 0
 
-  if [ ! -x "${brew}" ]; then
-    sudo -v
-    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  fi
+  sudo -v
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+}
+
+clone_dotfiles() {
+  [ ! -d "${dirname}/.git" ] || return 0
+
+  install_homebrew
+  git clone https://github.com/craigsloggett/dotfiles.git "${dirname}"
+}
+
+configure_homebrew() {
+  install_homebrew
 
   [ -e "${XDG_CONFIG_HOME}/homebrew/Brewfile" ] || return 0
 
-  if ! HOMEBREW_NO_AUTO_UPDATE=1 "${brew}" bundle check --global >/dev/null 2>&1; then
-    "${brew}" bundle install --global --no-upgrade
+  if ! HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew bundle check --global >/dev/null 2>&1; then
+    /opt/homebrew/bin/brew bundle install --global --no-upgrade
   fi
 }
 
@@ -378,6 +389,7 @@ main() {
   trap 'rm -f "${conflicts}"' EXIT
   trap 'exit 1' INT TERM HUP
 
+  clone_dotfiles
   load_environment
 
   configure_host
