@@ -7,7 +7,7 @@ export XDG_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-${HOME}/.local/state}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}"
 export XDG_BIN_HOME="${XDG_BIN_HOME:-${HOME}/.local/bin}"
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}"
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/rustup/bin:/Applications/Ghostty.app/Contents/MacOS:${PATH}:${XDG_BIN_HOME}"
 
 if [ -f "${0}" ]; then
   dirname="$(cd "$(dirname -- "${0}")" && printf '%s\n' "${PWD}")"
@@ -283,7 +283,7 @@ configure_less() {
   make_dirs "${LESSHISTFILE%/*}"
 }
 
-configure_python() {
+configure_python3() {
   migrate "${HOME}/.python_history" "${PYTHON_HISTORY}"
   migrate "${HOME}/.matplotlib" "${MPLCONFIGDIR}"
   make_dirs "${PYTHON_HISTORY%/*}"
@@ -430,30 +430,12 @@ main() {
   configure_host
   configure_homebrew
   configure_zsh
-  configure_vim
-  configure_nvim
-  configure_git
-  configure_gpg
-  configure_go
-  configure_pass
-  configure_less
-  configure_python
-  configure_bundle
-  configure_terraform
-  configure_tflint
-  configure_yamllint
-  configure_yamlfmt
-  configure_ghostty
-  configure_claude
-  configure_rustup
-  configure_cargo
-  configure_npm
-  configure_bun
-  configure_docker
-  configure_colima
-  configure_aws
-  configure_kubectl
-  configure_codex
+
+  for tool in vim nvim git gpg go pass less python3 bundle terraform tflint yamllint yamlfmt ghostty claude rustup cargo npm bun docker colima aws kubectl codex; do
+    command -v "${tool}" >/dev/null || continue
+    "configure_${tool}"
+  done
+
   configure_ssh
 
   if [ -s "${conflicts}" ]; then
