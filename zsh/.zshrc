@@ -1,7 +1,4 @@
-fpath+=(
-  /opt/homebrew/share/zsh/site-functions(N-/)
-  "${ZDOTDIR}"/.zfunctions/completions/*(N-/)
-)
+fpath+=(/opt/homebrew/share/zsh/site-functions(N-/))
 
 autoload -Uz compinit
 compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
