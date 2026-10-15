@@ -24,7 +24,9 @@ promptinit
 
 PROMPT=' %(!.%F{red}%B.%F{green}%B)%b%f %~ %(!.#.$) '
 
-source "${ZDOTDIR}/.zfunctions/zsh-autosuggestions"
+if [[ -r /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+  source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
 
 source "${ZDOTDIR}/.zfunctions/claude-kkp-reset"
 precmd_functions+=(_claude_kkp_reset)
