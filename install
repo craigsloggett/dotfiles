@@ -138,21 +138,31 @@ configure_host() (
     return 0
   fi
 
+  current="$(scutil --get ComputerName)"
+
   profiles=''
   for file in "${dirname}"/homebrew/*.Brewfile; do
     name="${file##*/}"
     profiles="${profiles:+${profiles}, }${name%.Brewfile}"
   done
 
-  profile="$(ask "Profile for this Mac (${profiles})")"
+  default=''
+  [ ! -f "${dirname}/homebrew/${current}.Brewfile" ] || default="${current}"
+
+  profile="$(ask "Profile for this Mac (${profiles})${default:+ [${default}]}")"
+  profile="${profile:-${default}}"
+
+  if [ -z "${profile}" ]; then
+    conflict "No profile chosen, pick one of: ${profiles}."
+    return 0
+  fi
 
   if [ ! -f "${dirname}/homebrew/${profile}.Brewfile" ]; then
     conflict "No profile named '${profile}' in ${dirname}/homebrew."
     return 0
   fi
 
-  current="$(scutil --get ComputerName)"
-  host_name="$(ask "Hostname for this Mac (${current})")"
+  host_name="$(ask "Hostname for this Mac [${current}]")"
 
   if [ -n "${host_name}" ] && [ "${host_name}" != "${current}" ]; then
     case "${host_name}" in
