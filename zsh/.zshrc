@@ -26,9 +26,6 @@ PROMPT=' %(!.%F{red}%B.%F{green}%B)%b%f %~ %(!.#.$) '
 
 source "${ZDOTDIR}/.zfunctions/zsh-autosuggestions"
 
-# Reset Kitty Keyboard Protocol state left by Claude Code.
-# TODO: Remove once the following issue is resolved:
-# https://github.com/anthropics/claude-code/issues/38761
 source "${ZDOTDIR}/.zfunctions/claude-kkp-reset"
 precmd_functions+=(_claude_kkp_reset)
 

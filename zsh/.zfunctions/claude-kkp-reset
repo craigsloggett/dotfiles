@@ -1,5 +1,3 @@
-# .zfunctions/claude-kkp-reset
-
 # Workaround: Claude Code enables the kitty keyboard protocol (CSI u mode)
 # but may not restore the terminal on unclean exit, leaving keypresses
 # interpreted as raw escape sequences. This resets CSI u mode before each
