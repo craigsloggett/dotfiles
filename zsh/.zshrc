@@ -25,9 +25,6 @@ if [ -r /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
   source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
 
-source "${ZDOTDIR}/.zfunctions/claude-kkp-reset"
-precmd_functions+=(_claude_kkp_reset)
-
 for file in "${ZDOTDIR}"/.zshrc.d/*.zsh(N); do
   command -v "${file:t:r}" >/dev/null || continue
 
