@@ -1,0 +1,512 @@
+#!/bin/sh
+
+set -eu
+
+restarts=''
+
+changed() {
+  case "${1:?a defaults domain is required}" in
+    com.apple.dock) restarts="${restarts} Dock" ;;
+    com.apple.finder) restarts="${restarts} Finder" ;;
+    com.apple.controlcenter | com.apple.menuextra.clock) restarts="${restarts} ControlCenter" ;;
+    com.apple.WindowManager) restarts="${restarts} WindowManager" ;;
+    com.apple.sharingd) restarts="${restarts} sharingd" ;;
+    NSGlobalDomain | com.apple.symbolichotkeys | com.apple.AppleMultitouch* | com.apple.driver.*) restarts="${restarts} logout" ;;
+  esac
+}
+
+set_default() {
+  domain="${1:?a defaults domain is required}"
+  key="${2:?a defaults key is required}"
+  type="${3:?a defaults type is required}"
+  value="${4?a defaults value is required}"
+
+  case "${type}:${value}" in
+    bool:true) want=1 ;;
+    bool:false) want=0 ;;
+    *) want="${value}" ;;
+  esac
+
+  [ "$(defaults read "${domain}" "${key}" 2>/dev/null)" != "${want}" ] || return 0
+
+  case "${domain}" in
+    /Library/*) sudo defaults write "${domain}" "${key}" "-${type}" "${value}" ;;
+    *) defaults write "${domain}" "${key}" "-${type}" "${value}" ;;
+  esac
+
+  printf '%s\n' "Set ${key} in ${domain##*/} to ${value}."
+  changed "${domain}"
+}
+
+dock_apps() {
+  i=0
+  while url="$(defaults export com.apple.dock - | plutil -extract "persistent-apps.${i}.tile-data.file-data._CFURLString" raw -o - - 2>/dev/null)"; do
+    printf '%s ' "${url}"
+    i=$((i + 1))
+  done
+}
+
+dock_tile() {
+  printf '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>%s</string><key>_CFURLStringType</key><integer>15</integer></dict></dict><key>tile-type</key><string>file-tile</string></dict>' "${1:?a dock tile url is required}"
+}
+
+set_dock_apps() {
+  count=$#
+  want=''
+  for app in "$@"; do
+    [ -d "${app}" ] || continue
+    url="file://$(printf '%s' "${app}" | sed 's/ /%20/g')/"
+    want="${want}${url} "
+    set -- "$@" "$(dock_tile "${url}")"
+  done
+  shift "${count}"
+
+  others="$(defaults export com.apple.dock - | plutil -extract persistent-others.0 raw -o - - 2>/dev/null || :)"
+  [ "${want}" != "$(dock_apps)" ] || [ -n "${others}" ] || return 0
+
+  defaults write com.apple.dock persistent-apps -array "$@"
+  defaults write com.apple.dock persistent-others -array
+  printf '%s\n' "Set the Dock apps."
+  changed com.apple.dock
+}
+
+disable_hotkey() {
+  id="${1:?a hotkey id is required}"
+  modifiers="${2:?hotkey modifiers are required}"
+
+  enabled="$(defaults export com.apple.symbolichotkeys - | plutil -extract "AppleSymbolicHotKeys.${id}.enabled" raw -o - - 2>/dev/null || :)"
+  [ "${enabled}" != false ] || return 0
+
+  defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add "${id}" \
+    "<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>32</integer><integer>49</integer><integer>${modifiers}</integer></array><key>type</key><string>standard</string></dict></dict>"
+  printf '%s\n' "Disabled keyboard shortcut ${id}."
+  changed com.apple.symbolichotkeys
+}
+
+language_and_region() {
+  set_default NSGlobalDomain AppleLocale string en_CA
+  set_default com.apple.loginwindow TALLogoutSavesState bool false
+}
+
+airdrop_and_handoff() {
+  set_default com.apple.sharingd DiscoverableMode string Off
+}
+
+software_update() {
+  for key in AutoUpdate AutomaticDownload AutomaticallyInstallMacOSUpdates ConfigDataInstall CriticalUpdateInstall; do
+    set_default /Library/Preferences/com.apple.SoftwareUpdate "${key}" bool true
+  done
+
+  set_default /Library/Preferences/com.apple.commerce AutoUpdate bool false
+}
+
+time_machine() {
+  set_default com.apple.TimeMachine DoNotOfferNewDisksForBackup bool true
+  set_default /Library/Preferences/com.apple.TimeMachine RequiresACPower bool false
+
+  if [ "$(defaults read /Library/Preferences/com.apple.TimeMachine AutoBackup 2>/dev/null)" != 0 ]; then
+    sudo tmutil disable
+    printf '%s\n' "Disabled automatic Time Machine backups."
+  fi
+}
+
+accessibility() {
+  set_default NSGlobalDomain com.apple.springing.enabled bool true
+  set_default NSGlobalDomain com.apple.springing.delay float 0.5
+}
+
+appearance() {
+  set_default NSGlobalDomain AppleInterfaceStyleSwitchesAutomatically bool true
+  set_default NSGlobalDomain AppleShowScrollBars string Automatic
+  set_default NSGlobalDomain NSGlassTintAmount float 0.5
+}
+
+control_center() {
+  set_default com.apple.controlcenter 'NSStatusItem VisibleCC Bluetooth' bool true
+  set_default com.apple.controlcenter 'NSStatusItem VisibleCC Sound' bool true
+  set_default com.apple.menuextra.clock ShowAMPM bool true
+  set_default com.apple.menuextra.clock ShowDate int 0
+  set_default com.apple.menuextra.clock ShowDayOfWeek bool true
+}
+
+desktop_and_dock() {
+  set_default com.apple.dock autohide bool true
+  set_default com.apple.dock show-recents bool false
+  set_default com.apple.dock tilesize float 43
+  set_default NSGlobalDomain AppleMiniaturizeOnDoubleClick bool false
+  set_default com.apple.WindowManager AutoHide bool false
+  set_default com.apple.WindowManager AppWindowGroupingBehavior int 1
+  set_default com.apple.WindowManager EnableStandardClickToShowDesktop bool false
+  set_default com.apple.WindowManager EnableTiledWindowMargins bool false
+  set_default com.apple.WindowManager HideDesktop bool true
+  set_default com.apple.WindowManager StageManagerHideWidgets bool false
+  set_default com.apple.WindowManager StandardHideWidgets bool false
+
+  set_dock_apps \
+    /Applications/Firefox.app \
+    /Applications/Ghostty.app \
+    /System/Applications/Mail.app \
+    /System/Applications/Calendar.app \
+    /Applications/Slack.app \
+    /Applications/Signal.app \
+    /Applications/Obsidian.app \
+    '/Applications/Microsoft Teams.app' \
+    /Applications/UTM.app \
+    /Applications/Xcode.app \
+    /Applications/Hark.app \
+    /Applications/KeePassXC.app
+}
+
+sound() {
+  set_default NSGlobalDomain com.apple.sound.beep.flash int 0
+}
+
+lock_screen() {
+  if [ "$(defaults -currentHost read com.apple.screensaver idleTime 2>/dev/null)" != 300 ]; then
+    defaults -currentHost write com.apple.screensaver idleTime -int 300
+    printf '%s\n' "Set the screen saver to start after 5 minutes."
+  fi
+
+  if ! sysadminctl -screenLock status 2>&1 | grep -q 'delay is 300 seconds'; then
+    sysadminctl -screenLock 300 -password -
+    printf '%s\n' "Set the screen to lock 5 minutes after the screen saver starts."
+  fi
+
+  set_default com.apple.loginwindow TALLogoutSavesState bool false
+}
+
+privacy_and_security() {
+  set_default com.apple.AdLib allowApplePersonalizedAdvertising bool false
+
+  for key in AutoSubmit ThirdPartyDataSubmit; do
+    set_default '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' "${key}" bool false
+  done
+}
+
+users_and_groups() {
+  set_default /Library/Preferences/com.apple.loginwindow GuestEnabled bool false
+}
+
+siri() {
+  set_default com.apple.assistant.support 'Assistant Enabled' bool false
+}
+
+keyboard() {
+  set_default NSGlobalDomain KeyRepeat int 2
+  set_default NSGlobalDomain InitialKeyRepeat int 25
+  set_default NSGlobalDomain AppleKeyboardUIMode int 0
+  set_default NSGlobalDomain NSAutomaticCapitalizationEnabled bool true
+  set_default NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled bool true
+
+  disable_hotkey 60 262144
+  disable_hotkey 61 786432
+}
+
+mouse() {
+  set_default NSGlobalDomain com.apple.mouse.scaling float 1
+  set_default com.apple.AppleMultitouchMouse MouseButtonDivision int 55
+  set_default com.apple.AppleMultitouchMouse MouseButtonMode string OneButton
+  set_default com.apple.AppleMultitouchMouse MouseHorizontalScroll bool true
+  set_default com.apple.AppleMultitouchMouse MouseMomentumScroll bool true
+  set_default com.apple.AppleMultitouchMouse MouseOneFingerDoubleTapGesture int 0
+  set_default com.apple.AppleMultitouchMouse MouseTwoFingerDoubleTapGesture int 3
+  set_default com.apple.AppleMultitouchMouse MouseTwoFingerHorizSwipeGesture int 2
+  set_default com.apple.AppleMultitouchMouse MouseVerticalScroll bool true
+  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseButtonDivision int 55
+  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseButtonMode string OneButton
+  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseHorizontalScroll bool true
+  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseMomentumScroll bool true
+  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseOneFingerDoubleTapGesture int 0
+  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseTwoFingerDoubleTapGesture int 3
+  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseTwoFingerHorizSwipeGesture int 2
+  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseVerticalScroll bool true
+  set_default com.apple.driver.AppleHIDMouse Button1 int 1
+  set_default com.apple.driver.AppleHIDMouse Button2 int 1
+  set_default com.apple.driver.AppleHIDMouse Button3 int 0
+  set_default com.apple.driver.AppleHIDMouse Button4 int 0
+  set_default com.apple.driver.AppleHIDMouse Button4Click int 0
+  set_default com.apple.driver.AppleHIDMouse Button4Force int 0
+  set_default com.apple.driver.AppleHIDMouse ButtonDominance int 1
+  set_default com.apple.driver.AppleHIDMouse ScrollH int 1
+  set_default com.apple.driver.AppleHIDMouse ScrollS int 4
+  set_default com.apple.driver.AppleHIDMouse ScrollSSize int 30
+  set_default com.apple.driver.AppleHIDMouse ScrollV int 1
+}
+
+trackpad() {
+  set_default NSGlobalDomain com.apple.swipescrolldirection bool false
+  set_default NSGlobalDomain com.apple.trackpad.forceClick bool true
+  set_default com.apple.AppleMultitouchTrackpad ActuateDetents int 1
+  set_default com.apple.AppleMultitouchTrackpad Clicking int 0
+  set_default com.apple.AppleMultitouchTrackpad DragLock int 0
+  set_default com.apple.AppleMultitouchTrackpad Dragging int 0
+  set_default com.apple.AppleMultitouchTrackpad FirstClickThreshold int 1
+  set_default com.apple.AppleMultitouchTrackpad SecondClickThreshold int 1
+  set_default com.apple.AppleMultitouchTrackpad ForceSuppressed bool false
+  set_default com.apple.AppleMultitouchTrackpad TrackpadCornerSecondaryClick int 0
+  set_default com.apple.AppleMultitouchTrackpad TrackpadFiveFingerPinchGesture int 2
+  set_default com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture int 2
+  set_default com.apple.AppleMultitouchTrackpad TrackpadFourFingerPinchGesture int 2
+  set_default com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture int 2
+  set_default com.apple.AppleMultitouchTrackpad TrackpadHandResting bool true
+  set_default com.apple.AppleMultitouchTrackpad TrackpadHorizScroll int 1
+  set_default com.apple.AppleMultitouchTrackpad TrackpadMomentumScroll bool true
+  set_default com.apple.AppleMultitouchTrackpad TrackpadPinch int 1
+  set_default com.apple.AppleMultitouchTrackpad TrackpadRightClick bool true
+  set_default com.apple.AppleMultitouchTrackpad TrackpadRotate int 1
+  set_default com.apple.AppleMultitouchTrackpad TrackpadScroll bool true
+  set_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag bool false
+  set_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture int 2
+  set_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerTapGesture int 0
+  set_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture int 2
+  set_default com.apple.AppleMultitouchTrackpad TrackpadTwoFingerDoubleTapGesture int 1
+  set_default com.apple.AppleMultitouchTrackpad TrackpadTwoFingerFromRightEdgeSwipeGesture int 3
+  set_default com.apple.AppleMultitouchTrackpad USBMouseStopsTrackpad int 0
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking int 0
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad DragLock int 0
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad Dragging int 0
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick int 0
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFiveFingerPinchGesture int 2
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerHorizSwipeGesture int 2
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerPinchGesture int 2
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerVertSwipeGesture int 2
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadHandResting bool true
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadHorizScroll int 1
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadMomentumScroll bool true
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadPinch int 1
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick bool true
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRotate int 1
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadScroll bool true
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag bool false
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerHorizSwipeGesture int 2
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerTapGesture int 0
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerVertSwipeGesture int 2
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadTwoFingerDoubleTapGesture int 1
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadTwoFingerFromRightEdgeSwipeGesture int 3
+  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad USBMouseStopsTrackpad int 0
+}
+
+finder() {
+  set_default com.apple.finder FXPreferredViewStyle string Nlsv
+  set_default com.apple.finder _FXSortFoldersFirst bool true
+  set_default com.apple.finder _FXEnableColumnAutoSizing bool true
+  set_default com.apple.finder FK_ArrangeBy string 'Date Modified'
+  set_default com.apple.finder FXArrangeGroupViewBy string Name
+  set_default com.apple.finder FXPreferredGroupBy string Name
+  set_default com.apple.finder ShowPathbar bool true
+  set_default com.apple.finder ShowStatusBar bool false
+  set_default com.apple.finder ShowSidebar bool true
+  set_default com.apple.finder FK_AppCentricShowSidebar bool true
+  set_default com.apple.finder NewWindowTarget string PfHm
+  set_default com.apple.finder ShowExternalHardDrivesOnDesktop bool true
+  set_default com.apple.finder ShowHardDrivesOnDesktop bool false
+  set_default com.apple.finder ShowRemovableMediaOnDesktop bool true
+  set_default com.apple.finder ShowRecentTags bool false
+}
+
+safari() {
+  set_default com.apple.Safari HomePage string about:blank
+  set_default com.apple.Safari SearchProviderShortName string DuckDuckGo
+  set_default com.apple.Safari PrivateSearchEngineUsesNormalSearchEngineToggle bool false
+  set_default com.apple.Safari HistoryAgeInDaysLimit int 1
+  set_default com.apple.Safari DownloadsClearingPolicy int 1
+  set_default com.apple.Safari ShowFullURLInSmartSearchField bool true
+  set_default com.apple.Safari ShowFavoritesUnderSmartSearchField bool false
+  set_default com.apple.Safari ShowSidebarInTopSites bool false
+  set_default com.apple.Safari SuppressSearchSuggestions bool true
+  set_default com.apple.Safari UniversalSearchEnabled bool false
+  set_default com.apple.Safari WebsiteSpecificSearchEnabled bool false
+  set_default com.apple.Safari PreloadTopHit bool false
+  set_default com.apple.Safari EnableEnhancedPrivacyInRegularBrowsing bool true
+  set_default com.apple.Safari EnableEnhancedPrivacyInPrivateBrowsing bool false
+  set_default com.apple.Safari CanPromptForPushNotifications bool false
+  set_default com.apple.Safari AutoFillFromAddressBook bool false
+  set_default com.apple.Safari AutoFillPasswords bool false
+  set_default com.apple.Safari AutoFillFromiCloudKeychain bool false
+  set_default com.apple.Safari AutoFillCreditCardData bool false
+  set_default com.apple.Safari AutoFillMiscellaneousForms bool false
+
+  provider="$(defaults export NSGlobalDomain - | plutil -extract NSPreferredWebServices.NSWebServicesProviderWebSearch.NSProviderIdentifier raw -o - - 2>/dev/null || :)"
+  if [ "${provider}" != com.duckduckgo ]; then
+    defaults write NSGlobalDomain NSPreferredWebServices -dict NSWebServicesProviderWebSearch \
+      '<dict><key>NSDefaultDisplayName</key><string>DuckDuckGo</string><key>NSProviderIdentifier</key><string>com.duckduckgo</string></dict>'
+    printf '%s\n' "Set the search engine to DuckDuckGo."
+  fi
+}
+
+mail() {
+  set_default com.apple.mail BottomPreview bool false
+  set_default com.apple.mail ColumnLayoutMessageList bool false
+  set_default com.apple.mail ThreadingDefault bool true
+  set_default com.apple.mail ConversationViewSortDescending bool true
+  set_default com.apple.mail ConversationViewSpansMailboxes bool true
+  set_default com.apple.mail HighlightClosedThreads int 1
+  set_default com.apple.mail EnableContactPhotos int 0
+  set_default com.apple.mail EnableToCcInMessageList int 0
+  set_default com.apple.mail MessageListShowDateTime int 0
+  set_default com.apple.mail MessageListShowSize int 0
+  set_default com.apple.mail NumberOfSnippetLines int 3
+  set_default com.apple.mail ShouldShowUnreadMessagesInBold bool false
+  set_default com.apple.mail MailShowFlags bool false
+  set_default com.apple.mail PollTime int -1
+  set_default com.apple.mail MailDockBadge int 1
+  set_default com.apple.mail MailUserNotificationScope int 1
+  set_default com.apple.mail CategoriesEnabledByDefault bool false
+  set_default com.apple.mail ShowBccHeader int 1
+  set_default com.apple.mail ShowCcHeader bool true
+  set_default com.apple.mail ShowReplyToHeader bool false
+  set_default com.apple.mail ShowPriorityControl bool false
+  set_default com.apple.mail ShowComposeFormatInspectorBar bool true
+  set_default com.apple.mail SignaturePlacedAboveQuotedText bool false
+  set_default com.apple.mail SpellCheckingBehavior string InlineSpellCheckingEnabled
+  set_default com.apple.mail WebContinuousSpellCheckingEnabled bool true
+}
+
+calendar() {
+  set_default com.apple.iCal 'Show Week Numbers' bool true
+  set_default com.apple.iCal 'display birthdays calendar' bool false
+  set_default com.apple.iCal 'Default duration in minutes for new event' float 30
+  set_default com.apple.iCal CalendarSidebarShown bool false
+}
+
+contacts() {
+  set_default com.apple.AddressBook ABDefaultAddressCountryCode string ca
+  set_default com.apple.AddressBook ABBirthDayVisible bool true
+}
+
+textedit() {
+  set_default com.apple.TextEdit RichText int 0
+  set_default com.apple.TextEdit ShowRuler bool false
+  set_default com.apple.TextEdit IgnoreHTML bool true
+  set_default com.apple.TextEdit CheckSpellingWhileTyping bool false
+  set_default com.apple.TextEdit CorrectSpellingAutomatically bool false
+  set_default com.apple.TextEdit SmartQuotes bool false
+  set_default com.apple.TextEdit SmartDashes bool false
+  set_default com.apple.TextEdit SmartCopyPaste bool false
+  set_default com.apple.TextEdit TextReplacement bool false
+  set_default com.apple.TextEdit SmartSubstitutionsEnabledInRichTextOnly bool false
+}
+
+activity_monitor() {
+  set_default com.apple.ActivityMonitor ShowCategory int 100
+}
+
+disk_utility() {
+  set_default com.apple.DiskUtility WorkspaceShowAPFSSnapshots bool true
+  set_default com.apple.DiskUtility SidebarShowAllDevices bool false
+}
+
+screenshot() {
+  set_default com.apple.screencapture showsClicks bool true
+  set_default com.apple.screencapture target-screenshot string file
+  set_default com.apple.screencapture target-screenrecording string file
+}
+
+terminal() {
+  set_default com.apple.Terminal 'Default Window Settings' string 'Clear Dark'
+  set_default com.apple.Terminal 'Startup Window Settings' string 'Clear Dark'
+}
+
+xcode() {
+  [ -d /Applications/Xcode.app ] || return 0
+
+  set_default com.apple.dt.Xcode DVTTextShowMinimap bool false
+  set_default com.apple.dt.Xcode DVTTextShowInvisibleCharacters bool false
+  set_default com.apple.dt.Xcode DVTEnableOnDeviceCodePredictions bool false
+  set_default com.apple.dt.Xcode DVTTextEnablePredictiveCompletion bool false
+  set_default com.apple.dt.Xcode IDEAlwaysShowEditorTabBar bool false
+  set_default com.apple.dt.Xcode IDEEditorSubEditorOrientation int 1
+  set_default com.apple.dt.Xcode IDEEditorDefaultCodeReviewPreference int 1
+  set_default com.apple.dt.Xcode IDEStringCatalogAutomaticCommentGenerationEnabled bool false
+  set_default com.apple.dt.Xcode IDEWorkspaceSuppressCleanBuildPrompt bool true
+  set_default com.apple.dt.Xcode XCFontAndColorCurrentTheme string 'Default (Light).xccolortheme'
+  set_default com.apple.dt.Xcode XCFontAndColorCurrentDarkTheme string 'Default (Dark).xccolortheme'
+}
+
+rectangle() {
+  [ -d /Applications/Rectangle.app ] || return 0
+
+  set_default com.knollsoft.Rectangle launchOnLogin bool true
+  set_default com.knollsoft.Rectangle hideMenubarIcon bool true
+  set_default com.knollsoft.Rectangle allowAnyShortcut bool true
+  set_default com.knollsoft.Rectangle alternateDefaultShortcuts bool true
+  set_default com.knollsoft.Rectangle gapSize float 10
+  set_default com.knollsoft.Rectangle windowSnapping int 2
+  set_default com.knollsoft.Rectangle unsnapRestore int 1
+  set_default com.knollsoft.Rectangle subsequentExecutionMode int 1
+  set_default com.knollsoft.Rectangle missionControlDragging int 1
+  set_default com.knollsoft.Rectangle hapticFeedbackOnSnap int 2
+  set_default com.knollsoft.Rectangle footprintAnimationDurationMultiplier float 0
+  set_default com.knollsoft.Rectangle footprintBlur bool false
+  set_default com.knollsoft.Rectangle landscapeSnapAreas string '[1,{"action":15},7,{"compound":-4},8,{"action":14},4,{"compound":-2},6,{"action":13},3,{"action":16},5,{"compound":-3},2,{"action":2}]'
+  set_default com.knollsoft.Rectangle SUEnableAutomaticChecks bool true
+}
+
+syncthing() {
+  [ -d /Applications/Syncthing.app ] || return 0
+
+  set_default com.github.xor-gate.syncthing-macosx StartAtLogin bool true
+  set_default com.github.xor-gate.syncthing-macosx SUEnableAutomaticChecks bool true
+  set_default com.github.xor-gate.syncthing-macosx SUSendProfileInfo bool false
+}
+
+ghostty() {
+  [ -d /Applications/Ghostty.app ] || return 0
+
+  set_default com.mitchellh.ghostty SUAutomaticallyUpdate bool true
+  set_default com.mitchellh.ghostty SUEnableAutomaticChecks bool true
+  set_default com.mitchellh.ghostty SUSendProfileInfo bool false
+}
+
+restart() {
+  for process in Dock Finder ControlCenter WindowManager sharingd; do
+    case " ${restarts} " in
+      *" ${process} "*) ;;
+      *) continue ;;
+    esac
+
+    ! pgrep -q -x "${process}" || killall "${process}"
+  done
+
+  case " ${restarts} " in
+    *' logout '*) printf '%s\n' "Log out to apply the keyboard, trackpad and mouse settings." ;;
+  esac
+}
+
+main() {
+  language_and_region
+  airdrop_and_handoff
+  software_update
+  time_machine
+  accessibility
+  appearance
+  control_center
+  desktop_and_dock
+  sound
+  lock_screen
+  privacy_and_security
+  users_and_groups
+  siri
+  keyboard
+  mouse
+  trackpad
+
+  finder
+  safari
+  mail
+  calendar
+  contacts
+  textedit
+  activity_monitor
+  disk_utility
+  screenshot
+  terminal
+  xcode
+  rectangle
+  syncthing
+  ghostty
+
+  restart
+}
+
+main "$@"
