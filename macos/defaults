@@ -17,6 +17,31 @@ require_full_disk_access() {
   return 1
 }
 
+ensure_container() {
+  id="${1:?a bundle identifier is required}"
+  app="${2:?an app name is required}"
+  container="${HOME}/Library/Containers/${id}"
+
+  [ ! -d "${container}" ] || return 0
+  [ -z "${CHECK}" ] || return 0
+
+  printf '%s\n' "${app}: opening hidden once to create its settings container"
+  open -gja "${app}"
+
+  tries=0
+  while [ ! -d "${container}" ] && [ "${tries}" -lt 10 ]; do
+    sleep 1
+    tries=$((tries + 1))
+  done
+
+  ! pgrep -q -x "${app}" || killall "${app}"
+
+  if [ ! -d "${container}" ]; then
+    printf '%s\n' "${app} did not create ${container}, open it once by hand and run again." >&2
+    return 1
+  fi
+}
+
 changed() {
   case "${1:?a defaults domain is required}" in
     com.apple.dock) restarts="${restarts} Dock" ;;
@@ -363,6 +388,8 @@ finder() {
 }
 
 safari() {
+  ensure_container com.apple.Safari Safari
+
   set_default com.apple.Safari SearchProviderShortName string DuckDuckGo
   set_default com.apple.Safari PrivateSearchEngineUsesNormalSearchEngineToggle bool false
   set_default com.apple.Safari HistoryAgeInDaysLimit int 1
@@ -421,6 +448,8 @@ calendar() {
 }
 
 textedit() {
+  ensure_container com.apple.TextEdit TextEdit
+
   set_default com.apple.TextEdit RichText int 0
   set_default com.apple.TextEdit ShowRuler bool false
   set_default com.apple.TextEdit IgnoreHTML bool true
