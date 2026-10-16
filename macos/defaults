@@ -2,6 +2,9 @@
 
 set -eu
 
+CHECK="${CHECK:-}"
+readonly CHECK
+
 restarts=''
 
 changed() {
@@ -27,14 +30,26 @@ set_default() {
     *) want="${value}" ;;
   esac
 
-  [ "$(defaults read "${domain}" "${key}" 2>/dev/null)" != "${want}" ] || return 0
+  case "${type}" in
+    bool) kind=boolean ;;
+    int) kind=integer ;;
+    *) kind="${type}" ;;
+  esac
+
+  current="$(defaults read "${domain}" "${key}" 2>/dev/null || :)"
+
+  if [ "${current}" = "${want}" ] && [ "$(defaults read-type "${domain}" "${key}" 2>/dev/null)" = "Type is ${kind}" ]; then
+    return 0
+  fi
+
+  printf '%s\n' "${domain##*/} ${key}: ${current:-unset} -> ${value}"
+  [ -z "${CHECK}" ] || return 0
 
   case "${domain}" in
     /Library/*) sudo defaults write "${domain}" "${key}" "-${type}" "${value}" ;;
     *) defaults write "${domain}" "${key}" "-${type}" "${value}" ;;
   esac
 
-  printf '%s\n' "Set ${key} in ${domain##*/} to ${value}."
   changed "${domain}"
 }
 
@@ -52,9 +67,12 @@ dock_tile() {
 
 set_dock_apps() {
   count=$#
+  names=''
   want=''
   for app in "$@"; do
     [ -d "${app}" ] || continue
+    name="${app##*/}"
+    names="${names:+${names}, }${name%.app}"
     url="file://$(printf '%s' "${app}" | sed 's/ /%20/g')/"
     want="${want}${url} "
     set -- "$@" "$(dock_tile "${url}")"
@@ -64,9 +82,11 @@ set_dock_apps() {
   others="$(defaults export com.apple.dock - | plutil -extract persistent-others.0 raw -o - - 2>/dev/null || :)"
   [ "${want}" != "$(dock_apps)" ] || [ -n "${others}" ] || return 0
 
+  printf '%s\n' "dock persistent-apps -> ${names}"
+  [ -z "${CHECK}" ] || return 0
+
   defaults write com.apple.dock persistent-apps -array "$@"
   defaults write com.apple.dock persistent-others -array
-  printf '%s\n' "Set the Dock apps."
   changed com.apple.dock
 }
 
@@ -77,10 +97,60 @@ disable_hotkey() {
   enabled="$(defaults export com.apple.symbolichotkeys - | plutil -extract "AppleSymbolicHotKeys.${id}.enabled" raw -o - - 2>/dev/null || :)"
   [ "${enabled}" != false ] || return 0
 
+  printf '%s\n' "symbolichotkeys ${id} enabled: ${enabled:-unset} -> false"
+  [ -z "${CHECK}" ] || return 0
+
   defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add "${id}" \
     "<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>32</integer><integer>49</integer><integer>${modifiers}</integer></array><key>type</key><string>standard</string></dict></dict>"
-  printf '%s\n' "Disabled keyboard shortcut ${id}."
   changed com.apple.symbolichotkeys
+}
+
+set_search_engine() {
+  provider="${1:?a search provider identifier is required}"
+  name="${2:?a search provider name is required}"
+
+  current="$(defaults export NSGlobalDomain - | plutil -extract NSPreferredWebServices.NSWebServicesProviderWebSearch.NSProviderIdentifier raw -o - - 2>/dev/null || :)"
+  [ "${current}" != "${provider}" ] || return 0
+
+  printf '%s\n' "NSPreferredWebServices: ${current:-unset} -> ${provider}"
+  [ -z "${CHECK}" ] || return 0
+
+  defaults write NSGlobalDomain NSPreferredWebServices -dict NSWebServicesProviderWebSearch \
+    "<dict><key>NSDefaultDisplayName</key><string>${name}</string><key>NSProviderIdentifier</key><string>${provider}</string></dict>"
+}
+
+set_screensaver_idle() {
+  seconds="${1:?an idle time in seconds is required}"
+
+  current="$(defaults -currentHost read com.apple.screensaver idleTime 2>/dev/null || :)"
+  [ "${current}" != "${seconds}" ] || return 0
+
+  printf '%s\n' "screensaver idleTime: ${current:-unset} -> ${seconds}"
+  [ -z "${CHECK}" ] || return 0
+
+  defaults -currentHost write com.apple.screensaver idleTime -int "${seconds}"
+}
+
+set_screen_lock() {
+  seconds="${1:?a lock delay in seconds is required}"
+
+  current="$(sysadminctl -screenLock status 2>&1 | sed 's/.*screenLock //')"
+  [ "${current}" != "delay is ${seconds} seconds" ] || return 0
+
+  printf '%s\n' "screenLock: ${current} -> delay is ${seconds} seconds"
+  [ -z "${CHECK}" ] || return 0
+
+  sysadminctl -screenLock "${seconds}" -password -
+}
+
+disable_automatic_backups() {
+  current="$(defaults read /Library/Preferences/com.apple.TimeMachine AutoBackup 2>/dev/null || :)"
+  [ "${current}" != 0 ] || return 0
+
+  printf '%s\n' "TimeMachine AutoBackup: ${current:-unset} -> 0"
+  [ -z "${CHECK}" ] || return 0
+
+  sudo tmutil disable
 }
 
 language_and_region() {
@@ -103,11 +173,7 @@ software_update() {
 time_machine() {
   set_default com.apple.TimeMachine DoNotOfferNewDisksForBackup bool true
   set_default /Library/Preferences/com.apple.TimeMachine RequiresACPower bool false
-
-  if [ "$(defaults read /Library/Preferences/com.apple.TimeMachine AutoBackup 2>/dev/null)" != 0 ]; then
-    sudo tmutil disable
-    printf '%s\n' "Disabled automatic Time Machine backups."
-  fi
+  disable_automatic_backups
 }
 
 accessibility() {
@@ -162,16 +228,8 @@ sound() {
 }
 
 lock_screen() {
-  if [ "$(defaults -currentHost read com.apple.screensaver idleTime 2>/dev/null)" != 300 ]; then
-    defaults -currentHost write com.apple.screensaver idleTime -int 300
-    printf '%s\n' "Set the screen saver to start after 5 minutes."
-  fi
-
-  if ! sysadminctl -screenLock status 2>&1 | grep -q 'delay is 300 seconds'; then
-    sysadminctl -screenLock 300 -password -
-    printf '%s\n' "Set the screen to lock 5 minutes after the screen saver starts."
-  fi
-
+  set_screensaver_idle 300
+  set_screen_lock 300
   set_default com.apple.loginwindow TALLogoutSavesState bool false
 }
 
@@ -325,13 +383,7 @@ safari() {
   set_default com.apple.Safari AutoFillFromiCloudKeychain bool false
   set_default com.apple.Safari AutoFillCreditCardData bool false
   set_default com.apple.Safari AutoFillMiscellaneousForms bool false
-
-  provider="$(defaults export NSGlobalDomain - | plutil -extract NSPreferredWebServices.NSWebServicesProviderWebSearch.NSProviderIdentifier raw -o - - 2>/dev/null || :)"
-  if [ "${provider}" != com.duckduckgo ]; then
-    defaults write NSGlobalDomain NSPreferredWebServices -dict NSWebServicesProviderWebSearch \
-      '<dict><key>NSDefaultDisplayName</key><string>DuckDuckGo</string><key>NSProviderIdentifier</key><string>com.duckduckgo</string></dict>'
-    printf '%s\n' "Set the search engine to DuckDuckGo."
-  fi
+  set_search_engine com.duckduckgo DuckDuckGo
 }
 
 mail() {
@@ -474,6 +526,11 @@ restart() {
 }
 
 main() {
+  if [ "$(uname -s)" != Darwin ]; then
+    printf '%s\n' "macos/defaults only runs on macOS." >&2
+    return 1
+  fi
+
   language_and_region
   airdrop_and_handoff
   software_update
