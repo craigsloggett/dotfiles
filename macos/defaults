@@ -393,8 +393,6 @@ finder() {
 }
 
 safari() {
-  ensure_container com.apple.Safari Safari
-
   set_default com.apple.Safari SearchProviderShortName string DuckDuckGo
   set_default com.apple.Safari PrivateSearchEngineUsesNormalSearchEngineToggle bool false
   set_default com.apple.Safari HistoryAgeInDaysLimit int 1
@@ -453,8 +451,6 @@ calendar() {
 }
 
 textedit() {
-  ensure_container com.apple.TextEdit TextEdit
-
   set_default com.apple.TextEdit RichText int 0
   set_default com.apple.TextEdit ShowRuler bool false
   set_default com.apple.TextEdit IgnoreHTML bool true
@@ -560,6 +556,9 @@ main() {
   fi
 
   require_full_disk_access
+
+  ensure_container com.apple.Safari Safari
+  ensure_container com.apple.TextEdit TextEdit
 
   language_and_region
   airdrop_and_handoff
