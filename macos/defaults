@@ -545,12 +545,12 @@ main() {
   if full_disk_access; then
     safari
     mail
+    contacts
   else
-    printf '%s\n' "Grant this terminal Full Disk Access in System Settings > Privacy & Security to set up Safari and Mail." >&2
+    printf '%s\n' "Grant this terminal Full Disk Access in System Settings > Privacy & Security to set up Safari, Mail and Contacts." >&2
   fi
 
   calendar
-  contacts
   textedit
   activity_monitor
   disk_utility

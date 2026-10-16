@@ -41,7 +41,7 @@ Each profile is a `homebrew/<profile>.Brewfile`. The chosen profile is linked to
 
 `macos/defaults` sets System Settings and app preferences, one `set_default` line per setting, grouped by pane. A line writes only when the value differs, and the Dock, Finder and Control Center restart only when one of their settings changed, so a re-run is silent. `install` runs it every time, and it runs on its own too. `CHECK=1 macos/defaults` prints what differs without writing anything.
 
-Safari and Mail keep their preferences where only a terminal with Full Disk Access can write, so those two sections wait for that grant. FileVault, iCloud, login items, Time Machine options, the wallpaper and the default browser still need a person.
+Safari, Mail and Contacts keep their preferences where only a terminal with Full Disk Access can write, so those sections wait for that grant. FileVault, iCloud, login items, Time Machine options, the wallpaper and the default browser still need a person.
 
 ## Left in `~`
 
