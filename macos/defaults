@@ -421,11 +421,6 @@ calendar() {
   set_default com.apple.iCal CalendarSidebarShown bool false
 }
 
-contacts() {
-  set_default com.apple.AddressBook ABDefaultAddressCountryCode string ca
-  set_default com.apple.AddressBook ABBirthDayVisible bool true
-}
-
 textedit() {
   set_default com.apple.TextEdit RichText int 0
   set_default com.apple.TextEdit ShowRuler bool false
@@ -553,7 +548,6 @@ main() {
   finder
   safari
   mail
-  contacts
   calendar
   textedit
   activity_monitor
