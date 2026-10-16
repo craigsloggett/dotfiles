@@ -179,24 +179,24 @@ set_screen_lock() {
   sysadminctl -screenLock "${seconds}" -password -
 }
 
-language_and_region() {
-  set_default NSGlobalDomain AppleLocale string en_CA
-  set_default com.apple.loginwindow TALLogoutSavesState bool false
-}
-
-airdrop_and_handoff() {
-  set_default com.apple.sharingd DiscoverableMode string Off
-  set_default -currentHost com.apple.coreservices.useractivityd ActivityAdvertisingAllowed bool false
-  set_default -currentHost com.apple.coreservices.useractivityd ActivityReceivingAllowed bool false
-  set_default -currentHost com.apple.controlcenter AirplayReceiverEnabled bool false
-}
-
 software_update() {
   for key in AutoUpdate AutomaticDownload AutomaticallyInstallMacOSUpdates ConfigDataInstall CriticalUpdateInstall; do
     set_default /Library/Preferences/com.apple.SoftwareUpdate "${key}" bool true
   done
 
   set_default /Library/Preferences/com.apple.commerce AutoUpdate bool false
+}
+
+airdrop_and_continuity() {
+  set_default com.apple.sharingd DiscoverableMode string Off
+  set_default -currentHost com.apple.coreservices.useractivityd ActivityAdvertisingAllowed bool false
+  set_default -currentHost com.apple.coreservices.useractivityd ActivityReceivingAllowed bool false
+  set_default -currentHost com.apple.controlcenter AirplayReceiverEnabled bool false
+}
+
+language_and_region() {
+  set_default NSGlobalDomain AppleLocale string en_CA
+  set_default com.apple.loginwindow TALLogoutSavesState bool false
 }
 
 time_machine() {
@@ -212,16 +212,6 @@ appearance() {
   set_default NSGlobalDomain AppleInterfaceStyleSwitchesAutomatically bool true
   set_default NSGlobalDomain AppleShowScrollBars string Automatic
   set_default NSGlobalDomain NSGlassTintAmount float 0.5
-}
-
-control_center() {
-  set_default com.apple.controlcenter 'NSStatusItem VisibleCC Bluetooth' bool true
-  set_default com.apple.controlcenter 'NSStatusItem VisibleCC Sound' bool true
-  set_default -currentHost com.apple.controlcenter Sound int 16
-  set_default com.apple.controlcenter RemoteLiveActivitiesEnabled bool false
-  set_default com.apple.menuextra.clock ShowAMPM bool true
-  set_default com.apple.menuextra.clock ShowDate int 0
-  set_default com.apple.menuextra.clock ShowDayOfWeek bool true
 }
 
 desktop_and_dock() {
@@ -253,6 +243,20 @@ desktop_and_dock() {
     /Applications/KeePassXC.app
 }
 
+menu_bar() {
+  set_default com.apple.controlcenter 'NSStatusItem VisibleCC Bluetooth' bool true
+  set_default com.apple.controlcenter 'NSStatusItem VisibleCC Sound' bool true
+  set_default -currentHost com.apple.controlcenter Sound int 16
+  set_default com.apple.controlcenter RemoteLiveActivitiesEnabled bool false
+  set_default com.apple.menuextra.clock ShowAMPM bool true
+  set_default com.apple.menuextra.clock ShowDate int 0
+  set_default com.apple.menuextra.clock ShowDayOfWeek bool true
+}
+
+siri() {
+  set_default com.apple.assistant.support 'Assistant Enabled' bool false
+}
+
 sound() {
   set_default NSGlobalDomain com.apple.sound.beep.flash int 0
 }
@@ -273,10 +277,6 @@ privacy_and_security() {
 
 users_and_groups() {
   set_default /Library/Preferences/com.apple.loginwindow GuestEnabled bool false
-}
-
-siri() {
-  set_default com.apple.assistant.support 'Assistant Enabled' bool false
 }
 
 keyboard() {
@@ -392,27 +392,19 @@ finder() {
   set_default com.apple.finder ShowRecentTags bool false
 }
 
-safari() {
-  set_default com.apple.Safari SearchProviderShortName string DuckDuckGo
-  set_default com.apple.Safari PrivateSearchEngineUsesNormalSearchEngineToggle bool false
-  set_default com.apple.Safari HistoryAgeInDaysLimit int 1
-  set_default com.apple.Safari DownloadsClearingPolicy int 1
-  set_default com.apple.Safari ShowFullURLInSmartSearchField bool true
-  set_default com.apple.Safari ShowFavoritesUnderSmartSearchField bool false
-  set_default com.apple.Safari ShowSidebarInTopSites bool false
-  set_default com.apple.Safari SuppressSearchSuggestions bool true
-  set_default com.apple.Safari UniversalSearchEnabled bool false
-  set_default com.apple.Safari WebsiteSpecificSearchEnabled bool false
-  set_default com.apple.Safari PreloadTopHit bool false
-  set_default com.apple.Safari EnableEnhancedPrivacyInRegularBrowsing bool true
-  set_default com.apple.Safari EnableEnhancedPrivacyInPrivateBrowsing bool false
-  set_default com.apple.Safari CanPromptForPushNotifications bool false
-  set_default com.apple.Safari AutoFillFromAddressBook bool false
-  set_default com.apple.Safari AutoFillPasswords bool false
-  set_default com.apple.Safari AutoFillFromiCloudKeychain bool false
-  set_default com.apple.Safari AutoFillCreditCardData bool false
-  set_default com.apple.Safari AutoFillMiscellaneousForms bool false
-  set_search_engine com.duckduckgo DuckDuckGo
+calendar() {
+  set_default com.apple.iCal 'Show Week Numbers' bool true
+  set_default com.apple.iCal 'display birthdays calendar' bool false
+  set_default com.apple.iCal 'Default duration in minutes for new event' float 30
+  set_default com.apple.iCal CalendarSidebarShown bool false
+}
+
+ghostty() {
+  [ -d /Applications/Ghostty.app ] || return 0
+
+  set_default com.mitchellh.ghostty SUAutomaticallyUpdate bool true
+  set_default com.mitchellh.ghostty SUEnableAutomaticChecks bool true
+  set_default com.mitchellh.ghostty SUSendProfileInfo bool false
 }
 
 mail() {
@@ -443,11 +435,54 @@ mail() {
   set_default com.apple.mail WebContinuousSpellCheckingEnabled bool true
 }
 
-calendar() {
-  set_default com.apple.iCal 'Show Week Numbers' bool true
-  set_default com.apple.iCal 'display birthdays calendar' bool false
-  set_default com.apple.iCal 'Default duration in minutes for new event' float 30
-  set_default com.apple.iCal CalendarSidebarShown bool false
+rectangle() {
+  [ -d /Applications/Rectangle.app ] || return 0
+
+  set_default com.knollsoft.Rectangle launchOnLogin bool true
+  set_default com.knollsoft.Rectangle hideMenubarIcon bool true
+  set_default com.knollsoft.Rectangle allowAnyShortcut bool true
+  set_default com.knollsoft.Rectangle alternateDefaultShortcuts bool true
+  set_default com.knollsoft.Rectangle gapSize float 10
+  set_default com.knollsoft.Rectangle windowSnapping int 2
+  set_default com.knollsoft.Rectangle unsnapRestore int 1
+  set_default com.knollsoft.Rectangle subsequentExecutionMode int 1
+  set_default com.knollsoft.Rectangle missionControlDragging int 1
+  set_default com.knollsoft.Rectangle hapticFeedbackOnSnap int 2
+  set_default com.knollsoft.Rectangle footprintAnimationDurationMultiplier float 0
+  set_default com.knollsoft.Rectangle footprintBlur bool false
+  set_default com.knollsoft.Rectangle landscapeSnapAreas string '[1,{"action":15},7,{"compound":-4},8,{"action":14},4,{"compound":-2},6,{"action":13},3,{"action":16},5,{"compound":-3},2,{"action":2}]'
+  set_default com.knollsoft.Rectangle SUEnableAutomaticChecks bool true
+}
+
+safari() {
+  set_default com.apple.Safari SearchProviderShortName string DuckDuckGo
+  set_default com.apple.Safari PrivateSearchEngineUsesNormalSearchEngineToggle bool false
+  set_default com.apple.Safari HistoryAgeInDaysLimit int 1
+  set_default com.apple.Safari DownloadsClearingPolicy int 1
+  set_default com.apple.Safari ShowFullURLInSmartSearchField bool true
+  set_default com.apple.Safari ShowFavoritesUnderSmartSearchField bool false
+  set_default com.apple.Safari ShowSidebarInTopSites bool false
+  set_default com.apple.Safari SuppressSearchSuggestions bool true
+  set_default com.apple.Safari UniversalSearchEnabled bool false
+  set_default com.apple.Safari WebsiteSpecificSearchEnabled bool false
+  set_default com.apple.Safari PreloadTopHit bool false
+  set_default com.apple.Safari EnableEnhancedPrivacyInRegularBrowsing bool true
+  set_default com.apple.Safari EnableEnhancedPrivacyInPrivateBrowsing bool false
+  set_default com.apple.Safari CanPromptForPushNotifications bool false
+  set_default com.apple.Safari AutoFillFromAddressBook bool false
+  set_default com.apple.Safari AutoFillPasswords bool false
+  set_default com.apple.Safari AutoFillFromiCloudKeychain bool false
+  set_default com.apple.Safari AutoFillCreditCardData bool false
+  set_default com.apple.Safari AutoFillMiscellaneousForms bool false
+  set_search_engine com.duckduckgo DuckDuckGo
+}
+
+syncthing() {
+  [ -d /Applications/Syncthing.app ] || return 0
+
+  set_default com.github.xor-gate.syncthing-macosx StartAtLogin bool true
+  set_default com.github.xor-gate.syncthing-macosx SUEnableAutomaticChecks bool true
+  set_default com.github.xor-gate.syncthing-macosx SUSendProfileInfo bool false
 }
 
 textedit() {
@@ -461,6 +496,22 @@ textedit() {
   set_default com.apple.TextEdit SmartCopyPaste bool false
   set_default com.apple.TextEdit TextReplacement bool false
   set_default com.apple.TextEdit SmartSubstitutionsEnabledInRichTextOnly bool false
+}
+
+xcode() {
+  [ -d /Applications/Xcode.app ] || return 0
+
+  set_default com.apple.dt.Xcode DVTTextShowMinimap bool false
+  set_default com.apple.dt.Xcode DVTTextShowInvisibleCharacters bool false
+  set_default com.apple.dt.Xcode DVTEnableOnDeviceCodePredictions bool false
+  set_default com.apple.dt.Xcode DVTTextEnablePredictiveCompletion bool false
+  set_default com.apple.dt.Xcode IDEAlwaysShowEditorTabBar bool false
+  set_default com.apple.dt.Xcode IDEEditorSubEditorOrientation int 1
+  set_default com.apple.dt.Xcode IDEEditorDefaultCodeReviewPreference int 1
+  set_default com.apple.dt.Xcode IDEStringCatalogAutomaticCommentGenerationEnabled bool false
+  set_default com.apple.dt.Xcode IDEWorkspaceSuppressCleanBuildPrompt bool true
+  set_default com.apple.dt.Xcode XCFontAndColorCurrentTheme string 'Default (Light).xccolortheme'
+  set_default com.apple.dt.Xcode XCFontAndColorCurrentDarkTheme string 'Default (Dark).xccolortheme'
 }
 
 activity_monitor() {
@@ -481,57 +532,6 @@ screenshot() {
 terminal() {
   set_default com.apple.Terminal 'Default Window Settings' string 'Clear Dark'
   set_default com.apple.Terminal 'Startup Window Settings' string 'Clear Dark'
-}
-
-xcode() {
-  [ -d /Applications/Xcode.app ] || return 0
-
-  set_default com.apple.dt.Xcode DVTTextShowMinimap bool false
-  set_default com.apple.dt.Xcode DVTTextShowInvisibleCharacters bool false
-  set_default com.apple.dt.Xcode DVTEnableOnDeviceCodePredictions bool false
-  set_default com.apple.dt.Xcode DVTTextEnablePredictiveCompletion bool false
-  set_default com.apple.dt.Xcode IDEAlwaysShowEditorTabBar bool false
-  set_default com.apple.dt.Xcode IDEEditorSubEditorOrientation int 1
-  set_default com.apple.dt.Xcode IDEEditorDefaultCodeReviewPreference int 1
-  set_default com.apple.dt.Xcode IDEStringCatalogAutomaticCommentGenerationEnabled bool false
-  set_default com.apple.dt.Xcode IDEWorkspaceSuppressCleanBuildPrompt bool true
-  set_default com.apple.dt.Xcode XCFontAndColorCurrentTheme string 'Default (Light).xccolortheme'
-  set_default com.apple.dt.Xcode XCFontAndColorCurrentDarkTheme string 'Default (Dark).xccolortheme'
-}
-
-rectangle() {
-  [ -d /Applications/Rectangle.app ] || return 0
-
-  set_default com.knollsoft.Rectangle launchOnLogin bool true
-  set_default com.knollsoft.Rectangle hideMenubarIcon bool true
-  set_default com.knollsoft.Rectangle allowAnyShortcut bool true
-  set_default com.knollsoft.Rectangle alternateDefaultShortcuts bool true
-  set_default com.knollsoft.Rectangle gapSize float 10
-  set_default com.knollsoft.Rectangle windowSnapping int 2
-  set_default com.knollsoft.Rectangle unsnapRestore int 1
-  set_default com.knollsoft.Rectangle subsequentExecutionMode int 1
-  set_default com.knollsoft.Rectangle missionControlDragging int 1
-  set_default com.knollsoft.Rectangle hapticFeedbackOnSnap int 2
-  set_default com.knollsoft.Rectangle footprintAnimationDurationMultiplier float 0
-  set_default com.knollsoft.Rectangle footprintBlur bool false
-  set_default com.knollsoft.Rectangle landscapeSnapAreas string '[1,{"action":15},7,{"compound":-4},8,{"action":14},4,{"compound":-2},6,{"action":13},3,{"action":16},5,{"compound":-3},2,{"action":2}]'
-  set_default com.knollsoft.Rectangle SUEnableAutomaticChecks bool true
-}
-
-syncthing() {
-  [ -d /Applications/Syncthing.app ] || return 0
-
-  set_default com.github.xor-gate.syncthing-macosx StartAtLogin bool true
-  set_default com.github.xor-gate.syncthing-macosx SUEnableAutomaticChecks bool true
-  set_default com.github.xor-gate.syncthing-macosx SUSendProfileInfo bool false
-}
-
-ghostty() {
-  [ -d /Applications/Ghostty.app ] || return 0
-
-  set_default com.mitchellh.ghostty SUAutomaticallyUpdate bool true
-  set_default com.mitchellh.ghostty SUEnableAutomaticChecks bool true
-  set_default com.mitchellh.ghostty SUSendProfileInfo bool false
 }
 
 restart() {
@@ -560,36 +560,37 @@ main() {
   ensure_container com.apple.Safari Safari
   ensure_container com.apple.TextEdit TextEdit
 
-  language_and_region
-  airdrop_and_handoff
   software_update
+  airdrop_and_continuity
+  language_and_region
   time_machine
   accessibility
   appearance
-  control_center
   desktop_and_dock
+  menu_bar
+  siri
   sound
   lock_screen
   privacy_and_security
   users_and_groups
-  siri
   keyboard
   mouse
   trackpad
 
   finder
-  safari
-  mail
   calendar
+  ghostty
+  mail
+  rectangle
+  safari
+  syncthing
   textedit
+  xcode
+
   activity_monitor
   disk_utility
   screenshot
   terminal
-  xcode
-  rectangle
-  syncthing
-  ghostty
 
   restart
 }
