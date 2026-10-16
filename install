@@ -398,9 +398,11 @@ configure_codex() {
   make_dirs "${CODEX_HOME}"
 }
 
-configure_macos() {
-  "${dirname}/macos/defaults" || conflict "The macOS settings stopped early, see the message above."
-}
+configure_macos() (
+  errors="$(mktemp)"
+  "${dirname}/macos/defaults" 2>"${errors}" || conflict "$(cat "${errors}")"
+  rm -f "${errors}"
+)
 
 configure_ssh() (
   key="${HOME}/.ssh/id_ed25519"
