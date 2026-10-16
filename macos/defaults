@@ -182,6 +182,7 @@ appearance() {
 control_center() {
   set_default com.apple.controlcenter 'NSStatusItem VisibleCC Bluetooth' bool true
   set_default com.apple.controlcenter 'NSStatusItem VisibleCC Sound' bool true
+  set_default com.apple.controlcenter RemoteLiveActivitiesEnabled bool false
   set_default com.apple.menuextra.clock ShowAMPM bool true
   set_default com.apple.menuextra.clock ShowDate int 0
   set_default com.apple.menuextra.clock ShowDayOfWeek bool true
@@ -197,8 +198,9 @@ desktop_and_dock() {
   set_default com.apple.WindowManager EnableStandardClickToShowDesktop bool false
   set_default com.apple.WindowManager EnableTiledWindowMargins bool false
   set_default com.apple.WindowManager HideDesktop bool true
-  set_default com.apple.WindowManager StageManagerHideWidgets bool false
-  set_default com.apple.WindowManager StandardHideWidgets bool false
+  set_default com.apple.WindowManager StageManagerHideWidgets bool true
+  set_default com.apple.WindowManager StandardHideWidgets bool true
+  set_default com.apple.chronod remoteWidgetsEnabled bool false
 
   set_dock_apps \
     /Applications/Firefox.app \
