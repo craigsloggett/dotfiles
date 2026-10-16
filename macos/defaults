@@ -363,7 +363,6 @@ finder() {
 }
 
 safari() {
-  set_default com.apple.Safari HomePage string about:blank
   set_default com.apple.Safari SearchProviderShortName string DuckDuckGo
   set_default com.apple.Safari PrivateSearchEngineUsesNormalSearchEngineToggle bool false
   set_default com.apple.Safari HistoryAgeInDaysLimit int 1
