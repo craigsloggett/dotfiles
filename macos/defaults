@@ -196,7 +196,6 @@ airdrop_and_continuity() {
 
 language_and_region() {
   set_default NSGlobalDomain AppleLocale string en_CA
-  set_default com.apple.loginwindow TALLogoutSavesState bool false
 }
 
 time_machine() {
