@@ -143,16 +143,6 @@ set_screen_lock() {
   sysadminctl -screenLock "${seconds}" -password -
 }
 
-disable_automatic_backups() {
-  current="$(defaults read /Library/Preferences/com.apple.TimeMachine AutoBackup 2>/dev/null || :)"
-  [ "${current}" != 0 ] || return 0
-
-  printf '%s\n' "TimeMachine AutoBackup: ${current:-unset} -> 0"
-  [ -z "${CHECK}" ] || return 0
-
-  sudo tmutil disable
-}
-
 language_and_region() {
   set_default NSGlobalDomain AppleLocale string en_CA
   set_default com.apple.loginwindow TALLogoutSavesState bool false
@@ -172,8 +162,6 @@ software_update() {
 
 time_machine() {
   set_default com.apple.TimeMachine DoNotOfferNewDisksForBackup bool true
-  set_default /Library/Preferences/com.apple.TimeMachine RequiresACPower bool false
-  disable_automatic_backups
 }
 
 accessibility() {
