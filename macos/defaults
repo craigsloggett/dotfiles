@@ -186,6 +186,9 @@ language_and_region() {
 
 airdrop_and_handoff() {
   set_default com.apple.sharingd DiscoverableMode string Off
+  set_default -currentHost com.apple.coreservices.useractivityd ActivityAdvertisingAllowed bool false
+  set_default -currentHost com.apple.coreservices.useractivityd ActivityReceivingAllowed bool false
+  set_default -currentHost com.apple.controlcenter AirplayReceiverEnabled bool false
 }
 
 software_update() {
