@@ -398,6 +398,10 @@ configure_codex() {
   make_dirs "${CODEX_HOME}"
 }
 
+configure_macos() {
+  "${dirname}/macos/defaults"
+}
+
 configure_ssh() (
   key="${HOME}/.ssh/id_ed25519"
   remote='git@github.com:craigsloggett/dotfiles.git'
@@ -436,6 +440,8 @@ main() {
     command -v "${tool}" >/dev/null || continue
     "configure_${tool}"
   done
+
+  configure_macos
 
   configure_ssh
 
