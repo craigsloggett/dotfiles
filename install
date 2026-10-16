@@ -182,6 +182,7 @@ configure_host() (
 install_homebrew() {
   [ ! -x /opt/homebrew/bin/brew ] || return 0
 
+  printf '%s\n' "Installing Homebrew, which needs sudo access."
   sudo -v
   NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
@@ -414,7 +415,7 @@ configure_ssh() (
     printf '%s\n' "Set origin to ${remote}."
   else
     pbcopy <"${key}.pub"
-    conflict "Add the SSH key in your clipboard at https://github.com/settings/ssh/new, then run install again."
+    conflict "Add the SSH key in your clipboard at https://github.com/settings/ssh/new."
   fi
 )
 
@@ -439,8 +440,9 @@ main() {
   configure_ssh
 
   if [ -s "${conflicts}" ]; then
-    printf '\n%s\n' "Resolve these by hand, then run install again:" >&2
+    printf '\n%s\n' "Resolve these by hand:" >&2
     cat "${conflicts}" >&2
+    printf '\n%s\n' "Then run install again:" "  ${dirname}/install" >&2
     return 1
   fi
 }
