@@ -41,7 +41,7 @@ Each profile is a `homebrew/<profile>.Brewfile`. The chosen profile is linked to
 
 `macos/defaults` sets System Settings and app preferences, one `set_default` line per setting, grouped by pane. A line writes only when the value differs, and the Dock, Finder and Control Center restart only when one of their settings changed, so a re-run is silent. `install` runs it every time, and it runs on its own too. `CHECK=1 macos/defaults` prints what differs without writing anything.
 
-Sandboxed apps keep their preferences where only a terminal with Full Disk Access can write, so the script opens that pane and stops until the grant is in place. FileVault, iCloud, login items, Time Machine options, the wallpaper and the default browser still need a person.
+Sandboxed apps keep their preferences where only a terminal with Full Disk Access can write, so the script opens that pane and stops until the grant is in place. Safari and TextEdit read settings only from a container they create on first launch, so on a new Mac the script opens each hidden once and quits it before writing. FileVault, iCloud, login items, Time Machine options, the wallpaper, the default browser and the Safari home page (Safari ignores one written from outside) still need a person.
 
 ## Left in `~`
 
