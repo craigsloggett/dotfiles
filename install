@@ -20,6 +20,10 @@ conflict() {
   printf '%s\n' "$*" | tee -a "${conflicts}" >&2
 }
 
+need_sudo() {
+  sudo -n -v 2>/dev/null || printf '%s\n' "$*"
+}
+
 symlink() (
   source="${1:?a symlink source is required}"
   target="${2:?a symlink target is required}"
@@ -122,12 +126,14 @@ set_hostname() (
 
   for key in ComputerName LocalHostName HostName; do
     [ "$(scutil --get "${key}" 2>/dev/null)" != "${name}" ] || continue
+    need_sudo "Setting the hostname needs sudo access."
     sudo scutil --set "${key}" "${name}"
     printf '%s\n' "Set ${key} to ${name}."
   done
 
   [ "${#name}" -le 15 ] || return 0
   [ "$(defaults read "${smb}" NetBIOSName 2>/dev/null)" != "${name}" ] || return 0
+  need_sudo "Setting the hostname needs sudo access."
   sudo defaults write "${smb}" NetBIOSName -string "${name}"
   printf '%s\n' "Set NetBIOSName to ${name}."
 )
@@ -209,6 +215,7 @@ configure_homebrew() {
 
 configure_zsh() {
   if [ "$(cat /etc/zshenv 2>/dev/null)" != "$(zshenv)" ]; then
+    need_sudo "Writing /etc/zshenv needs sudo access."
     zshenv | sudo tee /etc/zshenv >/dev/null
     printf '%s\n' "Wrote /etc/zshenv."
   fi
@@ -398,6 +405,12 @@ configure_codex() {
   make_dirs "${CODEX_HOME}"
 }
 
+configure_macos() (
+  errors="$(mktemp)"
+  "${dirname}/macos/defaults" 2>"${errors}" || conflict "$(cat "${errors}")"
+  rm -f "${errors}"
+)
+
 configure_ssh() (
   key="${HOME}/.ssh/id_ed25519"
   remote='git@github.com:craigsloggett/dotfiles.git'
@@ -436,6 +449,8 @@ main() {
     command -v "${tool}" >/dev/null || continue
     "configure_${tool}"
   done
+
+  configure_macos
 
   configure_ssh
 
