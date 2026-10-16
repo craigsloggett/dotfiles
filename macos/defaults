@@ -57,6 +57,12 @@ changed() {
 }
 
 set_default() {
+  host=''
+  if [ "${1}" = -currentHost ]; then
+    host="${1}"
+    shift
+  fi
+
   domain="${1:?a defaults domain is required}"
   key="${2:?a defaults key is required}"
   type="${3:?a defaults type is required}"
@@ -74,9 +80,9 @@ set_default() {
     *) kind="${type}" ;;
   esac
 
-  current="$(defaults read "${domain}" "${key}" 2>/dev/null || :)"
+  current="$(defaults ${host:+"${host}"} read "${domain}" "${key}" 2>/dev/null || :)"
 
-  if [ "${current}" = "${want}" ] && [ "$(defaults read-type "${domain}" "${key}" 2>/dev/null)" = "Type is ${kind}" ]; then
+  if [ "${current}" = "${want}" ] && [ "$(defaults ${host:+"${host}"} read-type "${domain}" "${key}" 2>/dev/null)" = "Type is ${kind}" ]; then
     return 0
   fi
 
@@ -88,7 +94,7 @@ set_default() {
       sudo -n -v 2>/dev/null || printf '%s\n' "Settings under /Library need sudo access."
       sudo defaults write "${domain}" "${key}" "-${type}" "${value}"
       ;;
-    *) defaults write "${domain}" "${key}" "-${type}" "${value}" ;;
+    *) defaults ${host:+"${host}"} write "${domain}" "${key}" "-${type}" "${value}" ;;
   esac
 
   changed "${domain}"
@@ -160,18 +166,6 @@ set_search_engine() {
     "<dict><key>NSDefaultDisplayName</key><string>${name}</string><key>NSProviderIdentifier</key><string>${provider}</string></dict>"
 }
 
-set_screensaver_idle() {
-  seconds="${1:?an idle time in seconds is required}"
-
-  current="$(defaults -currentHost read com.apple.screensaver idleTime 2>/dev/null || :)"
-  [ "${current}" != "${seconds}" ] || return 0
-
-  printf '%s\n' "screensaver idleTime: ${current:-unset} -> ${seconds}"
-  [ -z "${CHECK}" ] || return 0
-
-  defaults -currentHost write com.apple.screensaver idleTime -int "${seconds}"
-}
-
 set_screen_lock() {
   seconds="${1:?a lock delay in seconds is required}"
 
@@ -220,6 +214,7 @@ appearance() {
 control_center() {
   set_default com.apple.controlcenter 'NSStatusItem VisibleCC Bluetooth' bool true
   set_default com.apple.controlcenter 'NSStatusItem VisibleCC Sound' bool true
+  set_default -currentHost com.apple.controlcenter Sound int 16
   set_default com.apple.controlcenter RemoteLiveActivitiesEnabled bool false
   set_default com.apple.menuextra.clock ShowAMPM bool true
   set_default com.apple.menuextra.clock ShowDate int 0
@@ -260,7 +255,7 @@ sound() {
 }
 
 lock_screen() {
-  set_screensaver_idle 300
+  set_default -currentHost com.apple.screensaver idleTime int 300
   set_screen_lock 300
   set_default com.apple.loginwindow TALLogoutSavesState bool false
 }
