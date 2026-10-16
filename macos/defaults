@@ -81,7 +81,10 @@ set_default() {
   [ -z "${CHECK}" ] || return 0
 
   case "${domain}" in
-    /Library/*) sudo defaults write "${domain}" "${key}" "-${type}" "${value}" ;;
+    /Library/*)
+      sudo -n -v 2>/dev/null || printf '%s\n' "Settings under /Library need sudo access."
+      sudo defaults write "${domain}" "${key}" "-${type}" "${value}"
+      ;;
     *) defaults write "${domain}" "${key}" "-${type}" "${value}" ;;
   esac
 
@@ -175,6 +178,7 @@ set_screen_lock() {
   printf '%s\n' "screenLock: ${current} -> delay is ${seconds} seconds"
   [ -z "${CHECK}" ] || return 0
 
+  printf '%s\n' "Setting the screen lock delay needs your login password."
   sysadminctl -screenLock "${seconds}" -password -
 }
 
