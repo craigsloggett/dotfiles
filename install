@@ -399,7 +399,7 @@ configure_codex() {
 }
 
 configure_macos() {
-  "${dirname}/macos/defaults"
+  "${dirname}/macos/defaults" || conflict "The macOS settings stopped early, see the message above."
 }
 
 configure_ssh() (

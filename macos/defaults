@@ -7,8 +7,14 @@ readonly CHECK
 
 restarts=''
 
-full_disk_access() {
-  ls "${HOME}/Library/Safari" >/dev/null 2>&1
+require_full_disk_access() {
+  for dir in Safari Cookies Suggestions Messages; do
+    ! ls "${HOME}/Library/${dir}" >/dev/null 2>&1 || return 0
+  done
+
+  open 'x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles'
+  printf '%s\n' "Turn on Full Disk Access for this terminal in the System Settings pane that just opened, quit and reopen the terminal, then run again." >&2
+  return 1
 }
 
 changed() {
@@ -525,6 +531,8 @@ main() {
     return 1
   fi
 
+  require_full_disk_access
+
   language_and_region
   airdrop_and_handoff
   software_update
@@ -543,15 +551,9 @@ main() {
   trackpad
 
   finder
-
-  if full_disk_access; then
-    safari
-    mail
-    contacts
-  else
-    printf '%s\n' "Grant this terminal Full Disk Access in System Settings > Privacy & Security to set up Safari, Mail and Contacts." >&2
-  fi
-
+  safari
+  mail
+  contacts
   calendar
   textedit
   activity_monitor
