@@ -7,6 +7,10 @@ readonly CHECK
 
 restarts=''
 
+full_disk_access() {
+  ls "${HOME}/Library/Safari" >/dev/null 2>&1
+}
+
 changed() {
   case "${1:?a defaults domain is required}" in
     com.apple.dock) restarts="${restarts} Dock" ;;
@@ -537,8 +541,14 @@ main() {
   trackpad
 
   finder
-  safari
-  mail
+
+  if full_disk_access; then
+    safari
+    mail
+  else
+    printf '%s\n' "Grant this terminal Full Disk Access in System Settings > Privacy & Security to set up Safari and Mail." >&2
+  fi
+
   calendar
   contacts
   textedit
