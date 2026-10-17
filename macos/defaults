@@ -593,19 +593,19 @@ firefox() {
   set_firefox_pref browser.urlbar.suggest.recentsearches bool false
   set_firefox_pref browser.urlbar.showSearchSuggestionsFirst bool false
   set_firefox_pref browser.urlbar.showSearchTerms.enabled bool false
+  set_firefox_pref browser.urlbar.placeholderName string DuckDuckGo
   set_firefox_pref browser.newtabpage.activity-stream.showWeather bool false
-  set_firefox_pref browser.newtabpage.activity-stream.widgets.clocks.enabled bool false
-  set_firefox_pref browser.newtabpage.activity-stream.widgets.crossword.enabled bool false
-  set_firefox_pref browser.newtabpage.activity-stream.widgets.focusTimer.enabled bool false
-  set_firefox_pref browser.newtabpage.activity-stream.widgets.lists.enabled bool false
-  set_firefox_pref browser.newtabpage.activity-stream.widgets.pictureOfTheDay.enabled bool false
-  set_firefox_pref browser.newtabpage.activity-stream.widgets.sportsWidget.enabled bool false
-  set_firefox_pref browser.newtabpage.activity-stream.widgets.weather.enabled bool false
+  set_firefox_pref browser.newtabpage.activity-stream.showSponsoredCheckboxes bool false
+  set_firefox_pref browser.newtabpage.activity-stream.logowordmark.alwaysVisible bool false
+  set_default org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.widgets.enabled__Value bool false
+  set_default org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.widgets.enabled__Status string locked
   set_firefox_pref browser.toolbars.bookmarks.showOtherBookmarks bool false
+  set_firefox_pref sidebar.visibility string hide-launcher
   set_firefox_pref browser.ctrlTab.sortByRecentlyUsed bool true
   set_firefox_pref browser.tabs.hoverPreview.showThumbnails bool false
   set_firefox_pref browser.tabs.groups.smart.userEnabled bool false
   set_firefox_pref browser.ml.linkPreview.enabled bool false
+  set_firefox_pref alerts.useSystemBackend bool false
 }
 
 ghostty() {
