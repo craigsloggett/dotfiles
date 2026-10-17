@@ -24,6 +24,12 @@ need_sudo() {
   sudo -n -v 2>/dev/null || printf '%s\n' "$*"
 }
 
+keep_sudo_alive() {
+  while kill -0 "$$" 2>/dev/null && sudo -n -v 2>/dev/null; do
+    sleep 60
+  done &
+}
+
 symlink() (
   source="${1:?a symlink source is required}"
   target="${2:?a symlink target is required}"
@@ -200,6 +206,7 @@ install_homebrew() {
 
   printf '%s\n' "Installing Homebrew, which needs sudo access."
   sudo -v
+  keep_sudo_alive
   NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 
