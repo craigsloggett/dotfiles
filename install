@@ -136,6 +136,18 @@ require_full_disk_access() {
   return 1
 }
 
+create_ssh_key() (
+  key="${HOME}/.ssh/id_ed25519"
+
+  [ ! -f "${key}" ] || return 0
+
+  make_dirs "${key%/*}"
+  chmod 700 "${key%/*}"
+  ssh-keygen -t ed25519 -f "${key}"
+  pbcopy <"${key}.pub"
+  printf '%s\n' "Add the SSH key in your clipboard at https://github.com/settings/ssh/new while install runs."
+)
+
 set_hostname() (
   name="${1:?a hostname is required}"
   smb='/Library/Preferences/SystemConfiguration/com.apple.smb.server'
@@ -434,12 +446,6 @@ configure_ssh() (
 
   [ "$(git -C "${dirname}" remote get-url origin)" != "${remote}" ] || return 0
 
-  if [ ! -f "${key}" ]; then
-    make_dirs "${key%/*}"
-    chmod 700 "${key%/*}"
-    ssh-keygen -t ed25519 -f "${key}"
-  fi
-
   if ssh -T -o StrictHostKeyChecking=accept-new git@github.com 2>&1 | grep -q 'successfully authenticated'; then
     git -C "${dirname}" remote set-url origin "${remote}"
     printf '%s\n' "Set origin to ${remote}."
@@ -456,6 +462,7 @@ main() {
   trap 'exit 1' INT TERM HUP
 
   require_full_disk_access
+  create_ssh_key
   clone_dotfiles
   load_environment
 
@@ -469,7 +476,6 @@ main() {
   done
 
   configure_macos
-
   configure_ssh
 
   if [ -s "${conflicts}" ]; then
