@@ -10,11 +10,11 @@ export XDG_BIN_HOME="${XDG_BIN_HOME:-${HOME}/.local/bin}"
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/rustup/bin:/Applications/Ghostty.app/Contents/MacOS:${PATH}:${XDG_BIN_HOME}"
 
 if [ "${0##*/}" = install ]; then
-  dirname="$(cd "$(dirname -- "${0}")" && printf '%s\n' "${PWD}")"
+  dotfiles="$(cd "$(dirname -- "${0}")" && printf '%s\n' "${PWD}")"
 else
-  dirname="${HOME}/Developer/GitHub/craigsloggett/dotfiles"
+  dotfiles="${HOME}/Developer/GitHub/craigsloggett/dotfiles"
 fi
-readonly dirname
+readonly dotfiles
 
 conflict() {
   printf '%s\n' "$*" | tee -a "${conflicts}" >&2
@@ -114,7 +114,7 @@ ask() (
 )
 
 load_environment() {
-  for file in "${dirname}"/zsh/.zprofile.d/*.sh; do
+  for file in "${dotfiles}"/zsh/.zprofile.d/*.sh; do
     # shellcheck source=/dev/null
     . "${file}"
   done
@@ -142,8 +142,8 @@ profile_linked() (
 )
 
 list_profiles() (
-  if [ -d "${dirname}/.git" ]; then
-    for file in "${dirname}"/homebrew/*.Brewfile; do
+  if [ -d "${dotfiles}/.git" ]; then
+    for file in "${dotfiles}"/homebrew/*.Brewfile; do
       [ -e "${file}" ] || continue
       name="${file##*/}"
       printf '%s\n' "${name%.Brewfile}"
@@ -230,14 +230,14 @@ set_hostname() (
 configure_host() (
   ! profile_linked || return 0
 
-  if [ ! -f "${dirname}/homebrew/${profile}.Brewfile" ]; then
-    conflict "No profile named '${profile}' in ${dirname}/homebrew."
+  if [ ! -f "${dotfiles}/homebrew/${profile}.Brewfile" ]; then
+    conflict "No profile named '${profile}' in ${dotfiles}/homebrew."
     return 0
   fi
 
   [ -z "${host_name}" ] || set_hostname "${host_name}"
 
-  symlink "${dirname}/homebrew/${profile}.Brewfile" "${XDG_CONFIG_HOME}/homebrew/Brewfile"
+  symlink "${dotfiles}/homebrew/${profile}.Brewfile" "${XDG_CONFIG_HOME}/homebrew/Brewfile"
 )
 
 install_homebrew() {
@@ -250,15 +250,15 @@ install_homebrew() {
 }
 
 clone_dotfiles() {
-  [ ! -d "${dirname}/.git" ] || return 0
+  [ ! -d "${dotfiles}/.git" ] || return 0
 
   install_homebrew
-  git clone https://github.com/craigsloggett/dotfiles.git "${dirname}"
+  git clone https://github.com/craigsloggett/dotfiles.git "${dotfiles}"
 }
 
 configure_homebrew() {
   install_homebrew
-  symlink "${dirname}/homebrew/brew.env" "${XDG_CONFIG_HOME}/homebrew/brew.env"
+  symlink "${dotfiles}/homebrew/brew.env" "${XDG_CONFIG_HOME}/homebrew/brew.env"
 
   [ -e "${XDG_CONFIG_HOME}/homebrew/Brewfile" ] || return 0
 
@@ -276,14 +276,14 @@ configure_zsh() {
     printf '%s\n' "Wrote /etc/zshenv."
   fi
 
-  symlink "${dirname}/zsh" "${XDG_CONFIG_HOME}/zsh"
+  symlink "${dotfiles}/zsh" "${XDG_CONFIG_HOME}/zsh"
   make_dirs "${XDG_STATE_HOME}/zsh" "${XDG_CACHE_HOME}/zsh"
   merge_history "${HOME}/.zsh_history" "${XDG_STATE_HOME}/zsh/history"
   remove "${HOME}/.zcompdump" "${HOME}/.zsh_sessions" "${HOME}/.zprofile" "${HOME}/.zshrc"
 }
 
 configure_vim() {
-  symlink "${dirname}/vim" "${XDG_CONFIG_HOME}/vim"
+  symlink "${dotfiles}/vim" "${XDG_CONFIG_HOME}/vim"
   migrate "${HOME}/.viminfo" "${XDG_STATE_HOME}/vim/viminfo"
   make_dirs \
     "${XDG_STATE_HOME}/vim" \
@@ -295,13 +295,13 @@ configure_vim() {
 }
 
 configure_nvim() {
-  symlink "${dirname}/nvim" "${XDG_CONFIG_HOME}/nvim"
+  symlink "${dotfiles}/nvim" "${XDG_CONFIG_HOME}/nvim"
 }
 
 configure_git() (
   personal="${XDG_CONFIG_HOME}/git/config-personal"
 
-  symlink "${dirname}/git" "${XDG_CONFIG_HOME}/git"
+  symlink "${dotfiles}/git" "${XDG_CONFIG_HOME}/git"
   migrate "${HOME}/.gitconfig" "${personal}"
 
   [ -z "$(git config --file "${personal}" user.email)" ] || return 0
@@ -321,7 +321,7 @@ configure_gpg() {
   chmod 700 "${XDG_DATA_HOME}/gnupg"
 
   for conf in gpg.conf gpg-agent.conf; do
-    symlink "${dirname}/gnupg/${conf}" "${XDG_DATA_HOME}/gnupg/${conf}"
+    symlink "${dotfiles}/gnupg/${conf}" "${XDG_DATA_HOME}/gnupg/${conf}"
   done
 }
 
@@ -359,28 +359,28 @@ configure_bundle() {
 }
 
 configure_terraform() {
-  symlink "${dirname}/terraform" "${XDG_CONFIG_HOME}/terraform"
+  symlink "${dotfiles}/terraform" "${XDG_CONFIG_HOME}/terraform"
   make_dirs "${XDG_CACHE_HOME}/terraform"
   remove "${HOME}/.terraform.d/checkpoint_cache" "${HOME}/.terraform.d/checkpoint_signature"
   remove_empty "${HOME}/.terraform.d"
 }
 
 configure_tflint() {
-  symlink "${dirname}/tflint" "${XDG_CONFIG_HOME}/tflint"
+  symlink "${dotfiles}/tflint" "${XDG_CONFIG_HOME}/tflint"
   migrate "${HOME}/.tflint.d" "${XDG_DATA_HOME}/tflint"
   make_dirs "${XDG_DATA_HOME}/tflint"
 }
 
 configure_yamllint() {
-  symlink "${dirname}/yamllint" "${XDG_CONFIG_HOME}/yamllint"
+  symlink "${dotfiles}/yamllint" "${XDG_CONFIG_HOME}/yamllint"
 }
 
 configure_yamlfmt() {
-  symlink "${dirname}/yamlfmt" "${XDG_CONFIG_HOME}/yamlfmt"
+  symlink "${dotfiles}/yamlfmt" "${XDG_CONFIG_HOME}/yamlfmt"
 }
 
 configure_ghostty() {
-  symlink "${dirname}/ghostty" "${XDG_CONFIG_HOME}/ghostty"
+  symlink "${dotfiles}/ghostty" "${XDG_CONFIG_HOME}/ghostty"
   migrate "${HOME}/.terminfo" "${TERMINFO}"
 
   for entry in /Applications/Ghostty.app/Contents/Resources/terminfo/*; do
@@ -399,7 +399,7 @@ configure_claude() {
   done
 
   for conf in settings.json CLAUDE.md statusline-command.sh agents hooks rules skills; do
-    symlink "${dirname}/claude/${conf}" "${CLAUDE_CONFIG_DIR}/${conf}"
+    symlink "${dotfiles}/claude/${conf}" "${CLAUDE_CONFIG_DIR}/${conf}"
   done
 }
 
@@ -412,7 +412,7 @@ configure_cargo() {
 }
 
 configure_npm() {
-  symlink "${dirname}/npm" "${XDG_CONFIG_HOME}/npm"
+  symlink "${dotfiles}/npm" "${XDG_CONFIG_HOME}/npm"
   remove "${HOME}/.npm"
 }
 
@@ -461,7 +461,7 @@ configure_codex() {
 
 configure_macos() (
   errors="$(mktemp)"
-  "${dirname}/macos/defaults" 2>"${errors}" || conflict "$(cat "${errors}")"
+  "${dotfiles}/macos/defaults" 2>"${errors}" || conflict "$(cat "${errors}")"
   rm -f "${errors}"
 )
 
@@ -469,10 +469,10 @@ configure_ssh() (
   key="${HOME}/.ssh/id_ed25519"
   remote='git@github.com:craigsloggett/dotfiles.git'
 
-  [ "$(git -C "${dirname}" remote get-url origin)" != "${remote}" ] || return 0
+  [ "$(git -C "${dotfiles}" remote get-url origin)" != "${remote}" ] || return 0
 
   if ssh -T -o StrictHostKeyChecking=accept-new git@github.com 2>&1 | grep -q 'successfully authenticated'; then
-    git -C "${dirname}" remote set-url origin "${remote}"
+    git -C "${dotfiles}" remote set-url origin "${remote}"
     printf '%s\n' "Set origin to ${remote}."
   else
     pbcopy <"${key}.pub"
@@ -507,7 +507,7 @@ main() {
   if [ -s "${conflicts}" ]; then
     printf '\n%s\n' "Resolve these by hand:" >&2
     cat "${conflicts}" >&2
-    printf '\n%s\n' "Then run install again:" "  ${dirname}/install" >&2
+    printf '\n%s\n' "Then run install again:" "  ${dotfiles}/install" >&2
     return 1
   fi
 }
