@@ -57,7 +57,7 @@ queue_restart() {
 }
 
 restart_changed() {
-  for process in Dock Finder ControlCenter WindowManager sharingd; do
+  for process in "$@"; do
     case " ${restarts} " in
       *" ${process} "*) ;;
       *) continue ;;
@@ -65,7 +65,9 @@ restart_changed() {
 
     ! pgrep -q -x "${process}" || killall "${process}"
   done
+}
 
+note_logout() {
   case " ${restarts} " in
     *' logout '*) printf '%s\n' "Log out to apply the keyboard, trackpad and mouse settings." ;;
   esac
@@ -284,6 +286,8 @@ desktop_and_dock() {
     /Applications/KeePassXC.app \
     /Applications/UTM.app \
     /Applications/Xcode.app
+
+  restart_changed Dock
 }
 
 menu_bar() {
@@ -621,7 +625,8 @@ main() {
   syncthing
   xcode
 
-  restart_changed
+  restart_changed Finder ControlCenter WindowManager sharingd
+  note_logout
 }
 
 main "$@"
