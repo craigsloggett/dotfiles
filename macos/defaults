@@ -223,6 +223,15 @@ set_safari_search_engine() {
     "<dict><key>NSDefaultDisplayName</key><string>${name}</string><key>NSProviderIdentifier</key><string>${provider}</string></dict>"
 }
 
+set_firefox_pref() {
+  name="${1:?a preference name is required}"
+  type="${2:?a preference type is required}"
+  value="${3?a preference value is required}"
+
+  set_default org.mozilla.firefox "Preferences__${name}__Value" "${type}" "${value}"
+  set_default org.mozilla.firefox "Preferences__${name}__Status" string default
+}
+
 network_firewall() {
   set_firewall globalstate on
   set_firewall stealthmode on
@@ -530,6 +539,75 @@ terminal() {
   set_default com.apple.Terminal 'Startup Window Settings' string 'Clear Dark'
 }
 
+firefox() {
+  [ -d /Applications/Firefox.app ] || return 0
+
+  set_default org.mozilla.firefox EnterprisePoliciesEnabled bool true
+  set_default org.mozilla.firefox EnableTrackingProtection__Category string strict
+  set_default org.mozilla.firefox SanitizeOnShutdown__Cache bool true
+  set_default org.mozilla.firefox SanitizeOnShutdown__Cookies bool true
+  set_default org.mozilla.firefox SanitizeOnShutdown__FormData bool true
+  set_default org.mozilla.firefox SanitizeOnShutdown__History bool true
+  set_default org.mozilla.firefox SanitizeOnShutdown__Sessions bool true
+  set_default org.mozilla.firefox SanitizeOnShutdown__SiteSettings bool true
+  set_default org.mozilla.firefox OfferToSaveLoginsDefault bool false
+  set_default org.mozilla.firefox Permissions__Location__BlockNewRequests bool true
+  set_default org.mozilla.firefox Permissions__Notifications__BlockNewRequests bool true
+  set_default org.mozilla.firefox DisableTelemetry bool true
+  set_default org.mozilla.firefox DisableFirefoxStudies bool true
+  set_default org.mozilla.firefox HttpsOnlyMode string enabled
+  set_default org.mozilla.firefox DNSOverHTTPS__Enabled bool false
+  set_default org.mozilla.firefox NetworkPrediction bool false
+  set_default org.mozilla.firefox SearchEngines__Default string DuckDuckGo
+  set_default org.mozilla.firefox FirefoxHome__Search bool false
+  set_default org.mozilla.firefox FirefoxHome__TopSites bool false
+  set_default org.mozilla.firefox FirefoxHome__SponsoredTopSites bool false
+  set_default org.mozilla.firefox FirefoxHome__Highlights bool false
+  set_default org.mozilla.firefox FirefoxHome__Stories bool false
+  set_default org.mozilla.firefox FirefoxHome__SponsoredStories bool false
+  set_default org.mozilla.firefox DisplayBookmarksToolbar string never
+  set_default org.mozilla.firefox NoDefaultBookmarks bool true
+  set_default org.mozilla.firefox UserMessaging__ExtensionRecommendations bool false
+  set_default org.mozilla.firefox UserMessaging__FeatureRecommendations bool false
+  set_default org.mozilla.firefox UserMessaging__UrlbarInterventions bool false
+  set_default org.mozilla.firefox UserMessaging__SkipOnboarding bool true
+  set_default org.mozilla.firefox UserMessaging__MoreFromMozilla bool false
+  set_default org.mozilla.firefox UserMessaging__FirefoxLabs bool false
+
+  set_firefox_pref privacy.globalprivacycontrol.enabled bool true
+  set_firefox_pref places.history.enabled bool false
+  set_firefox_pref browser.formfill.enable bool false
+  set_firefox_pref signon.autofillForms bool false
+  set_firefox_pref signon.generation.enabled bool false
+  set_firefox_pref signon.management.page.breach-alerts.enabled bool false
+  set_firefox_pref signon.firefoxRelay.feature string disabled
+  set_firefox_pref extensions.formautofill.addresses.enabled bool false
+  set_firefox_pref extensions.formautofill.creditCards.enabled bool false
+  set_firefox_pref browser.search.suggest.enabled bool false
+  set_firefox_pref browser.urlbar.suggest.searches bool false
+  set_firefox_pref browser.urlbar.suggest.history bool false
+  set_firefox_pref browser.urlbar.suggest.openpage bool false
+  set_firefox_pref browser.urlbar.suggest.topsites bool false
+  set_firefox_pref browser.urlbar.suggest.engines bool false
+  set_firefox_pref browser.urlbar.suggest.quickactions bool false
+  set_firefox_pref browser.urlbar.suggest.recentsearches bool false
+  set_firefox_pref browser.urlbar.showSearchSuggestionsFirst bool false
+  set_firefox_pref browser.urlbar.showSearchTerms.enabled bool false
+  set_firefox_pref browser.newtabpage.activity-stream.showWeather bool false
+  set_firefox_pref browser.newtabpage.activity-stream.widgets.clocks.enabled bool false
+  set_firefox_pref browser.newtabpage.activity-stream.widgets.crossword.enabled bool false
+  set_firefox_pref browser.newtabpage.activity-stream.widgets.focusTimer.enabled bool false
+  set_firefox_pref browser.newtabpage.activity-stream.widgets.lists.enabled bool false
+  set_firefox_pref browser.newtabpage.activity-stream.widgets.pictureOfTheDay.enabled bool false
+  set_firefox_pref browser.newtabpage.activity-stream.widgets.sportsWidget.enabled bool false
+  set_firefox_pref browser.newtabpage.activity-stream.widgets.weather.enabled bool false
+  set_firefox_pref browser.toolbars.bookmarks.showOtherBookmarks bool false
+  set_firefox_pref browser.ctrlTab.sortByRecentlyUsed bool true
+  set_firefox_pref browser.tabs.hoverPreview.showThumbnails bool false
+  set_firefox_pref browser.tabs.groups.smart.userEnabled bool false
+  set_firefox_pref browser.ml.linkPreview.enabled bool false
+}
+
 ghostty() {
   [ -d /Applications/Ghostty.app ] || return 0
 
@@ -620,6 +698,7 @@ main() {
   screenshot
   terminal
 
+  firefox
   ghostty
   rectangle
   syncthing
