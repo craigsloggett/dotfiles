@@ -2,6 +2,7 @@ tap "hashicorp/security", "git@github.com:hashicorp/homebrew-security.git", trus
 tap "hashicorp/tap", trusted: true
 tap "redpanda-data/tap", trusted: true
 tap "smokris/getwindowid", trusted: true
+tap "terraform-linters/tap", trusted: true
 
 brew "actionlint"
 brew "awscli"
@@ -36,7 +37,6 @@ brew "swiftformat"
 brew "swiftlint"
 brew "terraform-docs"
 brew "terraform-ls"
-brew "tflint"
 brew "tree-sitter-cli"
 brew "uv"
 brew "vale"
@@ -71,6 +71,8 @@ cask "slack"
 cask "syncthing-app"
 cask "utm"
 cask "zoom"
+
+cask "terraform-linters/tap/tflint", trusted: true
 
 mas "Apple Configurator", id: 1037126344
 mas "WireGuard", id: 1451685025
