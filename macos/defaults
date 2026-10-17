@@ -45,7 +45,7 @@ ensure_container() {
   fi
 }
 
-changed() {
+queue_restart() {
   case "${1:?a defaults domain is required}" in
     com.apple.dock) restarts="${restarts} Dock" ;;
     com.apple.finder) restarts="${restarts} Finder" ;;
@@ -53,6 +53,21 @@ changed() {
     com.apple.WindowManager) restarts="${restarts} WindowManager" ;;
     com.apple.sharingd) restarts="${restarts} sharingd" ;;
     NSGlobalDomain | com.apple.symbolichotkeys | com.apple.AppleMultitouch* | com.apple.driver.*) restarts="${restarts} logout" ;;
+  esac
+}
+
+restart_changed() {
+  for process in Dock Finder ControlCenter WindowManager sharingd; do
+    case " ${restarts} " in
+      *" ${process} "*) ;;
+      *) continue ;;
+    esac
+
+    ! pgrep -q -x "${process}" || killall "${process}"
+  done
+
+  case " ${restarts} " in
+    *' logout '*) printf '%s\n' "Log out to apply the keyboard, trackpad and mouse settings." ;;
   esac
 }
 
@@ -97,10 +112,10 @@ set_default() {
     *) defaults ${host:+"${host}"} write "${domain}" "${key}" "-${type}" "${value}" ;;
   esac
 
-  changed "${domain}"
+  queue_restart "${domain}"
 }
 
-dock_apps() {
+dock_app_urls() {
   i=0
   while url="$(defaults export com.apple.dock - | plutil -extract "persistent-apps.${i}.tile-data.file-data._CFURLString" raw -o - - 2>/dev/null)"; do
     printf '%s ' "${url}"
@@ -127,17 +142,30 @@ set_dock_apps() {
   shift "${count}"
 
   others="$(defaults export com.apple.dock - | plutil -extract persistent-others.0 raw -o - - 2>/dev/null || :)"
-  [ "${want}" != "$(dock_apps)" ] || [ -n "${others}" ] || return 0
+  [ "${want}" != "$(dock_app_urls)" ] || [ -n "${others}" ] || return 0
 
   printf '%s\n' "dock persistent-apps -> ${names}"
   [ -z "${CHECK}" ] || return 0
 
   defaults write com.apple.dock persistent-apps -array "$@"
   defaults write com.apple.dock persistent-others -array
-  changed com.apple.dock
+  queue_restart com.apple.dock
 }
 
-disable_hotkey() {
+set_screen_lock_delay() {
+  seconds="${1:?a lock delay in seconds is required}"
+
+  current="$(sysadminctl -screenLock status 2>&1 | sed 's/.*screenLock //')"
+  [ "${current}" != "delay is ${seconds} seconds" ] || return 0
+
+  printf '%s\n' "screenLock: ${current} -> delay is ${seconds} seconds"
+  [ -z "${CHECK}" ] || return 0
+
+  printf '%s\n' "Setting the screen lock delay needs your login password."
+  sysadminctl -screenLock "${seconds}" -password -
+}
+
+disable_keyboard_shortcut() {
   id="${1:?a hotkey id is required}"
   modifiers="${2:?hotkey modifiers are required}"
 
@@ -149,10 +177,10 @@ disable_hotkey() {
 
   defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add "${id}" \
     "<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>32</integer><integer>49</integer><integer>${modifiers}</integer></array><key>type</key><string>standard</string></dict></dict>"
-  changed com.apple.symbolichotkeys
+  queue_restart com.apple.symbolichotkeys
 }
 
-set_search_engine() {
+set_safari_search_engine() {
   provider="${1:?a search provider identifier is required}"
   name="${2:?a search provider name is required}"
 
@@ -166,20 +194,7 @@ set_search_engine() {
     "<dict><key>NSDefaultDisplayName</key><string>${name}</string><key>NSProviderIdentifier</key><string>${provider}</string></dict>"
 }
 
-set_screen_lock() {
-  seconds="${1:?a lock delay in seconds is required}"
-
-  current="$(sysadminctl -screenLock status 2>&1 | sed 's/.*screenLock //')"
-  [ "${current}" != "delay is ${seconds} seconds" ] || return 0
-
-  printf '%s\n' "screenLock: ${current} -> delay is ${seconds} seconds"
-  [ -z "${CHECK}" ] || return 0
-
-  printf '%s\n' "Setting the screen lock delay needs your login password."
-  sysadminctl -screenLock "${seconds}" -password -
-}
-
-software_update() {
+general_software_update() {
   for key in AutoUpdate AutomaticDownload AutomaticallyInstallMacOSUpdates ConfigDataInstall CriticalUpdateInstall; do
     set_default /Library/Preferences/com.apple.SoftwareUpdate "${key}" bool true
   done
@@ -187,18 +202,18 @@ software_update() {
   set_default /Library/Preferences/com.apple.commerce AutoUpdate bool false
 }
 
-airdrop_and_continuity() {
+general_airdrop_and_continuity() {
   set_default com.apple.sharingd DiscoverableMode string Off
   set_default -currentHost com.apple.coreservices.useractivityd ActivityAdvertisingAllowed bool false
   set_default -currentHost com.apple.coreservices.useractivityd ActivityReceivingAllowed bool false
   set_default -currentHost com.apple.controlcenter AirplayReceiverEnabled bool false
 }
 
-language_and_region() {
+general_language_and_region() {
   set_default NSGlobalDomain AppleLocale string en_CA
 }
 
-time_machine() {
+general_time_machine() {
   set_default com.apple.TimeMachine DoNotOfferNewDisksForBackup bool true
 }
 
@@ -259,7 +274,7 @@ sound() {
 
 lock_screen() {
   set_default -currentHost com.apple.screensaver idleTime int 300
-  set_screen_lock 300
+  set_screen_lock_delay 300
   set_default com.apple.loginwindow TALLogoutSavesState bool false
 }
 
@@ -282,8 +297,8 @@ keyboard() {
   set_default NSGlobalDomain NSAutomaticCapitalizationEnabled bool true
   set_default NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled bool true
 
-  disable_hotkey 60 262144
-  disable_hotkey 61 786432
+  disable_keyboard_shortcut 60 262144
+  disable_keyboard_shortcut 61 786432
 }
 
 mouse() {
@@ -395,14 +410,6 @@ calendar() {
   set_default com.apple.iCal CalendarSidebarShown bool false
 }
 
-ghostty() {
-  [ -d /Applications/Ghostty.app ] || return 0
-
-  set_default com.mitchellh.ghostty SUAutomaticallyUpdate bool true
-  set_default com.mitchellh.ghostty SUEnableAutomaticChecks bool true
-  set_default com.mitchellh.ghostty SUSendProfileInfo bool false
-}
-
 mail() {
   set_default com.apple.mail BottomPreview bool false
   set_default com.apple.mail ColumnLayoutMessageList bool false
@@ -431,25 +438,6 @@ mail() {
   set_default com.apple.mail WebContinuousSpellCheckingEnabled bool true
 }
 
-rectangle() {
-  [ -d /Applications/Rectangle.app ] || return 0
-
-  set_default com.knollsoft.Rectangle launchOnLogin bool true
-  set_default com.knollsoft.Rectangle hideMenubarIcon bool true
-  set_default com.knollsoft.Rectangle allowAnyShortcut bool true
-  set_default com.knollsoft.Rectangle alternateDefaultShortcuts bool true
-  set_default com.knollsoft.Rectangle gapSize float 10
-  set_default com.knollsoft.Rectangle windowSnapping int 2
-  set_default com.knollsoft.Rectangle unsnapRestore int 1
-  set_default com.knollsoft.Rectangle subsequentExecutionMode int 1
-  set_default com.knollsoft.Rectangle missionControlDragging int 1
-  set_default com.knollsoft.Rectangle hapticFeedbackOnSnap int 2
-  set_default com.knollsoft.Rectangle footprintAnimationDurationMultiplier float 0
-  set_default com.knollsoft.Rectangle footprintBlur bool false
-  set_default com.knollsoft.Rectangle landscapeSnapAreas string '[1,{"action":15},7,{"compound":-4},8,{"action":14},4,{"compound":-2},6,{"action":13},3,{"action":16},5,{"compound":-3},2,{"action":2}]'
-  set_default com.knollsoft.Rectangle SUEnableAutomaticChecks bool true
-}
-
 safari() {
   set_default com.apple.Safari SearchProviderShortName string DuckDuckGo
   set_default com.apple.Safari PrivateSearchEngineUsesNormalSearchEngineToggle bool false
@@ -470,15 +458,7 @@ safari() {
   set_default com.apple.Safari AutoFillFromiCloudKeychain bool false
   set_default com.apple.Safari AutoFillCreditCardData bool false
   set_default com.apple.Safari AutoFillMiscellaneousForms bool false
-  set_search_engine com.duckduckgo DuckDuckGo
-}
-
-syncthing() {
-  [ -d /Applications/Syncthing.app ] || return 0
-
-  set_default com.github.xor-gate.syncthing-macosx StartAtLogin bool true
-  set_default com.github.xor-gate.syncthing-macosx SUEnableAutomaticChecks bool true
-  set_default com.github.xor-gate.syncthing-macosx SUSendProfileInfo bool false
+  set_safari_search_engine com.duckduckgo DuckDuckGo
 }
 
 textedit() {
@@ -492,22 +472,6 @@ textedit() {
   set_default com.apple.TextEdit SmartCopyPaste bool false
   set_default com.apple.TextEdit TextReplacement bool false
   set_default com.apple.TextEdit SmartSubstitutionsEnabledInRichTextOnly bool false
-}
-
-xcode() {
-  [ -d /Applications/Xcode.app ] || return 0
-
-  set_default com.apple.dt.Xcode DVTTextShowMinimap bool false
-  set_default com.apple.dt.Xcode DVTTextShowInvisibleCharacters bool false
-  set_default com.apple.dt.Xcode DVTEnableOnDeviceCodePredictions bool false
-  set_default com.apple.dt.Xcode DVTTextEnablePredictiveCompletion bool false
-  set_default com.apple.dt.Xcode IDEAlwaysShowEditorTabBar bool false
-  set_default com.apple.dt.Xcode IDEEditorSubEditorOrientation int 1
-  set_default com.apple.dt.Xcode IDEEditorDefaultCodeReviewPreference int 1
-  set_default com.apple.dt.Xcode IDEStringCatalogAutomaticCommentGenerationEnabled bool false
-  set_default com.apple.dt.Xcode IDEWorkspaceSuppressCleanBuildPrompt bool true
-  set_default com.apple.dt.Xcode XCFontAndColorCurrentTheme string 'Default (Light).xccolortheme'
-  set_default com.apple.dt.Xcode XCFontAndColorCurrentDarkTheme string 'Default (Dark).xccolortheme'
 }
 
 activity_monitor() {
@@ -530,19 +494,55 @@ terminal() {
   set_default com.apple.Terminal 'Startup Window Settings' string 'Clear Dark'
 }
 
-restart() {
-  for process in Dock Finder ControlCenter WindowManager sharingd; do
-    case " ${restarts} " in
-      *" ${process} "*) ;;
-      *) continue ;;
-    esac
+ghostty() {
+  [ -d /Applications/Ghostty.app ] || return 0
 
-    ! pgrep -q -x "${process}" || killall "${process}"
-  done
+  set_default com.mitchellh.ghostty SUAutomaticallyUpdate bool true
+  set_default com.mitchellh.ghostty SUEnableAutomaticChecks bool true
+  set_default com.mitchellh.ghostty SUSendProfileInfo bool false
+}
 
-  case " ${restarts} " in
-    *' logout '*) printf '%s\n' "Log out to apply the keyboard, trackpad and mouse settings." ;;
-  esac
+rectangle() {
+  [ -d /Applications/Rectangle.app ] || return 0
+
+  set_default com.knollsoft.Rectangle launchOnLogin bool true
+  set_default com.knollsoft.Rectangle hideMenubarIcon bool true
+  set_default com.knollsoft.Rectangle allowAnyShortcut bool true
+  set_default com.knollsoft.Rectangle alternateDefaultShortcuts bool true
+  set_default com.knollsoft.Rectangle gapSize float 10
+  set_default com.knollsoft.Rectangle windowSnapping int 2
+  set_default com.knollsoft.Rectangle unsnapRestore int 1
+  set_default com.knollsoft.Rectangle subsequentExecutionMode int 1
+  set_default com.knollsoft.Rectangle missionControlDragging int 1
+  set_default com.knollsoft.Rectangle hapticFeedbackOnSnap int 2
+  set_default com.knollsoft.Rectangle footprintAnimationDurationMultiplier float 0
+  set_default com.knollsoft.Rectangle footprintBlur bool false
+  set_default com.knollsoft.Rectangle landscapeSnapAreas string '[1,{"action":15},7,{"compound":-4},8,{"action":14},4,{"compound":-2},6,{"action":13},3,{"action":16},5,{"compound":-3},2,{"action":2}]'
+  set_default com.knollsoft.Rectangle SUEnableAutomaticChecks bool true
+}
+
+syncthing() {
+  [ -d /Applications/Syncthing.app ] || return 0
+
+  set_default com.github.xor-gate.syncthing-macosx StartAtLogin bool true
+  set_default com.github.xor-gate.syncthing-macosx SUEnableAutomaticChecks bool true
+  set_default com.github.xor-gate.syncthing-macosx SUSendProfileInfo bool false
+}
+
+xcode() {
+  [ -d /Applications/Xcode.app ] || return 0
+
+  set_default com.apple.dt.Xcode DVTTextShowMinimap bool false
+  set_default com.apple.dt.Xcode DVTTextShowInvisibleCharacters bool false
+  set_default com.apple.dt.Xcode DVTEnableOnDeviceCodePredictions bool false
+  set_default com.apple.dt.Xcode DVTTextEnablePredictiveCompletion bool false
+  set_default com.apple.dt.Xcode IDEAlwaysShowEditorTabBar bool false
+  set_default com.apple.dt.Xcode IDEEditorSubEditorOrientation int 1
+  set_default com.apple.dt.Xcode IDEEditorDefaultCodeReviewPreference int 1
+  set_default com.apple.dt.Xcode IDEStringCatalogAutomaticCommentGenerationEnabled bool false
+  set_default com.apple.dt.Xcode IDEWorkspaceSuppressCleanBuildPrompt bool true
+  set_default com.apple.dt.Xcode XCFontAndColorCurrentTheme string 'Default (Light).xccolortheme'
+  set_default com.apple.dt.Xcode XCFontAndColorCurrentDarkTheme string 'Default (Dark).xccolortheme'
 }
 
 main() {
@@ -556,10 +556,10 @@ main() {
   ensure_container com.apple.Safari Safari
   ensure_container com.apple.TextEdit TextEdit
 
-  software_update
-  airdrop_and_continuity
-  language_and_region
-  time_machine
+  general_software_update
+  general_airdrop_and_continuity
+  general_language_and_region
+  general_time_machine
   accessibility
   appearance
   desktop_and_dock
@@ -575,20 +575,20 @@ main() {
 
   finder
   calendar
-  ghostty
   mail
-  rectangle
   safari
-  syncthing
   textedit
-  xcode
-
   activity_monitor
   disk_utility
   screenshot
   terminal
 
-  restart
+  ghostty
+  rectangle
+  syncthing
+  xcode
+
+  restart_changed
 }
 
 main "$@"
