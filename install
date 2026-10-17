@@ -10,14 +10,15 @@ export XDG_BIN_HOME="${XDG_BIN_HOME:-${HOME}/.local/bin}"
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/rustup/bin:/Applications/Ghostty.app/Contents/MacOS:${PATH}:${XDG_BIN_HOME}"
 
 if [ "${0##*/}" = install ]; then
-  dotfiles="$(cd "$(dirname -- "${0}")" && printf '%s\n' "${PWD}")"
+  dotfiles="$(cd "$(dirname -- "${0}")" && pwd)"
 else
   dotfiles="${HOME}/Developer/GitHub/craigsloggett/dotfiles"
 fi
 readonly dotfiles
 
 conflict() {
-  printf '%s\n' "$*" | tee -a "${conflicts}" >&2
+  printf '%s\n' "$*" >>"${conflicts}"
+  printf '%s\n' "$*" >&2
 }
 
 need_sudo() {
@@ -25,7 +26,8 @@ need_sudo() {
 }
 
 keep_sudo_alive() {
-  while kill -0 "$$" 2>/dev/null && sudo -n -v 2>/dev/null; do
+  while kill -0 "$$" 2>/dev/null; do
+    sudo -n -v 2>/dev/null || break
     sleep 60
   done &
 }
@@ -98,10 +100,10 @@ remove() {
 
 remove_empty() {
   for dir in "$@"; do
-    if [ -d "${dir}" ] && [ -z "$(ls -A "${dir}")" ]; then
-      rmdir "${dir}"
-      printf '%s\n' "Removed ${dir}."
-    fi
+    [ -d "${dir}" ] || continue
+    [ -z "$(ls -A "${dir}")" ] || continue
+    rmdir "${dir}"
+    printf '%s\n' "Removed ${dir}."
   done
 }
 
@@ -128,7 +130,9 @@ EOF
 
 require_full_disk_access() {
   for dir in Safari Cookies Suggestions Messages; do
-    ! ls "${HOME}/Library/${dir}" >/dev/null 2>&1 || return 0
+    if ls "${HOME}/Library/${dir}" >/dev/null 2>&1; then
+      return 0
+    fi
   done
 
   open 'x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles'
@@ -142,6 +146,8 @@ profile_linked() (
 )
 
 list_profiles() (
+  url='https://api.github.com/repos/craigsloggett/dotfiles/contents/homebrew'
+
   if [ -d "${dotfiles}/.git" ]; then
     for file in "${dotfiles}"/homebrew/*.Brewfile; do
       [ -e "${file}" ] || continue
@@ -151,7 +157,7 @@ list_profiles() (
     return 0
   fi
 
-  if ! contents="$(curl -fsSL https://api.github.com/repos/craigsloggett/dotfiles/contents/homebrew)"; then
+  if ! contents="$(curl -fsSL "${url}")"; then
     printf '%s\n' "GitHub is unreachable, install needs network access." >&2
     return 1
   fi
@@ -165,31 +171,33 @@ ask_questions() {
   email=''
 
   if ! profile_linked; then
-    current="$(scutil --get ComputerName)"
-    names="$(list_profiles)"
+    computer_name="$(scutil --get ComputerName)"
+    profiles="$(list_profiles)"
 
-    profiles=''
-    default=''
-    for name in ${names}; do
-      profiles="${profiles:+${profiles}, }${name}"
-      [ "${name}" != "${current}" ] || default="${name}"
+    choices=''
+    default_profile=''
+    for name in ${profiles}; do
+      choices="${choices:+${choices}, }${name}"
+      [ "${name}" != "${computer_name}" ] || default_profile="${name}"
     done
 
     while :; do
-      profile="$(ask "Profile for this Mac (${profiles})${default:+ [${default}]}")"
-      profile="${profile:-${default}}"
-      ! printf '%s\n' "${names}" | grep -qxF -- "${profile}" || break
-      printf '%s\n' "Pick one of: ${profiles}." >&2
+      profile="$(ask "Profile for this Mac (${choices})${default_profile:+ [${default_profile}]}")"
+      profile="${profile:-${default_profile}}"
+      case ", ${choices}, " in
+        *", ${profile}, "*) break ;;
+        *) printf '%s\n' "Pick one of: ${choices}." >&2 ;;
+      esac
     done
 
     while :; do
-      host_name="$(ask "Hostname for this Mac [${current}]")"
+      host_name="$(ask "Hostname for this Mac [${computer_name}]")"
       case "${host_name}" in
         -* | *- | *[!A-Za-z0-9-]*) printf '%s\n' "Use only letters, digits and inner hyphens." >&2 ;;
         *) break ;;
       esac
     done
-    [ "${host_name}" != "${current}" ] || host_name=''
+    [ "${host_name}" != "${computer_name}" ] || host_name=''
   fi
 
   if [ ! -e "${XDG_CONFIG_HOME}/git/config-personal" ] && [ ! -e "${HOME}/.gitconfig" ]; then
@@ -240,14 +248,16 @@ configure_host() (
   symlink "${dotfiles}/homebrew/${profile}.Brewfile" "${XDG_CONFIG_HOME}/homebrew/Brewfile"
 )
 
-install_homebrew() {
+install_homebrew() (
   [ ! -x /opt/homebrew/bin/brew ] || return 0
+
+  installer="$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
   printf '%s\n' "Installing Homebrew, which needs sudo access."
   sudo -v
   keep_sudo_alive
-  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-}
+  NONINTERACTIVE=1 /bin/bash -c "${installer}"
+)
 
 clone_dotfiles() {
   [ ! -d "${dotfiles}/.git" ] || return 0
@@ -461,9 +471,17 @@ configure_codex() {
 
 configure_macos() (
   errors="$(mktemp)"
-  "${dotfiles}/macos/defaults" 2>"${errors}" || conflict "$(cat "${errors}")"
+
+  if ! "${dotfiles}/macos/defaults" 2>"${errors}"; then
+    conflict "$(cat "${errors}")"
+  fi
+
   rm -f "${errors}"
 )
+
+github_authenticates() {
+  ssh -T -o StrictHostKeyChecking=accept-new git@github.com 2>&1 | grep -q 'successfully authenticated'
+}
 
 configure_ssh() (
   key="${HOME}/.ssh/id_ed25519"
@@ -471,7 +489,7 @@ configure_ssh() (
 
   [ "$(git -C "${dotfiles}" remote get-url origin)" != "${remote}" ] || return 0
 
-  if ssh -T -o StrictHostKeyChecking=accept-new git@github.com 2>&1 | grep -q 'successfully authenticated'; then
+  if github_authenticates; then
     git -C "${dotfiles}" remote set-url origin "${remote}"
     printf '%s\n' "Set origin to ${remote}."
   else
