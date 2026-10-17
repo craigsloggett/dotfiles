@@ -143,7 +143,7 @@ profile_linked() (
 
 list_profiles() (
   if [ ! -d "${dirname}/.git" ]; then
-    curl -fsSL https://github.com/craigsloggett/dotfiles/archive/refs/heads/main.tar.gz | tar -tzf - 2>/dev/null | sed -n 's|^[^/]*/homebrew/\(.*\)\.Brewfile$|\1|p'
+    curl -fsSL https://api.github.com/repos/craigsloggett/dotfiles/contents/homebrew | jq -r '.[].name | select(endswith(".Brewfile")) | rtrimstr(".Brewfile")'
     return 0
   fi
 
