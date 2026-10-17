@@ -120,6 +120,16 @@ export ZDOTDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh"
 EOF
 }
 
+require_full_disk_access() {
+  for dir in Safari Cookies Suggestions Messages; do
+    ! ls "${HOME}/Library/${dir}" >/dev/null 2>&1 || return 0
+  done
+
+  open 'x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles'
+  printf '%s\n' "Turn on Full Disk Access for this terminal in the System Settings pane that just opened, quit and reopen the terminal, then run the same command again." >&2
+  return 1
+}
+
 set_hostname() (
   name="${1:?a hostname is required}"
   smb='/Library/Preferences/SystemConfiguration/com.apple.smb.server'
@@ -438,6 +448,7 @@ main() {
   trap 'rm -f "${conflicts}"' EXIT
   trap 'exit 1' INT TERM HUP
 
+  require_full_disk_access
   clone_dotfiles
   load_environment
 
