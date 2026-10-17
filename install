@@ -9,10 +9,13 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}"
 export XDG_BIN_HOME="${XDG_BIN_HOME:-${HOME}/.local/bin}"
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/rustup/bin:/Applications/Ghostty.app/Contents/MacOS:${PATH}:${XDG_BIN_HOME}"
 
+repo='craigsloggett/dotfiles'
+readonly repo
+
 if [ "${0##*/}" = install ]; then
   dotfiles="$(cd "$(dirname -- "${0}")" && pwd)"
 else
-  dotfiles="${HOME}/Developer/GitHub/craigsloggett/dotfiles"
+  dotfiles="${HOME}/Developer/GitHub/${repo}"
 fi
 readonly dotfiles
 
@@ -146,7 +149,7 @@ profile_linked() (
 )
 
 list_profiles() (
-  url='https://api.github.com/repos/craigsloggett/dotfiles/contents/homebrew'
+  url="https://api.github.com/repos/${repo}/contents/homebrew"
 
   if [ -d "${dotfiles}/.git" ]; then
     for file in "${dotfiles}"/homebrew/*.Brewfile; do
@@ -263,7 +266,7 @@ clone_dotfiles() {
   [ ! -d "${dotfiles}/.git" ] || return 0
 
   install_homebrew
-  git clone https://github.com/craigsloggett/dotfiles.git "${dotfiles}"
+  git clone "https://github.com/${repo}.git" "${dotfiles}"
 }
 
 configure_homebrew() {
@@ -485,7 +488,7 @@ github_authenticates() {
 
 configure_ssh() (
   key="${HOME}/.ssh/id_ed25519"
-  remote='git@github.com:craigsloggett/dotfiles.git'
+  remote="git@github.com:${repo}.git"
 
   [ "$(git -C "${dotfiles}" remote get-url origin)" != "${remote}" ] || return 0
 
