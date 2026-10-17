@@ -115,6 +115,33 @@ set_default() {
   queue_restart "${domain}"
 }
 
+set_firewall() {
+  option="${1:?a firewall option is required}"
+  value="${2:?a firewall value is required}"
+  socketfilterfw=/usr/libexec/ApplicationFirewall/socketfilterfw
+
+  if ! answer="$("${socketfilterfw}" "--get${option}")"; then
+    printf '%s\n' "socketfilterfw --get${option} failed." >&2
+    return 1
+  fi
+
+  case "$(printf '%s' "${answer}" | tr '[:upper:]' '[:lower:]')" in
+    *disabled* | *' off'*) current=off ;;
+    *enabled* | *' on'*) current=on ;;
+    *)
+      printf '%s\n' "socketfilterfw --get${option} gave an unexpected answer: ${answer}" >&2
+      return 1
+      ;;
+  esac
+  [ "${current}" != "${value}" ] || return 0
+
+  printf '%s\n' "firewall ${option}: ${current} -> ${value}"
+  [ -z "${CHECK}" ] || return 0
+
+  sudo -n -v 2>/dev/null || printf '%s\n' "Setting the firewall needs sudo access."
+  sudo "${socketfilterfw}" "--set${option}" "${value}" >/dev/null
+}
+
 dock_app_urls() {
   i=0
   while url="$(defaults export com.apple.dock - | plutil -extract "persistent-apps.${i}.tile-data.file-data._CFURLString" raw -o - - 2>/dev/null)"; do
@@ -192,6 +219,11 @@ set_safari_search_engine() {
 
   defaults write NSGlobalDomain NSPreferredWebServices -dict NSWebServicesProviderWebSearch \
     "<dict><key>NSDefaultDisplayName</key><string>${name}</string><key>NSProviderIdentifier</key><string>${provider}</string></dict>"
+}
+
+network_firewall() {
+  set_firewall globalstate on
+  set_firewall stealthmode on
 }
 
 general_software_update() {
@@ -556,6 +588,7 @@ main() {
   ensure_container com.apple.Safari Safari
   ensure_container com.apple.TextEdit TextEdit
 
+  network_firewall
   general_software_update
   general_airdrop_and_continuity
   general_language_and_region
