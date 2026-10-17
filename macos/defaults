@@ -232,14 +232,11 @@ desktop_and_dock() {
     /Applications/Ghostty.app \
     /System/Applications/Mail.app \
     /System/Applications/Calendar.app \
-    /Applications/Slack.app \
     /Applications/Signal.app \
     /Applications/Obsidian.app \
-    '/Applications/Microsoft Teams.app' \
+    /Applications/KeePassXC.app \
     /Applications/UTM.app \
-    /Applications/Xcode.app \
-    /Applications/Hark.app \
-    /Applications/KeePassXC.app
+    /Applications/Xcode.app
 }
 
 menu_bar() {
