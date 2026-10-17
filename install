@@ -136,6 +136,45 @@ require_full_disk_access() {
   return 1
 }
 
+profile_linked() (
+  brewfile="${XDG_CONFIG_HOME}/homebrew/Brewfile"
+  [ -L "${brewfile}" ] && [ -e "${brewfile}" ]
+)
+
+list_profiles() (
+  profiles=''
+  for file in "${dirname}"/homebrew/*.Brewfile; do
+    [ -e "${file}" ] || continue
+    name="${file##*/}"
+    profiles="${profiles:+${profiles}, }${name%.Brewfile}"
+  done
+  printf '%s\n' "${profiles}"
+)
+
+ask_questions() {
+  profile=''
+  host_name=''
+  email=''
+
+  if ! profile_linked; then
+    current="$(scutil --get ComputerName)"
+    profiles="$(list_profiles)"
+
+    default=''
+    [ ! -f "${dirname}/homebrew/${current}.Brewfile" ] || default="${current}"
+
+    profile="$(ask "Profile for this Mac${profiles:+ (${profiles})}${default:+ [${default}]}")"
+    profile="${profile:-${default}}"
+
+    host_name="$(ask "Hostname for this Mac [${current}]")"
+    [ "${host_name}" != "${current}" ] || host_name=''
+  fi
+
+  if [ ! -e "${XDG_CONFIG_HOME}/git/config-personal" ] && [ ! -e "${HOME}/.gitconfig" ]; then
+    email="$(ask 'Email address for Git commits')"
+  fi
+}
+
 create_ssh_key() (
   key="${HOME}/.ssh/id_ed25519"
 
@@ -167,28 +206,10 @@ set_hostname() (
 )
 
 configure_host() (
-  brewfile="${XDG_CONFIG_HOME}/homebrew/Brewfile"
-
-  if [ -L "${brewfile}" ] && [ -e "${brewfile}" ]; then
-    return 0
-  fi
-
-  current="$(scutil --get ComputerName)"
-
-  profiles=''
-  for file in "${dirname}"/homebrew/*.Brewfile; do
-    name="${file##*/}"
-    profiles="${profiles:+${profiles}, }${name%.Brewfile}"
-  done
-
-  default=''
-  [ ! -f "${dirname}/homebrew/${current}.Brewfile" ] || default="${current}"
-
-  profile="$(ask "Profile for this Mac (${profiles})${default:+ [${default}]}")"
-  profile="${profile:-${default}}"
+  ! profile_linked || return 0
 
   if [ -z "${profile}" ]; then
-    conflict "No profile chosen, pick one of: ${profiles}."
+    conflict "No profile chosen, pick one of: $(list_profiles)."
     return 0
   fi
 
@@ -197,9 +218,7 @@ configure_host() (
     return 0
   fi
 
-  host_name="$(ask "Hostname for this Mac [${current}]")"
-
-  if [ -n "${host_name}" ] && [ "${host_name}" != "${current}" ]; then
+  if [ -n "${host_name}" ]; then
     case "${host_name}" in
       -* | *- | *[!A-Za-z0-9-]*)
         conflict "Not setting the hostname to '${host_name}', use only letters, digits and inner hyphens."
@@ -210,7 +229,7 @@ configure_host() (
     set_hostname "${host_name}"
   fi
 
-  symlink "${dirname}/homebrew/${profile}.Brewfile" "${brewfile}"
+  symlink "${dirname}/homebrew/${profile}.Brewfile" "${XDG_CONFIG_HOME}/homebrew/Brewfile"
 )
 
 install_homebrew() {
@@ -278,8 +297,6 @@ configure_git() (
   migrate "${HOME}/.gitconfig" "${personal}"
 
   [ -z "$(git config --file "${personal}" user.email)" ] || return 0
-
-  email="$(ask 'Email address for Git commits')"
 
   if [ -z "${email}" ]; then
     conflict "No Git email set, add user.email to ${personal}."
@@ -462,6 +479,7 @@ main() {
   trap 'exit 1' INT TERM HUP
 
   require_full_disk_access
+  ask_questions
   create_ssh_key
   clone_dotfiles
   load_environment
