@@ -109,7 +109,7 @@ ask() (
   prompt="${1:?a prompt is required}"
 
   printf '%s: ' "${prompt}" >&2
-  read -r answer || answer=''
+  read -r answer || return 1
   printf '%s\n' "${answer}"
 )
 
@@ -142,37 +142,53 @@ profile_linked() (
 )
 
 list_profiles() (
-  if [ ! -d "${dirname}/.git" ]; then
-    curl -fsSL https://api.github.com/repos/craigsloggett/dotfiles/contents/homebrew | jq -r '.[].name | select(endswith(".Brewfile")) | rtrimstr(".Brewfile")'
+  if [ -d "${dirname}/.git" ]; then
+    for file in "${dirname}"/homebrew/*.Brewfile; do
+      [ -e "${file}" ] || continue
+      name="${file##*/}"
+      printf '%s\n' "${name%.Brewfile}"
+    done
     return 0
   fi
 
-  for file in "${dirname}"/homebrew/*.Brewfile; do
-    [ -e "${file}" ] || continue
-    name="${file##*/}"
-    printf '%s\n' "${name%.Brewfile}"
-  done
+  if ! contents="$(curl -fsSL https://api.github.com/repos/craigsloggett/dotfiles/contents/homebrew)"; then
+    printf '%s\n' "GitHub is unreachable, install needs network access." >&2
+    return 1
+  fi
+
+  printf '%s\n' "${contents}" | jq -r '.[].name | select(endswith(".Brewfile")) | rtrimstr(".Brewfile")'
 )
 
 ask_questions() {
   profile=''
-  profiles=''
   host_name=''
   email=''
 
   if ! profile_linked; then
     current="$(scutil --get ComputerName)"
+    names="$(list_profiles)"
 
+    profiles=''
     default=''
-    for name in $(list_profiles); do
+    for name in ${names}; do
       profiles="${profiles:+${profiles}, }${name}"
       [ "${name}" != "${current}" ] || default="${name}"
     done
 
-    profile="$(ask "Profile for this Mac${profiles:+ (${profiles})}${default:+ [${default}]}")"
-    profile="${profile:-${default}}"
+    while :; do
+      profile="$(ask "Profile for this Mac (${profiles})${default:+ [${default}]}")"
+      profile="${profile:-${default}}"
+      ! printf '%s\n' "${names}" | grep -qxF -- "${profile}" || break
+      printf '%s\n' "Pick one of: ${profiles}." >&2
+    done
 
-    host_name="$(ask "Hostname for this Mac [${current}]")"
+    while :; do
+      host_name="$(ask "Hostname for this Mac [${current}]")"
+      case "${host_name}" in
+        -* | *- | *[!A-Za-z0-9-]*) printf '%s\n' "Use only letters, digits and inner hyphens." >&2 ;;
+        *) break ;;
+      esac
+    done
     [ "${host_name}" != "${current}" ] || host_name=''
   fi
 
@@ -214,26 +230,12 @@ set_hostname() (
 configure_host() (
   ! profile_linked || return 0
 
-  if [ -z "${profile}" ]; then
-    conflict "No profile chosen, pick one of: ${profiles}."
-    return 0
-  fi
-
   if [ ! -f "${dirname}/homebrew/${profile}.Brewfile" ]; then
     conflict "No profile named '${profile}' in ${dirname}/homebrew."
     return 0
   fi
 
-  if [ -n "${host_name}" ]; then
-    case "${host_name}" in
-      -* | *- | *[!A-Za-z0-9-]*)
-        conflict "Not setting the hostname to '${host_name}', use only letters, digits and inner hyphens."
-        return 0
-        ;;
-    esac
-
-    set_hostname "${host_name}"
-  fi
+  [ -z "${host_name}" ] || set_hostname "${host_name}"
 
   symlink "${dirname}/homebrew/${profile}.Brewfile" "${XDG_CONFIG_HOME}/homebrew/Brewfile"
 )
