@@ -1,6 +1,12 @@
 brew "git"
 brew "jq"
 brew "neovim"
+brew "ripgrep"
 brew "shellcheck"
 brew "shfmt"
+brew "tree-sitter-cli"
 brew "zsh-autosuggestions"
+
+cask "firefox"
+cask "ghostty"
+cask "rectangle"
