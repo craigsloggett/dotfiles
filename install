@@ -142,26 +142,32 @@ profile_linked() (
 )
 
 list_profiles() (
-  profiles=''
+  if [ ! -d "${dirname}/.git" ]; then
+    curl -fsSL https://github.com/craigsloggett/dotfiles/archive/refs/heads/main.tar.gz | tar -tzf - 2>/dev/null | sed -n 's|^[^/]*/homebrew/\(.*\)\.Brewfile$|\1|p'
+    return 0
+  fi
+
   for file in "${dirname}"/homebrew/*.Brewfile; do
     [ -e "${file}" ] || continue
     name="${file##*/}"
-    profiles="${profiles:+${profiles}, }${name%.Brewfile}"
+    printf '%s\n' "${name%.Brewfile}"
   done
-  printf '%s\n' "${profiles}"
 )
 
 ask_questions() {
   profile=''
+  profiles=''
   host_name=''
   email=''
 
   if ! profile_linked; then
     current="$(scutil --get ComputerName)"
-    profiles="$(list_profiles)"
 
     default=''
-    [ ! -f "${dirname}/homebrew/${current}.Brewfile" ] || default="${current}"
+    for name in $(list_profiles); do
+      profiles="${profiles:+${profiles}, }${name}"
+      [ "${name}" != "${current}" ] || default="${name}"
+    done
 
     profile="$(ask "Profile for this Mac${profiles:+ (${profiles})}${default:+ [${default}]}")"
     profile="${profile:-${default}}"
@@ -209,7 +215,7 @@ configure_host() (
   ! profile_linked || return 0
 
   if [ -z "${profile}" ]; then
-    conflict "No profile chosen, pick one of: $(list_profiles)."
+    conflict "No profile chosen, pick one of: ${profiles}."
     return 0
   fi
 
