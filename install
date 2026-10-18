@@ -208,16 +208,32 @@ ask_questions() {
   fi
 }
 
-create_ssh_key() (
-  key="${HOME}/.ssh/id_ed25519"
+ssh_handle() (
+  for handle in "${HOME}"/.ssh/id_ed25519_sk_rk*; do
+    [ -e "${handle}" ] || continue
+    case "${handle}" in *.pub) continue ;; esac
+    printf '%s\n' "${handle}"
+    return 0
+  done
+  return 1
+)
 
-  [ ! -f "${key}" ] || return 0
+ssh_agent_key() (
+  [ -n "${SSH_AUTH_SOCK:-}" ] || return 1
+  ssh-add -L 2>/dev/null | awk '$1 ~ /^sk-/ { print "key::" $1, $2; exit }' | grep .
+)
 
-  make_dirs "${key%/*}"
-  chmod 700 "${key%/*}"
-  ssh-keygen -t ed25519 -f "${key}"
-  pbcopy <"${key}.pub"
-  printf '%s\n' "Add the SSH key in your clipboard at https://github.com/settings/ssh/new while install runs."
+pull_ssh_keys() (
+  ! ssh_handle >/dev/null || return 0
+  ! ssh_agent_key >/dev/null || return 0
+
+  make_dirs "${HOME}/.ssh"
+  chmod 700 "${HOME}/.ssh"
+
+  printf '%s\n' "Enter the FIDO PIN and touch the YubiKey to pull its SSH key."
+  if ! (cd "${HOME}/.ssh" && ssh-keygen -K); then
+    conflict "No SSH key found, plug in a YubiKey or connect with a forwarded agent, then run install again."
+  fi
 )
 
 set_hostname() (
@@ -311,24 +327,36 @@ configure_nvim() {
   symlink "${dotfiles}/nvim" "${XDG_CONFIG_HOME}/nvim"
 }
 
+signing_key() {
+  ssh_handle || ssh_agent_key
+}
+
 configure_git() (
   personal="${XDG_CONFIG_HOME}/git/config-personal"
 
   symlink "${dotfiles}/git" "${XDG_CONFIG_HOME}/git"
   migrate "${HOME}/.gitconfig" "${personal}"
 
-  [ -z "$(git config --file "${personal}" user.email)" ] || return 0
-
-  if [ -z "${email}" ]; then
-    conflict "No Git email set, add user.email to ${personal}."
-    return 0
+  if [ -z "$(git config --file "${personal}" user.email)" ]; then
+    if [ -n "${email}" ]; then
+      git config --file "${personal}" user.email "${email}"
+      printf '%s\n' "Set user.email in ${personal}."
+    else
+      conflict "No Git email set, add user.email to ${personal}."
+    fi
   fi
 
-  git config --file "${personal}" user.email "${email}"
-  printf '%s\n' "Set user.email in ${personal}."
+  if [ -z "$(git config --file "${personal}" user.signingKey)" ]; then
+    if key="$(signing_key)"; then
+      git config --file "${personal}" user.signingKey "${key}"
+      printf '%s\n' "Set user.signingKey in ${personal}."
+    else
+      conflict "No SSH signing key found, add user.signingKey to ${personal}."
+    fi
+  fi
 )
 
-configure_gpg() {
+configure_gpg() (
   migrate "${HOME}/.gnupg" "${XDG_DATA_HOME}/gnupg"
   make_dirs "${XDG_DATA_HOME}/gnupg"
   chmod 700 "${XDG_DATA_HOME}/gnupg"
@@ -336,7 +364,7 @@ configure_gpg() {
   for conf in gpg.conf gpg-agent.conf; do
     symlink "${dotfiles}/gnupg/${conf}" "${XDG_DATA_HOME}/gnupg/${conf}"
   done
-}
+)
 
 configure_go() {
   migrate "${HOME}/go" "${GOPATH}"
@@ -483,11 +511,11 @@ configure_macos() (
 )
 
 github_authenticates() {
+  printf '%s\n' "Touch the YubiKey to authenticate with GitHub."
   ssh -T -o StrictHostKeyChecking=accept-new git@github.com 2>&1 | grep -q 'successfully authenticated'
 }
 
 configure_ssh() (
-  key="${HOME}/.ssh/id_ed25519"
   remote="git@github.com:${repo}.git"
 
   [ "$(git -C "${dotfiles}" remote get-url origin)" != "${remote}" ] || return 0
@@ -496,8 +524,7 @@ configure_ssh() (
     git -C "${dotfiles}" remote set-url origin "${remote}"
     printf '%s\n' "Set origin to ${remote}."
   else
-    pbcopy <"${key}.pub"
-    conflict "Add the SSH key in your clipboard at https://github.com/settings/ssh/new."
+    conflict "GitHub rejected the SSH key, register the YubiKey's key at https://github.com/settings/keys."
   fi
 )
 
@@ -509,7 +536,7 @@ main() {
 
   require_full_disk_access
   ask_questions
-  create_ssh_key
+  pull_ssh_keys
   clone_dotfiles
   load_environment
 

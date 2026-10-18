@@ -1,7 +1,10 @@
 # vim: set syntax=gitconfig :
 [user]
 	name = Craig Sloggett
-	signingKey = 24D7E38CCECE344585A0822F3D5272A2CA547996!
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.config/git/allowed_signers
 [commit]
 	gpgSign = true
 [init]
@@ -25,5 +28,6 @@
 #
 # [user]
 # 	email = <NAME>@gmail.com
+# 	signingKey = ~/.ssh/id_ed25519_sk_rk
 # [includeIf "gitdir:~/Developer/GitHub/<COMPANY>/"]
 # 	path = ~/.config/git/config-work

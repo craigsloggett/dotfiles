@@ -1,0 +1,6 @@
+# Keys git verify-commit accepts, one per YubiKey. The first field is the
+# principal git reports in "Good signature for <principal>".
+#
+#   <principal> namespaces="git" sk-ssh-ed25519@openssh.com AAAA... <comment>
+craigsloggett namespaces="git" sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAINXYOe/7HLMP6f2lKcSRw5dA9DFGtw2my9F0WuyRWlNmAAAADHNzaDozMzEzNTAyNw== YubiKey-33135027
+craigsloggett namespaces="git" sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIK1RhdzMNJdifB5LEB0gXT2aTm4UprSlAkt0M8bzWWADAAAADHNzaDozMzEzNTA2Mw== YubiKey-33135063
