@@ -1,30 +1,22 @@
--- User AutoCmds should specify `clear = true`, but this is not true when a plugin manages them.
 vim.api.nvim_create_augroup("UserAutoCmds", { clear = true })
 
--- Language specific tab lengths.
 vim.api.nvim_create_autocmd("FileType", {
   group = "UserAutoCmds",
-  pattern = { "go", "python" },
-  callback = function()
-    vim.opt_local.tabstop = 4
-    vim.opt_local.shiftwidth = 4
-    vim.opt_local.softtabstop = 4
+  callback = function(ev)
+    pcall(vim.treesitter.start, ev.buf)
   end
 })
 
--- Language specific tab character.
-vim.api.nvim_create_autocmd("FileType", {
+vim.api.nvim_create_autocmd("BufWritePre", {
   group = "UserAutoCmds",
-  pattern = "go",
-  callback = function()
-    vim.opt_local.expandtab = false
-  end
-})
-
--- Lint files as you go.
-vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave", "TextChanged" }, {
-  group = "UserAutoCmds",
-  callback = function()
-    require("lint").try_lint()
+  callback = function(ev)
+    local editorconfig = vim.b[ev.buf].editorconfig or {}
+    if editorconfig.trim_trailing_whitespace then
+      return
+    end
+    local view = vim.fn.winsaveview()
+    vim.cmd("silent! undojoin")
+    vim.cmd([[silent keepjumps keeppatterns %s/\s\+$//e]])
+    vim.fn.winrestview(view)
   end
 })

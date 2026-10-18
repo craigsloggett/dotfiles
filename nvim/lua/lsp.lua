@@ -1,18 +1,6 @@
-vim.lsp.enable({
-  "basedpyright",
-  "gopls",
-  "lua_ls",
-  "ruff",
-  "terraform-ls",
-  "tflint"
-})
-
 vim.diagnostic.config({
   virtual_lines = { current_line = true },
-  float         = { source = true }
+  float = { source = true }
 })
 
--- Keymaps specific to LSP.
-vim.keymap.set("n", "<leader>d", ":lua vim.lsp.buf.definition()<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>h", ":lua vim.lsp.buf.hover()<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>rn", ":lua vim.lsp.buf.rename()<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "gd", vim.lsp.buf.definition)

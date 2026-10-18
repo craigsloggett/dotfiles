@@ -5,7 +5,7 @@ vim.pack.add({
   }
 })
 
-require("telescope").setup {
+require("telescope").setup({
   defaults = {
     history = {
       path = vim.fn.stdpath("data") .. "/telescope/history"
@@ -29,8 +29,10 @@ require("telescope").setup {
       glob_pattern = "!**/.git/*"
     }
   }
-}
+})
 
-vim.keymap.set("n", "<C-p>", ":lua require('telescope.builtin').find_files()<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>fg", ":lua require('telescope.builtin').live_grep()<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>fb", ":lua require('telescope.builtin').buffers()<CR>", { noremap = true, silent = true })
+local builtin = require("telescope.builtin")
+
+vim.keymap.set("n", "<C-p>", builtin.find_files)
+vim.keymap.set("n", "<leader>fg", builtin.live_grep)
+vim.keymap.set("n", "<leader>fb", builtin.buffers)

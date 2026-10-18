@@ -1,21 +1,25 @@
 vim.g.mapleader = " "
 
-vim.cmd("colorscheme habamax")
+vim.cmd.colorscheme("habamax")
 
-vim.opt.tabstop = 2
-vim.opt.shiftwidth = 2
-vim.opt.softtabstop = 2
-vim.opt.expandtab = true
+vim.o.tabstop = 2
+vim.o.shiftwidth = 2
+vim.o.softtabstop = 2
+vim.o.expandtab = true
 
-vim.opt.number = true
-vim.opt.signcolumn = "yes"
-vim.opt.cursorline = true
-vim.opt.splitbelow = true
-vim.opt.splitright = true
+vim.o.number = true
+vim.o.signcolumn = "yes"
+vim.o.cursorline = true
+vim.o.splitbelow = true
+vim.o.splitright = true
+vim.o.undofile = true
 
-vim.opt.incsearch = true
-vim.opt.hlsearch = false
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
+vim.o.hlsearch = false
+vim.o.ignorecase = true
+vim.o.smartcase = true
 
-vim.opt.mouse = ""
+vim.o.mouse = ""
+
+vim.o.autocomplete = true
+vim.o.complete = "o,."
+vim.o.completeopt = "menuone,noselect,fuzzy,popup"
