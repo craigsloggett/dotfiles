@@ -2,7 +2,6 @@ brew "git"
 brew "jq"
 brew "neovim"
 brew "ripgrep"
-brew "tree-sitter-cli"
 brew "zsh-autosuggestions"
 
 cask "firefox"
