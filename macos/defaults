@@ -548,6 +548,9 @@ firefox() {
   set_default org.mozilla.firefox SanitizeOnShutdown__History bool true
   set_default org.mozilla.firefox SanitizeOnShutdown__Sessions bool true
   set_default org.mozilla.firefox SanitizeOnShutdown__SiteSettings bool true
+  set_default org.mozilla.firefox SanitizeOnShutdown__Exceptions__0 string https://google.com
+  set_default org.mozilla.firefox SanitizeOnShutdown__Exceptions__1 string https://claude.ai
+  set_default org.mozilla.firefox SanitizeOnShutdown__Exceptions__2 string https://spotify.com
   set_default org.mozilla.firefox OfferToSaveLoginsDefault bool false
   set_default org.mozilla.firefox Permissions__Location__BlockNewRequests bool true
   set_default org.mozilla.firefox Permissions__Notifications__BlockNewRequests bool true
