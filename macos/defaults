@@ -15,6 +15,12 @@ require_full_disk_access() {
   return 1
 }
 
+linked_profile() (
+  brewfile="$(readlink "${XDG_CONFIG_HOME:-${HOME}/.config}/homebrew/Brewfile")" || return 1
+  brewfile="${brewfile##*/}"
+  printf '%s\n' "${brewfile%.Brewfile}"
+)
+
 container_in_use() {
   defaults -verbose read "${1:?a bundle identifier is required}" 2>&1 | grep -qF "/Containers/${1}/"
 }
@@ -230,6 +236,22 @@ set_firefox_pref() {
   set_default org.mozilla.firefox "Preferences__${name}__Status" string default
 }
 
+set_firefox_exceptions() {
+  [ -d /Applications/Firefox.app ] || return 0
+
+  i=0
+  for url in "$@"; do
+    set_default org.mozilla.firefox "SanitizeOnShutdown__Exceptions__${i}" string "${url}"
+    i=$((i + 1))
+  done
+
+  while stale="$(defaults read org.mozilla.firefox "SanitizeOnShutdown__Exceptions__${i}" 2>/dev/null)"; do
+    printf '%s\n' "org.mozilla.firefox SanitizeOnShutdown__Exceptions__${i}: ${stale} -> unset"
+    [ -n "${CHECK}" ] || defaults delete org.mozilla.firefox "SanitizeOnShutdown__Exceptions__${i}"
+    i=$((i + 1))
+  done
+}
+
 network_firewall() {
   set_firewall globalstate on
   set_firewall stealthmode on
@@ -282,19 +304,6 @@ desktop_and_dock() {
   set_default com.apple.WindowManager StageManagerHideWidgets bool true
   set_default com.apple.WindowManager StandardHideWidgets bool true
   set_default com.apple.chronod remoteWidgetsEnabled bool false
-
-  set_dock_apps \
-    /Applications/Firefox.app \
-    /Applications/Ghostty.app \
-    /System/Applications/Mail.app \
-    /System/Applications/Calendar.app \
-    /Applications/Signal.app \
-    /Applications/Obsidian.app \
-    /Applications/KeePassXC.app \
-    /Applications/UTM.app \
-    /Applications/Xcode.app
-
-  restart_changed Dock
 }
 
 menu_bar() {
@@ -323,10 +332,6 @@ lock_screen() {
 
 privacy_and_security() {
   set_default com.apple.AdLib allowApplePersonalizedAdvertising bool false
-
-  for key in AutoSubmit ThirdPartyDataSubmit; do
-    set_default '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' "${key}" bool false
-  done
 }
 
 users_and_groups() {
@@ -548,9 +553,6 @@ firefox() {
   set_default org.mozilla.firefox SanitizeOnShutdown__History bool true
   set_default org.mozilla.firefox SanitizeOnShutdown__Sessions bool true
   set_default org.mozilla.firefox SanitizeOnShutdown__SiteSettings bool true
-  set_default org.mozilla.firefox SanitizeOnShutdown__Exceptions__0 string https://google.com
-  set_default org.mozilla.firefox SanitizeOnShutdown__Exceptions__1 string https://claude.ai
-  set_default org.mozilla.firefox SanitizeOnShutdown__Exceptions__2 string https://spotify.com
   set_default org.mozilla.firefox OfferToSaveLoginsDefault bool false
   set_default org.mozilla.firefox Permissions__Location__BlockNewRequests bool true
   set_default org.mozilla.firefox Permissions__Notifications__BlockNewRequests bool true
@@ -660,6 +662,22 @@ xcode() {
   set_default com.apple.dt.Xcode XCFontAndColorCurrentDarkTheme string 'Default (Dark).xccolortheme'
 }
 
+apply_profile() {
+  if ! profile="$(linked_profile)"; then
+    printf '%s\n' "No profile linked, run install first." >&2
+    return 1
+  fi
+
+  settings="$(dirname -- "$0")/${profile}.sh"
+  if [ ! -f "${settings}" ]; then
+    printf '%s\n' "No settings for the ${profile} profile, add ${settings}." >&2
+    return 1
+  fi
+
+  # shellcheck source=/dev/null
+  . "${settings}"
+}
+
 main() {
   if [ "$(uname -s)" != Darwin ]; then
     printf '%s\n' "macos/defaults only runs on macOS." >&2
@@ -705,7 +723,9 @@ main() {
   syncthing
   xcode
 
-  restart_changed Finder ControlCenter WindowManager sharingd
+  apply_profile
+
+  restart_changed Dock Finder ControlCenter WindowManager sharingd
   note_logout
 }
 
