@@ -1,6 +1,6 @@
 -- Parsers to install beyond those bundled with Neovim. The FileType
 -- autocommand in autocmds.lua starts highlighting once a parser exists.
-local parsers = { "hcl", "terraform" }
+local parsers = { "bash", "hcl", "terraform", "zsh" }
 
 -- Parsers only work with the revisions the plugin pins, so rebuild them
 -- whenever vim.pack updates it.
