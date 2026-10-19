@@ -9,6 +9,7 @@ brew "tree-sitter-cli"
 brew "ykman"
 brew "zsh-autosuggestions"
 
+cask "1password"
 cask "firefox"
 cask "ghostty"
 cask "keepassxc"
