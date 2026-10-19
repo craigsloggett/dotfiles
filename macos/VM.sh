@@ -1,7 +1,4 @@
 # shellcheck shell=sh
-#
-# Settings for the VM profile, sourced by macos/defaults after the settings
-# every Mac shares.
 
 set_dock_apps \
   /Applications/Firefox.app \
