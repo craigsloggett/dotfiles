@@ -1,5 +1,10 @@
 {
   "plugins": {
+    "nvim-treesitter": {
+      "rev": "29212d826054bb2948fa9d3a99eca9bf6a050eb2",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter",
+      "version": "'main'"
+    },
     "plenary.nvim": {
       "rev": "5001291",
       "src": "https://github.com/nvim-lua/plenary.nvim",

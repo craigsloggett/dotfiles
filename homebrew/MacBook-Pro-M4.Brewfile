@@ -5,6 +5,7 @@ brew "neovim"
 brew "openssh"
 brew "pass"
 brew "ripgrep"
+brew "tree-sitter-cli"
 brew "ykman"
 brew "zsh-autosuggestions"
 
