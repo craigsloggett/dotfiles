@@ -523,6 +523,8 @@ github_authenticates() {
 configure_ssh() (
   remote="git@github.com:${repo}.git"
 
+  symlink "${dotfiles}/ssh/config" "${HOME}/.ssh/config"
+
   [ "$(git -C "${dotfiles}" remote get-url origin)" != "${remote}" ] || return 0
 
   if github_authenticates; then
