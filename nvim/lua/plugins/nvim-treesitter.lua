@@ -2,12 +2,14 @@
 -- autocommand in autocmds.lua starts highlighting once a parser exists.
 local parsers = {
   "bash",
+  "comment",
   "go",
   "gomod",
   "gosum",
   "gowork",
   "hcl",
   "terraform",
+  "yaml",
   "zsh"
 }
 
