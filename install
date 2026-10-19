@@ -227,11 +227,16 @@ pull_ssh_keys() (
   ! ssh_handle >/dev/null || return 0
   ! ssh_agent_key >/dev/null || return 0
 
+  if [ ! -x /opt/homebrew/bin/ssh-keygen ]; then
+    conflict "Apple's ssh-keygen cannot read FIDO keys, add openssh to the Brewfile, then run install again."
+    return 0
+  fi
+
   make_dirs "${HOME}/.ssh"
   chmod 700 "${HOME}/.ssh"
 
   printf '%s\n' "Enter the FIDO PIN and touch the YubiKey to pull its SSH key."
-  if ! (cd "${HOME}/.ssh" && ssh-keygen -K); then
+  if ! (cd "${HOME}/.ssh" && /opt/homebrew/bin/ssh-keygen -K); then
     conflict "No SSH key found, plug in a YubiKey or connect with a forwarded agent, then run install again."
   fi
 )
@@ -536,12 +541,12 @@ main() {
 
   require_full_disk_access
   ask_questions
-  pull_ssh_keys
   clone_dotfiles
   load_environment
 
   configure_host
   configure_homebrew
+  pull_ssh_keys
   configure_zsh
 
   for tool in vim nvim git gpg go pass less python3 bundle terraform tflint yamllint yamlfmt ghostty claude rustup cargo npm bun docker colima aws kubectl codex; do
