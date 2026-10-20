@@ -1,20 +1,9 @@
 # shellcheck shell=sh
 
-set_dock_apps \
-  /Applications/Firefox.app \
-  /Applications/Ghostty.app \
-  /System/Applications/Mail.app \
-  /System/Applications/Calendar.app \
-  /Applications/Signal.app \
-  /Applications/Obsidian.app \
-  /Applications/KeePassXC.app \
-  /Applications/UTM.app \
-  /Applications/Xcode.app
+# Firefox -> Privacy & Security -> History -> Clear history when Firefox closes -> Manage Exceptions
+write org.mozilla.firefox SanitizeOnShutdown__Exceptions__0 -string https://google.com
+write org.mozilla.firefox SanitizeOnShutdown__Exceptions__1 -string https://claude.ai
+write org.mozilla.firefox SanitizeOnShutdown__Exceptions__2 -string https://spotify.com
 
-set_default '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' AutoSubmit bool false
-set_default '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' ThirdPartyDataSubmit bool false
-
-set_firefox_exceptions \
-  https://google.com \
-  https://claude.ai \
-  https://spotify.com
+# Dock items, left to right
+dock Firefox Ghostty Mail Calendar KeePassXC

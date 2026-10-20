@@ -1,732 +1,532 @@
 #!/bin/sh
-
 set -eu
 
-CHECK="${CHECK:-}"
-readonly CHECK
-
-restarts=''
-
-require_full_disk_access() {
-  ! ls "${HOME}/Library/Safari" >/dev/null 2>&1 || return 0
-
+if ! ls "${HOME}/Library/Safari" >/dev/null 2>&1; then
   open 'x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles'
   printf '%s\n' "Turn on Full Disk Access for this terminal in the System Settings pane that just opened, quit and reopen the terminal, then run again." >&2
-  return 1
-}
+  exit 1
+fi
 
-linked_profile() (
-  brewfile="$(readlink "${XDG_CONFIG_HOME:-${HOME}/.config}/homebrew/Brewfile")" || return 1
-  brewfile="${brewfile##*/}"
-  printf '%s\n' "${brewfile%.Brewfile}"
-)
+profile="$(readlink "${XDG_CONFIG_HOME:-${HOME}/.config}/homebrew/Brewfile")"
+profile="${profile##*/}"
+profile="${profile%.Brewfile}"
 
-container_in_use() {
-  defaults -verbose read "${1:?a bundle identifier is required}" 2>&1 | grep -qF "/Containers/${1}/"
-}
+write() {
+  case "$3 $4" in
+    '-bool true') want=1 ;;
+    '-bool false') want=0 ;;
+    *) want="$4" ;;
+  esac
 
-ensure_container() {
-  id="${1:?a bundle identifier is required}"
-  app="${2:?an app name is required}"
-
-  ! container_in_use "${id}" || return 0
-  [ -z "${CHECK}" ] || return 0
-
-  printf '%s\n' "${app}: opening hidden once so its settings go to its container"
-  open -gja "${app}"
-
-  tries=0
-  while ! container_in_use "${id}" && [ "${tries}" -lt 30 ]; do
-    sleep 1
-    tries=$((tries + 1))
-  done
-
-  ! pgrep -q -x "${app}" || killall "${app}"
-
-  if ! container_in_use "${id}"; then
-    printf '%s\n' "${app} did not start using its settings container, open it once by hand and run again." >&2
-    return 1
+  if [ "$(defaults read "$1" "$2" 2>/dev/null)" != "${want}" ]; then
+    printf '%s %s: %s\n' "$1" "$2" "$4"
+    defaults write "$@"
   fi
 }
 
-queue_restart() {
-  case "${1:?a defaults domain is required}" in
-    com.apple.dock) restarts="${restarts} Dock" ;;
-    com.apple.finder) restarts="${restarts} Finder" ;;
-    com.apple.controlcenter | com.apple.menuextra.clock) restarts="${restarts} ControlCenter" ;;
-    com.apple.WindowManager) restarts="${restarts} WindowManager" ;;
-    com.apple.sharingd) restarts="${restarts} sharingd" ;;
-    NSGlobalDomain | com.apple.symbolichotkeys | com.apple.AppleMultitouch* | com.apple.driver.*) restarts="${restarts} logout" ;;
-  esac
-}
+dock() {
+  for application in "$@"; do
+    directory=/Applications
+    if [ -d "/System/Applications/${application}.app" ]; then
+      # The App is one of Apple's built-in applications.
+      directory=/System/Applications
+    else
+      directory=/Applications
+    fi
 
-restart_changed() {
-  for process in "$@"; do
-    case " ${restarts} " in
-      *" ${process} "*) ;;
-      *) continue ;;
-    esac
+    [ -d "${directory}/${application}.app" ] || printf '%s\n' "${application}.app not found" >&2
 
-    ! pgrep -q -x "${process}" || killall "${process}"
-  done
-}
-
-note_logout() {
-  case " ${restarts} " in
-    *' logout '*) printf '%s\n' "Log out to apply the keyboard, trackpad and mouse settings." ;;
-  esac
-}
-
-set_default() {
-  host=''
-  if [ "${1}" = -currentHost ]; then
-    host="${1}"
+    url="$(printf 'file://%s/%s.app/' "${directory}" "${application}" | sed 's/ /%20/g')"
+    file_data="<key>_CFURLString</key><string>${url}</string><key>_CFURLStringType</key><integer>15</integer>"
+    tile_data="<key>file-data</key><dict>${file_data}</dict>"
+    tile="<key>tile-data</key><dict>${tile_data}</dict><key>tile-type</key><string>file-tile</string>"
+    set -- "$@" "<dict>${tile}</dict>"
     shift
-  fi
-
-  domain="${1:?a defaults domain is required}"
-  key="${2:?a defaults key is required}"
-  type="${3:?a defaults type is required}"
-  value="${4?a defaults value is required}"
-
-  case "${type}:${value}" in
-    bool:true) want=1 ;;
-    bool:false) want=0 ;;
-    *) want="${value}" ;;
-  esac
-
-  case "${type}" in
-    bool) kind=boolean ;;
-    int) kind=integer ;;
-    *) kind="${type}" ;;
-  esac
-
-  current="$(defaults ${host:+"${host}"} read "${domain}" "${key}" 2>/dev/null || :)"
-
-  if [ "${current}" = "${want}" ] && [ "$(defaults ${host:+"${host}"} read-type "${domain}" "${key}" 2>/dev/null)" = "Type is ${kind}" ]; then
-    return 0
-  fi
-
-  printf '%s\n' "${domain##*/} ${key}: ${current:-unset} -> ${value}"
-  [ -z "${CHECK}" ] || return 0
-
-  case "${domain}" in
-    /Library/*)
-      sudo -n -v 2>/dev/null || printf '%s\n' "Settings under /Library need sudo access."
-      sudo defaults write "${domain}" "${key}" "-${type}" "${value}"
-      ;;
-    *) defaults ${host:+"${host}"} write "${domain}" "${key}" "-${type}" "${value}" ;;
-  esac
-
-  queue_restart "${domain}"
-}
-
-set_firewall() {
-  option="${1:?a firewall option is required}"
-  value="${2:?a firewall value is required}"
-  socketfilterfw=/usr/libexec/ApplicationFirewall/socketfilterfw
-
-  if ! answer="$("${socketfilterfw}" "--get${option}")"; then
-    printf '%s\n' "socketfilterfw --get${option} failed." >&2
-    return 1
-  fi
-
-  case "$(printf '%s' "${answer}" | tr '[:upper:]' '[:lower:]')" in
-    *disabled* | *' off'*) current=off ;;
-    *enabled* | *' on'*) current=on ;;
-    *)
-      printf '%s\n' "socketfilterfw --get${option} gave an unexpected answer: ${answer}" >&2
-      return 1
-      ;;
-  esac
-  [ "${current}" != "${value}" ] || return 0
-
-  printf '%s\n' "firewall ${option}: ${current} -> ${value}"
-  [ -z "${CHECK}" ] || return 0
-
-  sudo -n -v 2>/dev/null || printf '%s\n' "Setting the firewall needs sudo access."
-  sudo "${socketfilterfw}" "--set${option}" "${value}" >/dev/null
-}
-
-dock_app_urls() {
-  i=0
-  while url="$(defaults export com.apple.dock - | plutil -extract "persistent-apps.${i}.tile-data.file-data._CFURLString" raw -o - - 2>/dev/null)"; do
-    printf '%s ' "${url}"
-    i=$((i + 1))
   done
-}
-
-dock_tile() {
-  printf '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>%s</string><key>_CFURLStringType</key><integer>15</integer></dict></dict><key>tile-type</key><string>file-tile</string></dict>' "${1:?a dock tile url is required}"
-}
-
-set_dock_apps() {
-  count=$#
-  names=''
-  want=''
-  for app in "$@"; do
-    [ -d "${app}" ] || continue
-    name="${app##*/}"
-    names="${names:+${names}, }${name%.app}"
-    url="file://$(printf '%s' "${app}" | sed 's/ /%20/g')/"
-    want="${want}${url} "
-    set -- "$@" "$(dock_tile "${url}")"
-  done
-  shift "${count}"
-
-  others="$(defaults export com.apple.dock - | plutil -extract persistent-others.0 raw -o - - 2>/dev/null || :)"
-  [ "${want}" != "$(dock_app_urls)" ] || [ -n "${others}" ] || return 0
-
-  printf '%s\n' "dock persistent-apps -> ${names}"
-  [ -z "${CHECK}" ] || return 0
 
   defaults write com.apple.dock persistent-apps -array "$@"
   defaults write com.apple.dock persistent-others -array
-  queue_restart com.apple.dock
-}
-
-set_screen_lock_delay() {
-  seconds="${1:?a lock delay in seconds is required}"
-
-  current="$(sysadminctl -screenLock status 2>&1 | sed 's/.*screenLock //')"
-  [ "${current}" != "delay is ${seconds} seconds" ] || return 0
-
-  printf '%s\n' "screenLock: ${current} -> delay is ${seconds} seconds"
-  [ -z "${CHECK}" ] || return 0
-
-  printf '%s\n' "Setting the screen lock delay needs your login password."
-  sysadminctl -screenLock "${seconds}" -password -
-}
-
-disable_keyboard_shortcut() {
-  id="${1:?a hotkey id is required}"
-  modifiers="${2:?hotkey modifiers are required}"
-
-  enabled="$(defaults export com.apple.symbolichotkeys - | plutil -extract "AppleSymbolicHotKeys.${id}.enabled" raw -o - - 2>/dev/null || :)"
-  [ "${enabled}" != false ] || return 0
-
-  printf '%s\n' "symbolichotkeys ${id} enabled: ${enabled:-unset} -> false"
-  [ -z "${CHECK}" ] || return 0
-
-  defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add "${id}" \
-    "<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>32</integer><integer>49</integer><integer>${modifiers}</integer></array><key>type</key><string>standard</string></dict></dict>"
-  queue_restart com.apple.symbolichotkeys
-}
-
-set_safari_search_engine() {
-  provider="${1:?a search provider identifier is required}"
-  name="${2:?a search provider name is required}"
-
-  current="$(defaults export NSGlobalDomain - | plutil -extract NSPreferredWebServices.NSWebServicesProviderWebSearch.NSProviderIdentifier raw -o - - 2>/dev/null || :)"
-  [ "${current}" != "${provider}" ] || return 0
-
-  printf '%s\n' "NSPreferredWebServices: ${current:-unset} -> ${provider}"
-  [ -z "${CHECK}" ] || return 0
-
-  defaults write NSGlobalDomain NSPreferredWebServices -dict NSWebServicesProviderWebSearch \
-    "<dict><key>NSDefaultDisplayName</key><string>${name}</string><key>NSProviderIdentifier</key><string>${provider}</string></dict>"
-}
-
-set_firefox_pref() {
-  name="${1:?a preference name is required}"
-  type="${2:?a preference type is required}"
-  value="${3?a preference value is required}"
-
-  set_default org.mozilla.firefox "Preferences__${name}__Value" "${type}" "${value}"
-  set_default org.mozilla.firefox "Preferences__${name}__Status" string default
-}
-
-set_firefox_exceptions() {
-  [ -d /Applications/Firefox.app ] || return 0
-
-  i=0
-  for url in "$@"; do
-    set_default org.mozilla.firefox "SanitizeOnShutdown__Exceptions__${i}" string "${url}"
-    i=$((i + 1))
-  done
-
-  while stale="$(defaults read org.mozilla.firefox "SanitizeOnShutdown__Exceptions__${i}" 2>/dev/null)"; do
-    printf '%s\n' "org.mozilla.firefox SanitizeOnShutdown__Exceptions__${i}: ${stale} -> unset"
-    [ -n "${CHECK}" ] || defaults delete org.mozilla.firefox "SanitizeOnShutdown__Exceptions__${i}"
-    i=$((i + 1))
-  done
+  killall Dock
 }
 
 network_firewall() {
-  set_firewall globalstate on
-  set_firewall stealthmode on
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on >/dev/null
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on >/dev/null
 }
 
 general_software_update() {
-  for key in AutoUpdate AutomaticDownload AutomaticallyInstallMacOSUpdates ConfigDataInstall CriticalUpdateInstall; do
-    set_default /Library/Preferences/com.apple.SoftwareUpdate "${key}" bool true
-  done
-
-  set_default /Library/Preferences/com.apple.commerce AutoUpdate bool false
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutoUpdate -bool true
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
+  sudo defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool false
 }
 
 general_airdrop_and_continuity() {
-  set_default com.apple.sharingd DiscoverableMode string Off
-  set_default -currentHost com.apple.coreservices.useractivityd ActivityAdvertisingAllowed bool false
-  set_default -currentHost com.apple.coreservices.useractivityd ActivityReceivingAllowed bool false
-  set_default -currentHost com.apple.controlcenter AirplayReceiverEnabled bool false
+  # AirDrop = No One
+  write com.apple.sharingd DiscoverableMode -string Off
+  # Allow Handoff between this Mac and your iCloud devices = Disabled
+  defaults -currentHost write com.apple.coreservices.useractivityd ActivityAdvertisingAllowed -bool false
+  defaults -currentHost write com.apple.coreservices.useractivityd ActivityReceivingAllowed -bool false
+  # iPhone Widgets = Disabled
+  write com.apple.chronod remoteWidgetsEnabled -bool false
+  # Notifications & Live Activities -> Allow Live Activities from iPhone = Disabled
+  write com.apple.controlcenter RemoteLiveActivitiesEnabled -bool false
+  # AirPlay Receiver = Disabled
+  defaults -currentHost write com.apple.controlcenter AirplayReceiverEnabled -bool false
+
+  # Restart the service to pick up the new values immediately.
+  killall ControlCenter sharingd
 }
 
 general_language_and_region() {
-  set_default NSGlobalDomain AppleLocale string en_CA
+  # Region = Canada
+  write NSGlobalDomain AppleLocale -string en_CA
 }
 
 general_time_machine() {
-  set_default com.apple.TimeMachine DoNotOfferNewDisksForBackup bool true
-}
-
-accessibility() {
-  set_default NSGlobalDomain com.apple.springing.enabled bool true
-  set_default NSGlobalDomain com.apple.springing.delay float 0.5
+  # Suggest new disks for backup = Disabled
+  write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 }
 
 appearance() {
-  set_default NSGlobalDomain AppleInterfaceStyleSwitchesAutomatically bool true
-  set_default NSGlobalDomain AppleShowScrollBars string Automatic
-  set_default NSGlobalDomain NSGlassTintAmount float 0.5
+  # Appearance = Auto
+  write NSGlobalDomain AppleInterfaceStyleSwitchesAutomatically -bool true
+  # Liquid Glass = 50%
+  write NSGlobalDomain NSGlassTintAmount -float 0.5
+  # Show scroll bars = Automatically based on mouse or trackpad
+  write NSGlobalDomain AppleShowScrollBars -string Automatic
 }
 
 desktop_and_dock() {
-  set_default com.apple.dock autohide bool true
-  set_default com.apple.dock show-recents bool false
-  set_default com.apple.dock tilesize float 43
-  set_default NSGlobalDomain AppleMiniaturizeOnDoubleClick bool false
-  set_default com.apple.WindowManager AutoHide bool false
-  set_default com.apple.WindowManager AppWindowGroupingBehavior int 1
-  set_default com.apple.WindowManager EnableStandardClickToShowDesktop bool false
-  set_default com.apple.WindowManager EnableTiledWindowMargins bool false
-  set_default com.apple.WindowManager HideDesktop bool true
-  set_default com.apple.WindowManager StageManagerHideWidgets bool true
-  set_default com.apple.WindowManager StandardHideWidgets bool true
-  set_default com.apple.chronod remoteWidgetsEnabled bool false
+  # Size = 43 points
+  write com.apple.dock tilesize -float 43
+  # Window title bar double-click action = Zoom/Fill
+  write NSGlobalDomain AppleMiniaturizeOnDoubleClick -bool false
+  # Automatically hide and show the Dock = Enabled
+  write com.apple.dock autohide -bool true
+  # Show suggested and recent apps in Dock = Disabled
+  write com.apple.dock show-recents -bool false
+
+  # Show Items (On Desktop) = Enabled
+  write com.apple.WindowManager HideDesktop -bool true
+  # Click wallpaper to reveal desktop = Only in Stage Manager
+  write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
+
+  # Stage Manager = Disabled
+  write com.apple.WindowManager AutoHide -bool false
+  # Show windows from an application = All at Once
+  write com.apple.WindowManager AppWindowGroupingBehavior -int 1
+
+  # Show Widgets (On Desktop) = Disabled
+  write com.apple.WindowManager StandardHideWidgets -bool true
+  # Show Widgets (In Stage Manager) = Disabled
+  write com.apple.WindowManager StageManagerHideWidgets -bool true
+
+  # Tiled windows have margins = Disabled
+  write com.apple.WindowManager EnableTiledWindowMargins -bool false
+
+  # Restart the service to pick up the new values immediately.
+  killall Dock WindowManager
 }
 
 menu_bar() {
-  set_default com.apple.controlcenter 'NSStatusItem VisibleCC Bluetooth' bool true
-  set_default com.apple.controlcenter 'NSStatusItem VisibleCC Sound' bool true
-  set_default -currentHost com.apple.controlcenter Sound int 16
-  set_default com.apple.controlcenter RemoteLiveActivitiesEnabled bool false
-  set_default com.apple.menuextra.clock ShowAMPM bool true
-  set_default com.apple.menuextra.clock ShowDate int 0
-  set_default com.apple.menuextra.clock ShowDayOfWeek bool true
+  # Bluetooth = Enabled
+  write com.apple.controlcenter 'NSStatusItem VisibleCC Bluetooth' -bool true
+  # Sound = Enabled
+  write com.apple.controlcenter 'NSStatusItem VisibleCC Sound' -bool true
+  # Sound = Always Show
+  defaults -currentHost write com.apple.controlcenter Sound -int 16
+
+  # Clock -> Show date = Enabled
+  write com.apple.menuextra.clock ShowDate -int 0
+  # Clock -> Show the day of the week = Enabled
+  write com.apple.menuextra.clock ShowDayOfWeek -bool true
+  # Clock -> Show AM/PM = Enabled
+  write com.apple.menuextra.clock ShowAMPM -bool true
+
+  # Restart the service to pick up the new values immediately.
+  killall ControlCenter
 }
 
 siri() {
-  set_default com.apple.assistant.support 'Assistant Enabled' bool false
+  # Siri = Disabled
+  write com.apple.assistant.support 'Assistant Enabled' -bool false
 }
 
-sound() {
-  set_default NSGlobalDomain com.apple.sound.beep.flash int 0
+wallpaper() {
+  # Screen Saver -> Start Screen Saver = After 5 minutes
+  defaults -currentHost write com.apple.screensaver idleTime -int 300
 }
 
 lock_screen() {
-  set_default -currentHost com.apple.screensaver idleTime int 300
-  set_screen_lock_delay 300
-  set_default com.apple.loginwindow TALLogoutSavesState bool false
+  # Require password after screen saver begins or display is turned off = After 5 minutes
+  sysadminctl -screenLock status 2>&1 | grep -q 'delay is 300 seconds' || sysadminctl -screenLock 300 -password -
+  # Reopen windows when logging back in = Disabled
+  write com.apple.loginwindow TALLogoutSavesState -bool false
 }
 
 privacy_and_security() {
-  set_default com.apple.AdLib allowApplePersonalizedAdvertising bool false
+  # Analytics & Improvements -> Share Mac Analytics = Disabled
+  sudo defaults write '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' AutoSubmit -bool false
+  # Analytics & Improvements -> Share with App Developers = Disabled
+  sudo defaults write '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' ThirdPartyDataSubmit -bool false
+
+  # Apple Advertising -> Personalized Ads = Disabled
+  write com.apple.AdLib allowApplePersonalizedAdvertising -bool false
 }
 
 users_and_groups() {
-  set_default /Library/Preferences/com.apple.loginwindow GuestEnabled bool false
+  # Guest User = Off
+  sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
 }
 
 keyboard() {
-  set_default NSGlobalDomain KeyRepeat int 2
-  set_default NSGlobalDomain InitialKeyRepeat int 25
-  set_default NSGlobalDomain AppleKeyboardUIMode int 0
-  set_default NSGlobalDomain NSAutomaticCapitalizationEnabled bool true
-  set_default NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled bool true
-
-  disable_keyboard_shortcut 60 262144
-  disable_keyboard_shortcut 61 786432
-}
-
-mouse() {
-  set_default NSGlobalDomain com.apple.mouse.scaling float 1
-  set_default com.apple.AppleMultitouchMouse MouseButtonDivision int 55
-  set_default com.apple.AppleMultitouchMouse MouseButtonMode string OneButton
-  set_default com.apple.AppleMultitouchMouse MouseHorizontalScroll bool true
-  set_default com.apple.AppleMultitouchMouse MouseMomentumScroll bool true
-  set_default com.apple.AppleMultitouchMouse MouseOneFingerDoubleTapGesture int 0
-  set_default com.apple.AppleMultitouchMouse MouseTwoFingerDoubleTapGesture int 3
-  set_default com.apple.AppleMultitouchMouse MouseTwoFingerHorizSwipeGesture int 2
-  set_default com.apple.AppleMultitouchMouse MouseVerticalScroll bool true
-  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseButtonDivision int 55
-  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseButtonMode string OneButton
-  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseHorizontalScroll bool true
-  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseMomentumScroll bool true
-  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseOneFingerDoubleTapGesture int 0
-  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseTwoFingerDoubleTapGesture int 3
-  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseTwoFingerHorizSwipeGesture int 2
-  set_default com.apple.driver.AppleBluetoothMultitouch.mouse MouseVerticalScroll bool true
-  set_default com.apple.driver.AppleHIDMouse Button1 int 1
-  set_default com.apple.driver.AppleHIDMouse Button2 int 1
-  set_default com.apple.driver.AppleHIDMouse Button3 int 0
-  set_default com.apple.driver.AppleHIDMouse Button4 int 0
-  set_default com.apple.driver.AppleHIDMouse Button4Click int 0
-  set_default com.apple.driver.AppleHIDMouse Button4Force int 0
-  set_default com.apple.driver.AppleHIDMouse ButtonDominance int 1
-  set_default com.apple.driver.AppleHIDMouse ScrollH int 1
-  set_default com.apple.driver.AppleHIDMouse ScrollS int 4
-  set_default com.apple.driver.AppleHIDMouse ScrollSSize int 30
-  set_default com.apple.driver.AppleHIDMouse ScrollV int 1
-}
-
-trackpad() {
-  set_default NSGlobalDomain com.apple.swipescrolldirection bool false
-  set_default NSGlobalDomain com.apple.trackpad.forceClick bool true
-  set_default com.apple.AppleMultitouchTrackpad ActuateDetents int 1
-  set_default com.apple.AppleMultitouchTrackpad Clicking int 0
-  set_default com.apple.AppleMultitouchTrackpad DragLock int 0
-  set_default com.apple.AppleMultitouchTrackpad Dragging int 0
-  set_default com.apple.AppleMultitouchTrackpad FirstClickThreshold int 1
-  set_default com.apple.AppleMultitouchTrackpad SecondClickThreshold int 1
-  set_default com.apple.AppleMultitouchTrackpad ForceSuppressed bool false
-  set_default com.apple.AppleMultitouchTrackpad TrackpadCornerSecondaryClick int 0
-  set_default com.apple.AppleMultitouchTrackpad TrackpadFiveFingerPinchGesture int 2
-  set_default com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture int 2
-  set_default com.apple.AppleMultitouchTrackpad TrackpadFourFingerPinchGesture int 2
-  set_default com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture int 2
-  set_default com.apple.AppleMultitouchTrackpad TrackpadHandResting bool true
-  set_default com.apple.AppleMultitouchTrackpad TrackpadHorizScroll int 1
-  set_default com.apple.AppleMultitouchTrackpad TrackpadMomentumScroll bool true
-  set_default com.apple.AppleMultitouchTrackpad TrackpadPinch int 1
-  set_default com.apple.AppleMultitouchTrackpad TrackpadRightClick bool true
-  set_default com.apple.AppleMultitouchTrackpad TrackpadRotate int 1
-  set_default com.apple.AppleMultitouchTrackpad TrackpadScroll bool true
-  set_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag bool false
-  set_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture int 2
-  set_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerTapGesture int 0
-  set_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture int 2
-  set_default com.apple.AppleMultitouchTrackpad TrackpadTwoFingerDoubleTapGesture int 1
-  set_default com.apple.AppleMultitouchTrackpad TrackpadTwoFingerFromRightEdgeSwipeGesture int 3
-  set_default com.apple.AppleMultitouchTrackpad USBMouseStopsTrackpad int 0
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking int 0
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad DragLock int 0
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad Dragging int 0
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick int 0
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFiveFingerPinchGesture int 2
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerHorizSwipeGesture int 2
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerPinchGesture int 2
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerVertSwipeGesture int 2
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadHandResting bool true
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadHorizScroll int 1
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadMomentumScroll bool true
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadPinch int 1
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick bool true
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRotate int 1
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadScroll bool true
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag bool false
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerHorizSwipeGesture int 2
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerTapGesture int 0
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerVertSwipeGesture int 2
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadTwoFingerDoubleTapGesture int 1
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadTwoFingerFromRightEdgeSwipeGesture int 3
-  set_default com.apple.driver.AppleBluetoothMultitouch.trackpad USBMouseStopsTrackpad int 0
+  # Key repeat rate = Fast (Fastest)
+  write NSGlobalDomain KeyRepeat -int 2
+  # Delay until repeat = Short (Second Shortest Position)
+  write NSGlobalDomain InitialKeyRepeat -int 25
 }
 
 finder() {
-  set_default com.apple.finder FXPreferredViewStyle string Nlsv
-  set_default com.apple.finder _FXSortFoldersFirst bool true
-  set_default com.apple.finder _FXEnableColumnAutoSizing bool true
-  set_default com.apple.finder FK_ArrangeBy string 'Date Modified'
-  set_default com.apple.finder FXArrangeGroupViewBy string Name
-  set_default com.apple.finder FXPreferredGroupBy string Name
-  set_default com.apple.finder ShowPathbar bool true
-  set_default com.apple.finder ShowStatusBar bool false
-  set_default com.apple.finder ShowSidebar bool true
-  set_default com.apple.finder FK_AppCentricShowSidebar bool true
-  set_default com.apple.finder NewWindowTarget string PfHm
-  set_default com.apple.finder ShowExternalHardDrivesOnDesktop bool true
-  set_default com.apple.finder ShowHardDrivesOnDesktop bool false
-  set_default com.apple.finder ShowRemovableMediaOnDesktop bool true
-  set_default com.apple.finder ShowRecentTags bool false
+  # Show these items on the desktop -> Hard disks = Disabled
+  write com.apple.finder ShowHardDrivesOnDesktop -bool false
+  # Show these items on the desktop -> External disks = Enabled
+  write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+  # Show these items on the desktop -> CDs, DVDs, and iPods = Enabled
+  write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+  # New Finder windows show = Home
+  write com.apple.finder NewWindowTarget -string PfHm
+
+  # Show these items on the sidebar -> Tags -> Recent Tags = Disabled
+  write com.apple.finder ShowRecentTags -bool false
+
+  # Keep folders on top -> In windows when sorting by name = Enabled
+  write com.apple.finder _FXSortFoldersFirst -bool true
+
+  # View -> Show Sidebar = Enabled
+  write com.apple.finder ShowSidebar -bool true
+  write com.apple.finder FK_AppCentricShowSidebar -bool true
+  # View -> Show Path Bar = Enabled
+  write com.apple.finder ShowPathbar -bool true
+  # View -> Show Status Bar = Disabled
+  write com.apple.finder ShowStatusBar -bool false
+
+  # Restart the service to pick up the new values immediately.
+  killall Finder
 }
 
 calendar() {
-  set_default com.apple.iCal 'Show Week Numbers' bool true
-  set_default com.apple.iCal 'display birthdays calendar' bool false
-  set_default com.apple.iCal 'Default duration in minutes for new event' float 30
-  set_default com.apple.iCal CalendarSidebarShown bool false
-}
+  # Default event duration = 30 minutes
+  write com.apple.iCal 'Default duration in minutes for new event' -float 30
+  # Show Birthdays calendar = Disabled
+  write com.apple.iCal 'display birthdays calendar' -bool false
 
-mail() {
-  set_default com.apple.mail BottomPreview bool false
-  set_default com.apple.mail ColumnLayoutMessageList bool false
-  set_default com.apple.mail ThreadingDefault bool true
-  set_default com.apple.mail ConversationViewSortDescending bool true
-  set_default com.apple.mail ConversationViewSpansMailboxes bool true
-  set_default com.apple.mail HighlightClosedThreads int 1
-  set_default com.apple.mail EnableContactPhotos int 0
-  set_default com.apple.mail EnableToCcInMessageList int 0
-  set_default com.apple.mail MessageListShowDateTime int 0
-  set_default com.apple.mail MessageListShowSize int 0
-  set_default com.apple.mail NumberOfSnippetLines int 3
-  set_default com.apple.mail ShouldShowUnreadMessagesInBold bool false
-  set_default com.apple.mail MailShowFlags bool false
-  set_default com.apple.mail PollTime int -1
-  set_default com.apple.mail MailDockBadge int 1
-  set_default com.apple.mail MailUserNotificationScope int 1
-  set_default com.apple.mail CategoriesEnabledByDefault bool false
-  set_default com.apple.mail ShowBccHeader int 1
-  set_default com.apple.mail ShowCcHeader bool true
-  set_default com.apple.mail ShowReplyToHeader bool false
-  set_default com.apple.mail ShowPriorityControl bool false
-  set_default com.apple.mail ShowComposeFormatInspectorBar bool true
-  set_default com.apple.mail SignaturePlacedAboveQuotedText bool false
-  set_default com.apple.mail SpellCheckingBehavior string InlineSpellCheckingEnabled
-  set_default com.apple.mail WebContinuousSpellCheckingEnabled bool true
-}
+  # Show week numbers = Enabled
+  write com.apple.iCal 'Show Week Numbers' -bool true
 
-safari() {
-  set_default com.apple.Safari SearchProviderShortName string DuckDuckGo
-  set_default com.apple.Safari PrivateSearchEngineUsesNormalSearchEngineToggle bool false
-  set_default com.apple.Safari HistoryAgeInDaysLimit int 1
-  set_default com.apple.Safari DownloadsClearingPolicy int 1
-  set_default com.apple.Safari ShowFullURLInSmartSearchField bool true
-  set_default com.apple.Safari ShowFavoritesUnderSmartSearchField bool false
-  set_default com.apple.Safari ShowSidebarInTopSites bool false
-  set_default com.apple.Safari SuppressSearchSuggestions bool true
-  set_default com.apple.Safari UniversalSearchEnabled bool false
-  set_default com.apple.Safari WebsiteSpecificSearchEnabled bool false
-  set_default com.apple.Safari PreloadTopHit bool false
-  set_default com.apple.Safari EnableEnhancedPrivacyInRegularBrowsing bool true
-  set_default com.apple.Safari EnableEnhancedPrivacyInPrivateBrowsing bool false
-  set_default com.apple.Safari CanPromptForPushNotifications bool false
-  set_default com.apple.Safari AutoFillFromAddressBook bool false
-  set_default com.apple.Safari AutoFillPasswords bool false
-  set_default com.apple.Safari AutoFillFromiCloudKeychain bool false
-  set_default com.apple.Safari AutoFillCreditCardData bool false
-  set_default com.apple.Safari AutoFillMiscellaneousForms bool false
-  set_safari_search_engine com.duckduckgo DuckDuckGo
+  # View -> Show Calendar List = Disabled
+  write com.apple.iCal CalendarSidebarShown -bool false
 }
 
 textedit() {
-  set_default com.apple.TextEdit RichText int 0
-  set_default com.apple.TextEdit ShowRuler bool false
-  set_default com.apple.TextEdit IgnoreHTML bool true
-  set_default com.apple.TextEdit CheckSpellingWhileTyping bool false
-  set_default com.apple.TextEdit CorrectSpellingAutomatically bool false
-  set_default com.apple.TextEdit SmartQuotes bool false
-  set_default com.apple.TextEdit SmartDashes bool false
-  set_default com.apple.TextEdit SmartCopyPaste bool false
-  set_default com.apple.TextEdit TextReplacement bool false
-  set_default com.apple.TextEdit SmartSubstitutionsEnabledInRichTextOnly bool false
-}
+  # Format = Plain text
+  write com.apple.TextEdit RichText -int 0
 
-activity_monitor() {
-  set_default com.apple.ActivityMonitor ShowCategory int 100
-}
+  # Check spelling as you type = Disabled
+  write com.apple.TextEdit CheckSpellingWhileTyping -bool false
+  # Correct spelling automatically = Disabled
+  write com.apple.TextEdit CorrectSpellingAutomatically -bool false
+  # Show ruler = Disabled
+  write com.apple.TextEdit ShowRuler -bool false
+  # Smart quotes and dashes in rich text documents only
+  write com.apple.TextEdit SmartSubstitutionsEnabledInRichTextOnly -bool false
 
-disk_utility() {
-  set_default com.apple.DiskUtility WorkspaceShowAPFSSnapshots bool true
-  set_default com.apple.DiskUtility SidebarShowAllDevices bool false
-}
+  # Smart copy/paste = Disabled
+  write com.apple.TextEdit SmartCopyPaste -bool false
+  # Smart quotes = Disabled
+  write com.apple.TextEdit SmartQuotes -bool false
+  # Smart dashes = Disabled
+  write com.apple.TextEdit SmartDashes -bool false
+  # Text replacement = Disabled
+  write com.apple.TextEdit TextReplacement -bool false
 
-screenshot() {
-  set_default com.apple.screencapture showsClicks bool true
-  set_default com.apple.screencapture target-screenshot string file
-  set_default com.apple.screencapture target-screenrecording string file
+  # Display HTML files as HTML code instead of formatted text = Enabled
+  write com.apple.TextEdit IgnoreHTML -bool true
 }
 
 terminal() {
-  set_default com.apple.Terminal 'Default Window Settings' string 'Clear Dark'
-  set_default com.apple.Terminal 'Startup Window Settings' string 'Clear Dark'
+  # On startup, open = Clear Dark
+  write com.apple.Terminal 'Startup Window Settings' -string 'Clear Dark'
+  # Clear Dark = Default Profile
+  write com.apple.Terminal 'Default Window Settings' -string 'Clear Dark'
+}
+
+safari() {
+  # General -> Remove history items = After one day
+  write com.apple.Safari HistoryAgeInDaysLimit -int 1
+  # General -> Remove download list items = When Safari quits
+  write com.apple.Safari DownloadsClearingPolicy -int 1
+
+  # Search -> Search engine = DuckDuckGo
+  write com.apple.Safari SearchProviderShortName -string DuckDuckGo
+  defaults write NSGlobalDomain NSPreferredWebServices -dict NSWebServicesProviderWebSearch '<dict><key>NSDefaultDisplayName</key><string>DuckDuckGo</string><key>NSProviderIdentifier</key><string>com.duckduckgo</string></dict>'
+  # Search -> Private Browsing search engine = Use Default Search Engine
+  write com.apple.Safari PrivateSearchEngineUsesNormalSearchEngineToggle -bool true
+  # Search -> Search engine suggestions -> Include search engine suggestions = Disabled
+  write com.apple.Safari SuppressSearchSuggestions -bool true
+  # Search -> Search engine suggestions -> Include Safari Suggestions = Disabled
+  write com.apple.Safari UniversalSearchEnabled -bool false
+  # Search -> Quick Website Search -> Enable Quick Website Search = Disabled
+  write com.apple.Safari WebsiteSpecificSearchEnabled -bool false
+  # Search -> Smart Search Field -> Preload Top Hit in the background = Disabled
+  write com.apple.Safari PreloadTopHit -bool false
+  # Search -> Smart Search Field -> Show Favorites = Disabled
+  write com.apple.Safari ShowFavoritesUnderSmartSearchField -bool false
+
+  # AutoFill -> Using information from my contacts = Disabled
+  write com.apple.Safari AutoFillFromAddressBook -bool false
+  # AutoFill -> User names and passwords = Disabled
+  write com.apple.Safari AutoFillPasswords -bool false
+  write com.apple.Safari AutoFillFromiCloudKeychain -bool false
+  # AutoFill -> Credit cards = Disabled
+  write com.apple.Safari AutoFillCreditCardData -bool false
+  # AutoFill -> Other forms = Disabled
+  write com.apple.Safari AutoFillMiscellaneousForms -bool false
+
+  # Websites -> Notifications -> Allow websites to ask for permission to send notifications = Disabled
+  write com.apple.Safari CanPromptForPushNotifications -bool false
+
+  # Advanced -> Smart Search Field -> Show full website address = Enabled
+  write com.apple.Safari ShowFullURLInSmartSearchField -bool true
+  # Advanced -> Privacy -> Use advanced tracking and fingerprinting protection = in all browsing
+  write com.apple.Safari EnableEnhancedPrivacyInPrivateBrowsing -bool true
+  write com.apple.Safari EnableEnhancedPrivacyInRegularBrowsing -bool true
 }
 
 firefox() {
   [ -d /Applications/Firefox.app ] || return 0
 
-  set_default org.mozilla.firefox EnterprisePoliciesEnabled bool true
-  set_default org.mozilla.firefox EnableTrackingProtection__Category string strict
-  set_default org.mozilla.firefox SanitizeOnShutdown__Cache bool true
-  set_default org.mozilla.firefox SanitizeOnShutdown__Cookies bool true
-  set_default org.mozilla.firefox SanitizeOnShutdown__FormData bool true
-  set_default org.mozilla.firefox SanitizeOnShutdown__History bool true
-  set_default org.mozilla.firefox SanitizeOnShutdown__Sessions bool true
-  set_default org.mozilla.firefox SanitizeOnShutdown__SiteSettings bool true
-  set_default org.mozilla.firefox OfferToSaveLoginsDefault bool false
-  set_default org.mozilla.firefox Permissions__Location__BlockNewRequests bool true
-  set_default org.mozilla.firefox Permissions__Notifications__BlockNewRequests bool true
-  set_default org.mozilla.firefox DisableTelemetry bool true
-  set_default org.mozilla.firefox DisableFirefoxStudies bool true
-  set_default org.mozilla.firefox HttpsOnlyMode string enabled
-  set_default org.mozilla.firefox DNSOverHTTPS__Enabled bool false
-  set_default org.mozilla.firefox NetworkPrediction bool false
-  set_default org.mozilla.firefox SearchEngines__Default string DuckDuckGo
-  set_default org.mozilla.firefox FirefoxHome__Search bool false
-  set_default org.mozilla.firefox FirefoxHome__TopSites bool false
-  set_default org.mozilla.firefox FirefoxHome__SponsoredTopSites bool false
-  set_default org.mozilla.firefox FirefoxHome__Highlights bool false
-  set_default org.mozilla.firefox FirefoxHome__Stories bool false
-  set_default org.mozilla.firefox FirefoxHome__SponsoredStories bool false
-  set_default org.mozilla.firefox DisplayBookmarksToolbar string never
-  set_default org.mozilla.firefox NoDefaultBookmarks bool true
-  set_default org.mozilla.firefox UserMessaging__ExtensionRecommendations bool false
-  set_default org.mozilla.firefox UserMessaging__FeatureRecommendations bool false
-  set_default org.mozilla.firefox UserMessaging__UrlbarInterventions bool false
-  set_default org.mozilla.firefox UserMessaging__SkipOnboarding bool true
-  set_default org.mozilla.firefox UserMessaging__MoreFromMozilla bool false
-  set_default org.mozilla.firefox UserMessaging__FirefoxLabs bool false
+  # Required for Firefox to read policies from the defaults domain.
+  write org.mozilla.firefox EnterprisePoliciesEnabled -bool true
 
-  set_firefox_pref privacy.globalprivacycontrol.enabled bool true
-  set_firefox_pref places.history.enabled bool false
-  set_firefox_pref browser.formfill.enable bool false
-  set_firefox_pref signon.autofillForms bool false
-  set_firefox_pref signon.generation.enabled bool false
-  set_firefox_pref signon.management.page.breach-alerts.enabled bool false
-  set_firefox_pref signon.firefoxRelay.feature string disabled
-  set_firefox_pref extensions.formautofill.addresses.enabled bool false
-  set_firefox_pref extensions.formautofill.creditCards.enabled bool false
-  set_firefox_pref browser.search.suggest.enabled bool false
-  set_firefox_pref browser.urlbar.suggest.searches bool false
-  set_firefox_pref browser.urlbar.suggest.history bool false
-  set_firefox_pref browser.urlbar.suggest.openpage bool false
-  set_firefox_pref browser.urlbar.suggest.topsites bool false
-  set_firefox_pref browser.urlbar.suggest.engines bool false
-  set_firefox_pref browser.urlbar.suggest.quickactions bool false
-  set_firefox_pref browser.urlbar.suggest.recentsearches bool false
-  set_firefox_pref browser.urlbar.showSearchSuggestionsFirst bool false
-  set_firefox_pref browser.urlbar.showSearchTerms.enabled bool false
-  set_firefox_pref browser.urlbar.placeholderName string DuckDuckGo
-  set_firefox_pref browser.newtabpage.activity-stream.showWeather bool false
-  set_firefox_pref browser.newtabpage.activity-stream.showSponsoredCheckboxes bool false
-  set_firefox_pref browser.newtabpage.activity-stream.logowordmark.alwaysVisible bool false
-  set_default org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.widgets.enabled__Value bool false
-  set_default org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.widgets.enabled__Status string locked
-  set_firefox_pref browser.toolbars.bookmarks.showOtherBookmarks bool false
-  set_firefox_pref sidebar.visibility string hide-launcher
-  set_firefox_pref browser.ctrlTab.sortByRecentlyUsed bool true
-  set_firefox_pref browser.tabs.hoverPreview.showThumbnails bool false
-  set_firefox_pref browser.tabs.groups.smart.userEnabled bool false
-  set_firefox_pref browser.ml.linkPreview.enabled bool false
-  set_firefox_pref alerts.useSystemBackend bool false
+  # General -> Tabs -> Ctrl+Tab cycles through tabs in recently used order = Enabled
+  write org.mozilla.firefox Preferences__browser.ctrlTab.sortByRecentlyUsed__Value -bool true
+  write org.mozilla.firefox Preferences__browser.ctrlTab.sortByRecentlyUsed__Status -string default
+  # General -> Tabs -> Show an image preview when you hover on a tab = Disabled
+  write org.mozilla.firefox Preferences__browser.tabs.hoverPreview.showThumbnails__Value -bool false
+  write org.mozilla.firefox Preferences__browser.tabs.hoverPreview.showThumbnails__Status -string default
+  # Home -> New Windows and Tabs -> Web Search = Disabled
+  write org.mozilla.firefox FirefoxHome__Search -bool false
+  # Home -> New Windows and Tabs -> Shortcuts = Disabled
+  write org.mozilla.firefox FirefoxHome__TopSites -bool false
+  # Home -> New Windows and Tabs -> Shortcuts -> Sponsored shortcuts = Disabled
+  write org.mozilla.firefox FirefoxHome__SponsoredTopSites -bool false
+  # Home -> New Windows and Tabs -> Recent activity = Disabled
+  write org.mozilla.firefox FirefoxHome__Highlights -bool false
+  # Home -> New Windows and Tabs -> Recommended stories = Disabled
+  write org.mozilla.firefox FirefoxHome__Stories -bool false
+  # Home -> New Windows and Tabs -> Recommended stories -> Sponsored stories = Disabled
+  write org.mozilla.firefox FirefoxHome__SponsoredStories -bool false
+  # New Tab -> Customize -> Weather = Disabled
+  write org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.showWeather__Value -bool false
+  write org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.showWeather__Status -string default
+  # New Tab -> Customize -> Widgets = Disabled
+  write org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.widgets.enabled__Value -bool false
+  write org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.widgets.enabled__Status -string locked
+  # New Tab -> Hide the sponsored content checkboxes in the Customize panel (no UI)
+  write org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.showSponsoredCheckboxes__Value -bool false
+  write org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.showSponsoredCheckboxes__Status -string default
+  # New Tab -> Hide the Firefox logo and wordmark (no UI)
+  write org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.logowordmark.alwaysVisible__Value -bool false
+  write org.mozilla.firefox Preferences__browser.newtabpage.activity-stream.logowordmark.alwaysVisible__Status -string default
+
+  # Search -> Default Search Engine = DuckDuckGo
+  write org.mozilla.firefox SearchEngines__Default -string DuckDuckGo
+  write org.mozilla.firefox Preferences__browser.urlbar.placeholderName__Value -string DuckDuckGo
+  write org.mozilla.firefox Preferences__browser.urlbar.placeholderName__Status -string default
+  # Search -> Default Search Engine -> Show search terms in the address bar on results pages = Disabled
+  write org.mozilla.firefox Preferences__browser.urlbar.showSearchTerms.enabled__Value -bool false
+  write org.mozilla.firefox Preferences__browser.urlbar.showSearchTerms.enabled__Status -string default
+  # Search -> Search engine suggestions -> Show search suggestions = Disabled
+  write org.mozilla.firefox Preferences__browser.search.suggest.enabled__Value -bool false
+  write org.mozilla.firefox Preferences__browser.search.suggest.enabled__Status -string default
+  # Search -> Search engine suggestions -> Show search suggestions in address bar results = Disabled
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.searches__Value -bool false
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.searches__Status -string default
+  # Search -> Search engine suggestions -> Show search suggestions before browsing history in address bar results = Disabled
+  write org.mozilla.firefox Preferences__browser.urlbar.showSearchSuggestionsFirst__Value -bool false
+  write org.mozilla.firefox Preferences__browser.urlbar.showSearchSuggestionsFirst__Status -string default
+  # Search -> Address Bar -> Browsing history = Disabled
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.history__Value -bool false
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.history__Status -string default
+  # Search -> Address Bar -> Open tabs = Disabled
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.openpage__Value -bool false
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.openpage__Status -string default
+  # Search -> Address Bar -> Shortcuts = Disabled
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.topsites__Value -bool false
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.topsites__Status -string default
+  # Search -> Address Bar -> Recent searches = Disabled
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.recentsearches__Value -bool false
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.recentsearches__Status -string default
+  # Search -> Address Bar -> Suggest search engines to use = Disabled
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.engines__Value -bool false
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.engines__Status -string default
+  # Search -> Address Bar -> Quick actions = Disabled
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.quickactions__Value -bool false
+  write org.mozilla.firefox Preferences__browser.urlbar.suggest.quickactions__Status -string default
+
+  # Privacy & Security -> Enhanced Tracking Protection = Strict
+  write org.mozilla.firefox EnableTrackingProtection__Category -string strict
+  # Privacy & Security -> Website Privacy Preferences -> Tell websites not to sell or share my data = Enabled
+  write org.mozilla.firefox Preferences__privacy.globalprivacycontrol.enabled__Value -bool true
+  write org.mozilla.firefox Preferences__privacy.globalprivacycontrol.enabled__Status -string default
+  # Privacy & Security -> Passwords -> Ask to save passwords = Disabled
+  write org.mozilla.firefox OfferToSaveLoginsDefault -bool false
+  # Privacy & Security -> Passwords -> Fill usernames and passwords automatically = Disabled
+  write org.mozilla.firefox Preferences__signon.autofillForms__Value -bool false
+  write org.mozilla.firefox Preferences__signon.autofillForms__Status -string default
+  # Privacy & Security -> Passwords -> Suggest strong passwords = Disabled
+  write org.mozilla.firefox Preferences__signon.generation.enabled__Value -bool false
+  write org.mozilla.firefox Preferences__signon.generation.enabled__Status -string default
+  # Privacy & Security -> Passwords -> Show alerts about passwords for breached websites = Disabled
+  write org.mozilla.firefox Preferences__signon.management.page.breach-alerts.enabled__Value -bool false
+  write org.mozilla.firefox Preferences__signon.management.page.breach-alerts.enabled__Status -string default
+  # Privacy & Security -> Passwords -> Suggest Firefox Relay email masks = Disabled
+  write org.mozilla.firefox Preferences__signon.firefoxRelay.feature__Value -string disabled
+  write org.mozilla.firefox Preferences__signon.firefoxRelay.feature__Status -string default
+  # Privacy & Security -> Autofill -> Save and autofill addresses = Disabled
+  write org.mozilla.firefox Preferences__extensions.formautofill.addresses.enabled__Value -bool false
+  write org.mozilla.firefox Preferences__extensions.formautofill.addresses.enabled__Status -string default
+  # Privacy & Security -> Autofill -> Save and autofill payment info = Disabled
+  write org.mozilla.firefox Preferences__extensions.formautofill.creditCards.enabled__Value -bool false
+  write org.mozilla.firefox Preferences__extensions.formautofill.creditCards.enabled__Status -string default
+  # Privacy & Security -> History -> Remember browsing and download history = Disabled
+  write org.mozilla.firefox Preferences__places.history.enabled__Value -bool false
+  write org.mozilla.firefox Preferences__places.history.enabled__Status -string default
+  # Privacy & Security -> History -> Remember search and form history = Disabled
+  write org.mozilla.firefox Preferences__browser.formfill.enable__Value -bool false
+  write org.mozilla.firefox Preferences__browser.formfill.enable__Status -string default
+  # Privacy & Security -> History -> Clear history when Firefox closes -> Settings... -> Browsing & download history = Enabled
+  write org.mozilla.firefox SanitizeOnShutdown__History -bool true
+  # Privacy & Security -> History -> Clear history when Firefox closes -> Settings... -> Cookies and site data = Enabled
+  write org.mozilla.firefox SanitizeOnShutdown__Cookies -bool true
+  # Privacy & Security -> History -> Clear history when Firefox closes -> Settings... -> Temporary cached files and pages = Enabled
+  write org.mozilla.firefox SanitizeOnShutdown__Cache -bool true
+  # Privacy & Security -> History -> Clear history when Firefox closes -> Settings... -> Form & search history = Enabled
+  write org.mozilla.firefox SanitizeOnShutdown__FormData -bool true
+  # Privacy & Security -> History -> Clear history when Firefox closes -> Settings... -> Site settings = Enabled
+  write org.mozilla.firefox SanitizeOnShutdown__SiteSettings -bool true
+  # Privacy & Security -> History -> Clear history when Firefox closes -> Active logins (no checkbox in the current dialog)
+  write org.mozilla.firefox SanitizeOnShutdown__Sessions -bool true
+  # Privacy & Security -> Permissions -> Location -> Settings... -> Block new requests asking to access your location = Enabled
+  write org.mozilla.firefox Permissions__Location__BlockNewRequests -bool true
+  # Privacy & Security -> Permissions -> Notifications -> Settings... -> Block new requests asking to allow notifications = Enabled
+  write org.mozilla.firefox Permissions__Notifications__BlockNewRequests -bool true
+  # Privacy & Security -> Firefox Data Collection and Use -> Send technical and interaction data to Mozilla = Disabled
+  write org.mozilla.firefox DisableTelemetry -bool true
+  # Privacy & Security -> Firefox Data Collection and Use -> Install and run studies = Disabled
+  write org.mozilla.firefox DisableFirefoxStudies -bool true
+  # Privacy & Security -> HTTPS-Only Mode = Enable HTTPS-Only Mode in all windows
+  write org.mozilla.firefox HttpsOnlyMode -string enabled
+  # Privacy & Security -> DNS over HTTPS = Off
+  write org.mozilla.firefox DNSOverHTTPS__Enabled -bool false
+
+  # AI Controls -> Key points in link previews = Disabled
+  write org.mozilla.firefox Preferences__browser.ml.linkPreview.enabled__Value -bool false
+  write org.mozilla.firefox Preferences__browser.ml.linkPreview.enabled__Status -string default
+  # AI Controls -> Tab group suggestions = Disabled
+  write org.mozilla.firefox Preferences__browser.tabs.groups.smart.userEnabled__Value -bool false
+  write org.mozilla.firefox Preferences__browser.tabs.groups.smart.userEnabled__Status -string default
+
+  # View -> Toolbars -> Bookmarks Toolbar = Never Show
+  write org.mozilla.firefox DisplayBookmarksToolbar -string never
+  # Bookmarks Toolbar -> right-click -> Show Other Bookmarks = Disabled
+  write org.mozilla.firefox Preferences__browser.toolbars.bookmarks.showOtherBookmarks__Value -bool false
+  write org.mozilla.firefox Preferences__browser.toolbars.bookmarks.showOtherBookmarks__Status -string default
+  # Skip creating the default bookmarks in a new profile.
+  write org.mozilla.firefox NoDefaultBookmarks -bool true
+
+  # Sidebar -> Customize sidebar -> Open tools from sidebar = Disabled
+  write org.mozilla.firefox Preferences__sidebar.visibility__Value -string hide-launcher
+  write org.mozilla.firefox Preferences__sidebar.visibility__Status -string default
+
+  # Recommendations, onboarding and promos that have no settings UI.
+  write org.mozilla.firefox UserMessaging__ExtensionRecommendations -bool false
+  write org.mozilla.firefox UserMessaging__FeatureRecommendations -bool false
+  write org.mozilla.firefox UserMessaging__UrlbarInterventions -bool false
+  write org.mozilla.firefox UserMessaging__SkipOnboarding -bool true
+  write org.mozilla.firefox UserMessaging__MoreFromMozilla -bool false
+  write org.mozilla.firefox UserMessaging__FirefoxLabs -bool false
+  # Link prefetching and DNS prefetching (no UI).
+  write org.mozilla.firefox NetworkPrediction -bool false
+  # Show web notifications in Firefox's own popups instead of Notification Center (no UI).
+  write org.mozilla.firefox Preferences__alerts.useSystemBackend__Value -bool false
+  write org.mozilla.firefox Preferences__alerts.useSystemBackend__Status -string default
 }
 
 ghostty() {
   [ -d /Applications/Ghostty.app ] || return 0
 
-  set_default com.mitchellh.ghostty SUAutomaticallyUpdate bool true
-  set_default com.mitchellh.ghostty SUEnableAutomaticChecks bool true
-  set_default com.mitchellh.ghostty SUSendProfileInfo bool false
+  write com.mitchellh.ghostty SUAutomaticallyUpdate -bool true
+  write com.mitchellh.ghostty SUEnableAutomaticChecks -bool true
+  write com.mitchellh.ghostty SUSendProfileInfo -bool false
 }
 
 rectangle() {
   [ -d /Applications/Rectangle.app ] || return 0
 
-  set_default com.knollsoft.Rectangle launchOnLogin bool true
-  set_default com.knollsoft.Rectangle hideMenubarIcon bool true
-  set_default com.knollsoft.Rectangle allowAnyShortcut bool true
-  set_default com.knollsoft.Rectangle alternateDefaultShortcuts bool true
-  set_default com.knollsoft.Rectangle gapSize float 10
-  set_default com.knollsoft.Rectangle windowSnapping int 2
-  set_default com.knollsoft.Rectangle unsnapRestore int 1
-  set_default com.knollsoft.Rectangle subsequentExecutionMode int 1
-  set_default com.knollsoft.Rectangle missionControlDragging int 1
-  set_default com.knollsoft.Rectangle hapticFeedbackOnSnap int 2
-  set_default com.knollsoft.Rectangle footprintAnimationDurationMultiplier float 0
-  set_default com.knollsoft.Rectangle footprintBlur bool false
-  set_default com.knollsoft.Rectangle landscapeSnapAreas string '[1,{"action":15},7,{"compound":-4},8,{"action":14},4,{"compound":-2},6,{"action":13},3,{"action":16},5,{"compound":-3},2,{"action":2}]'
-  set_default com.knollsoft.Rectangle SUEnableAutomaticChecks bool true
+  # Gaps between windows = 10 px
+  write com.knollsoft.Rectangle gapSize -float 10
+
+  # Launch on login = Enabled
+  write com.knollsoft.Rectangle launchOnLogin -bool true
+  # Hide menu bar icon = Enabled
+  write com.knollsoft.Rectangle hideMenubarIcon -bool true
+  # Check for updates automatically = Enabled
+  write com.knollsoft.Rectangle SUEnableAutomaticChecks -bool true
 }
 
 syncthing() {
   [ -d /Applications/Syncthing.app ] || return 0
 
-  set_default com.github.xor-gate.syncthing-macosx StartAtLogin bool true
-  set_default com.github.xor-gate.syncthing-macosx SUEnableAutomaticChecks bool true
-  set_default com.github.xor-gate.syncthing-macosx SUSendProfileInfo bool false
+  write com.github.xor-gate.syncthing-macosx StartAtLogin -bool true
+  write com.github.xor-gate.syncthing-macosx SUEnableAutomaticChecks -bool true
+  write com.github.xor-gate.syncthing-macosx SUSendProfileInfo -bool false
 }
 
-xcode() {
-  [ -d /Applications/Xcode.app ] || return 0
+# System Settings
+network_firewall
+general_software_update
+general_airdrop_and_continuity
+general_language_and_region
+general_time_machine
+appearance
+desktop_and_dock
+menu_bar
+siri
+wallpaper
+lock_screen
+privacy_and_security
+users_and_groups
+keyboard
 
-  set_default com.apple.dt.Xcode DVTTextShowMinimap bool false
-  set_default com.apple.dt.Xcode DVTTextShowInvisibleCharacters bool false
-  set_default com.apple.dt.Xcode DVTEnableOnDeviceCodePredictions bool false
-  set_default com.apple.dt.Xcode DVTTextEnablePredictiveCompletion bool false
-  set_default com.apple.dt.Xcode IDEAlwaysShowEditorTabBar bool false
-  set_default com.apple.dt.Xcode IDEEditorSubEditorOrientation int 1
-  set_default com.apple.dt.Xcode IDEEditorDefaultCodeReviewPreference int 1
-  set_default com.apple.dt.Xcode IDEStringCatalogAutomaticCommentGenerationEnabled bool false
-  set_default com.apple.dt.Xcode IDEWorkspaceSuppressCleanBuildPrompt bool true
-  set_default com.apple.dt.Xcode XCFontAndColorCurrentTheme string 'Default (Light).xccolortheme'
-  set_default com.apple.dt.Xcode XCFontAndColorCurrentDarkTheme string 'Default (Dark).xccolortheme'
-}
+# Apple's Built-in Applications
+finder
+calendar
+safari
+textedit
+terminal
 
-apply_profile() {
-  if ! profile="$(linked_profile)"; then
-    printf '%s\n' "No profile linked, run install first." >&2
-    return 1
-  fi
+# Applications
+firefox
+ghostty
+rectangle
+syncthing
 
-  settings="$(dirname -- "$0")/${profile}.sh"
-  if [ ! -f "${settings}" ]; then
-    printf '%s\n' "No settings for the ${profile} profile, add ${settings}." >&2
-    return 1
-  fi
+# Overrides
+# shellcheck source=/dev/null
+. "$(dirname -- "$0")/${profile}.sh"
 
-  # shellcheck source=/dev/null
-  . "${settings}"
-}
-
-main() {
-  if [ "$(uname -s)" != Darwin ]; then
-    printf '%s\n' "macos/defaults only runs on macOS." >&2
-    return 1
-  fi
-
-  require_full_disk_access
-
-  ensure_container com.apple.Safari Safari
-  ensure_container com.apple.TextEdit TextEdit
-
-  network_firewall
-  general_software_update
-  general_airdrop_and_continuity
-  general_language_and_region
-  general_time_machine
-  accessibility
-  appearance
-  desktop_and_dock
-  menu_bar
-  siri
-  sound
-  lock_screen
-  privacy_and_security
-  users_and_groups
-  keyboard
-  mouse
-  trackpad
-
-  finder
-  calendar
-  mail
-  safari
-  textedit
-  activity_monitor
-  disk_utility
-  screenshot
-  terminal
-
-  firefox
-  ghostty
-  rectangle
-  syncthing
-  xcode
-
-  apply_profile
-
-  restart_changed Dock Finder ControlCenter WindowManager sharingd
-  note_logout
-}
-
-main "$@"
+printf '%s\n' "Log out to apply the keyboard settings."
