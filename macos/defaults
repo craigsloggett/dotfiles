@@ -512,6 +512,10 @@ syncthing() {
   write com.github.xor-gate.syncthing-macosx SUSendProfileInfo -bool false
 }
 
+# Overrides
+# shellcheck source=/dev/null
+. "$(dirname -- "$0")/${profile}.sh"
+
 # System Settings
 network_firewall
 general_software_update
@@ -540,9 +544,5 @@ firefox
 ghostty
 rectangle
 syncthing
-
-# Overrides
-# shellcheck source=/dev/null
-. "$(dirname -- "$0")/${profile}.sh"
 
 printf '%s\n' "Log out to apply the keyboard settings."
