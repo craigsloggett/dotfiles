@@ -25,8 +25,8 @@ write org.mozilla.firefox SanitizeOnShutdown__Exceptions__0 -string https://goog
 write org.mozilla.firefox 'ExtensionSettings__{d634138d-c276-4fc8-924b-40a0ea21d284}__installation_mode' -string normal_installed
 # Firefox -> Add-ons and themes -> Extensions -> 1Password -> Run in Private Windows = Allow
 write org.mozilla.firefox 'ExtensionSettings__{d634138d-c276-4fc8-924b-40a0ea21d284}__private_browsing' -bool true
-# Firefox -> Toolbar -> 1Password -> Pin to Toolbar
-write org.mozilla.firefox 'ExtensionSettings__{d634138d-c276-4fc8-924b-40a0ea21d284}__default_area' -string navbar
+# Firefox -> Toolbar -> 1Password -> Unpin from Toolbar
+write org.mozilla.firefox 'ExtensionSettings__{d634138d-c276-4fc8-924b-40a0ea21d284}__default_area' -string menupanel
 
 # Dock items, left to right
 dock Mail Calendar Firefox Ghostty KeePassXC Slack
