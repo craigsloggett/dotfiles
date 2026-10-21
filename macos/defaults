@@ -207,10 +207,14 @@ users_and_groups() {
 }
 
 keyboard() {
+  changed=''
+
   # Key repeat rate = Fast (Fastest)
   write NSGlobalDomain KeyRepeat -int 2
   # Delay until repeat = Short (Second Shortest Position)
   write NSGlobalDomain InitialKeyRepeat -int 25
+
+  [ -z "${changed}" ] || printf '%s\n' "Log out to apply the keyboard settings."
 }
 
 finder() {
@@ -564,8 +568,6 @@ main() {
   ghostty
   rectangle
   syncthing
-
-  printf '%s\n' "Log out to apply the keyboard settings."
 }
 
 main "$@"
