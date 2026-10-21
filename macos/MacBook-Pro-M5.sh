@@ -21,5 +21,12 @@ privacy_and_security() {
 # Firefox -> Privacy & Security -> History -> Clear history when Firefox closes -> Manage Exceptions
 write org.mozilla.firefox SanitizeOnShutdown__Exceptions__0 -string https://google.com
 
+# Firefox -> Add-ons and themes -> Extensions -> 1Password = Installed
+write org.mozilla.firefox 'ExtensionSettings__{d634138d-c276-4fc8-924b-40a0ea21d284}__installation_mode' -string normal_installed
+# Firefox -> Add-ons and themes -> Extensions -> 1Password -> Run in Private Windows = Allow
+write org.mozilla.firefox 'ExtensionSettings__{d634138d-c276-4fc8-924b-40a0ea21d284}__private_browsing' -bool true
+# Firefox -> Toolbar -> 1Password -> Pin to Toolbar
+write org.mozilla.firefox 'ExtensionSettings__{d634138d-c276-4fc8-924b-40a0ea21d284}__default_area' -string navbar
+
 # Dock items, left to right
 dock Mail Calendar Firefox Ghostty KeePassXC Slack
