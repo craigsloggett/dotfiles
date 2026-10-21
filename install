@@ -505,6 +505,35 @@ configure_codex() {
   make_dirs "${CODEX_HOME}"
 }
 
+configure_syncthing() (
+  env_file="${XDG_CONFIG_HOME}/homebrew/services/syncthing.env"
+  default_home="${HOME}/Library/Application Support/Syncthing"
+
+  if [ "$(cat "${env_file}" 2>/dev/null)" != "STHOMEDIR=${STHOMEDIR}" ]; then
+    make_dirs "${env_file%/*}"
+    printf 'STHOMEDIR=%s\n' "${STHOMEDIR}" >"${env_file}"
+    printf '%s\n' "Wrote ${env_file}."
+  fi
+
+  if [ -e "${default_home}" ]; then
+    brew services stop syncthing
+    migrate "${default_home}" "${STHOMEDIR}"
+    brew services start syncthing
+    sleep 2
+  fi
+
+  if ! syncthing cli config options uraccepted get >/dev/null 2>&1; then
+    conflict "Syncthing is not responding, run install again once it has started."
+    return 0
+  fi
+
+  while read -r option value; do
+    [ "$(syncthing cli config options "${option}" get)" != "${value}" ] || continue
+    syncthing cli config options "${option}" set -- "${value}"
+    printf '%s\n' "Set Syncthing ${option} to ${value}."
+  done <"${dotfiles}/syncthing/options"
+)
+
 configure_macos() (
   errors="$(mktemp)"
 
@@ -551,7 +580,7 @@ main() {
   pull_ssh_keys
   configure_zsh
 
-  for tool in vim nvim git gpg go pass less python3 bundle terraform tflint yamllint yamlfmt ghostty claude rustup cargo npm bun docker colima aws kubectl codex; do
+  for tool in vim nvim git gpg go pass less python3 bundle terraform tflint yamllint yamlfmt ghostty claude rustup cargo npm bun docker colima aws kubectl codex syncthing; do
     command -v "${tool}" >/dev/null || continue
     "configure_${tool}"
   done
