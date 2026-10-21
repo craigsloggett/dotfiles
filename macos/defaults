@@ -525,14 +525,6 @@ rectangle() {
   write com.knollsoft.Rectangle SUEnableAutomaticChecks -bool true
 }
 
-syncthing() {
-  [ -d /Applications/Syncthing.app ] || return 0
-
-  write com.github.xor-gate.syncthing-macosx StartAtLogin -bool true
-  write com.github.xor-gate.syncthing-macosx SUEnableAutomaticChecks -bool true
-  write com.github.xor-gate.syncthing-macosx SUSendProfileInfo -bool false
-}
-
 main() {
   changed=''
 
@@ -567,7 +559,6 @@ main() {
   firefox
   ghostty
   rectangle
-  syncthing
 }
 
 main "$@"
