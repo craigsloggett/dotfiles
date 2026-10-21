@@ -452,6 +452,13 @@ firefox() {
   write org.mozilla.firefox Preferences__sidebar.visibility__Value -string hide-launcher
   write org.mozilla.firefox Preferences__sidebar.visibility__Status -string default
 
+  # Add-ons and themes -> Extensions -> uBlock Origin = Installed
+  write org.mozilla.firefox ExtensionSettings__uBlock0@raymondhill.net__installation_mode -string normal_installed
+  # Add-ons and themes -> Extensions -> uBlock Origin -> Run in Private Windows = Allow
+  write org.mozilla.firefox ExtensionSettings__uBlock0@raymondhill.net__private_browsing -bool true
+  # Toolbar -> uBlock Origin -> Pin to Toolbar
+  write org.mozilla.firefox ExtensionSettings__uBlock0@raymondhill.net__default_area -string navbar
+
   # Recommendations, onboarding and promos that have no settings UI.
   write org.mozilla.firefox UserMessaging__ExtensionRecommendations -bool false
   write org.mozilla.firefox UserMessaging__FeatureRecommendations -bool false
