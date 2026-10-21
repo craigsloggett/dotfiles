@@ -97,7 +97,7 @@ general_airdrop_and_continuity() {
   defaults -currentHost write com.apple.controlcenter AirplayReceiverEnabled -bool false
 
   # Restart the service to pick up the new values immediately.
-  [ -z "${changed}" ] || killall ControlCenter sharingd
+  [ -z "${changed}" ] || killall ControlCenter sharingd useractivityd chronod
 }
 
 general_language_and_region() {
