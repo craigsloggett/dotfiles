@@ -5,7 +5,7 @@ brew "neovim"
 brew "openssh"
 brew "pass"
 brew "ripgrep"
-brew "syncthing"
+brew "syncthing", start_service: true
 brew "tree-sitter-cli"
 brew "ykman"
 brew "zsh-autosuggestions"
