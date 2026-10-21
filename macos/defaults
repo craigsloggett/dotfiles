@@ -20,6 +20,7 @@ write() {
 
   [ "$(defaults read "$1" "$2" 2>/dev/null)" != "${want}" ] || return 0
   printf '%s %s: %s\n' "$1" "$2" "$4"
+  changed=1
 
   case "$1" in
     /*)
@@ -31,6 +32,8 @@ write() {
 }
 
 dock() {
+  apps="$*"
+  urls=''
   for application in "$@"; do
     directory=/Applications
     if [ -d "/System/Applications/${application}.app" ]; then
@@ -43,6 +46,7 @@ dock() {
     [ -d "${directory}/${application}.app" ] || printf '%s\n' "${application}.app not found" >&2
 
     url="$(printf 'file://%s/%s.app/' "${directory}" "${application}" | sed 's/ /%20/g')"
+    urls="${urls:+${urls} }${url}"
     file_data="<key>_CFURLString</key><string>${url}</string><key>_CFURLStringType</key><integer>15</integer>"
     tile_data="<key>file-data</key><dict>${file_data}</dict>"
     tile="<key>tile-data</key><dict>${tile_data}</dict><key>tile-type</key><string>file-tile</string>"
@@ -50,6 +54,11 @@ dock() {
     shift
   done
 
+  current="$({ defaults read com.apple.dock persistent-apps; defaults read com.apple.dock persistent-others; } 2>/dev/null |
+    sed -n 's/.*"_CFURLString" = "\(.*\)";/\1/p' | paste -s -d ' ' -)"
+  [ "${current}" != "${urls}" ] || return 0
+
+  printf '%s\n' "com.apple.dock persistent-apps: ${apps}"
   defaults write com.apple.dock persistent-apps -array "$@"
   defaults write com.apple.dock persistent-others -array
   killall Dock
@@ -73,6 +82,8 @@ general_software_update() {
 }
 
 general_airdrop_and_continuity() {
+  changed=''
+
   # AirDrop = No One
   write com.apple.sharingd DiscoverableMode -string Off
   # Allow Handoff between this Mac and your iCloud devices = Disabled
@@ -86,7 +97,7 @@ general_airdrop_and_continuity() {
   defaults -currentHost write com.apple.controlcenter AirplayReceiverEnabled -bool false
 
   # Restart the service to pick up the new values immediately.
-  killall ControlCenter sharingd
+  [ -z "${changed}" ] || killall ControlCenter sharingd
 }
 
 general_language_and_region() {
@@ -109,6 +120,8 @@ appearance() {
 }
 
 desktop_and_dock() {
+  changed=''
+
   # Size = 43 points
   write com.apple.dock tilesize -float 43
   # Window title bar double-click action = Zoom/Fill
@@ -137,10 +150,12 @@ desktop_and_dock() {
   write com.apple.WindowManager EnableTiledWindowMargins -bool false
 
   # Restart the service to pick up the new values immediately.
-  killall Dock WindowManager
+  [ -z "${changed}" ] || killall Dock WindowManager
 }
 
 menu_bar() {
+  changed=''
+
   # Bluetooth = Enabled
   write com.apple.controlcenter 'NSStatusItem VisibleCC Bluetooth' -bool true
   # Sound = Enabled
@@ -156,7 +171,7 @@ menu_bar() {
   write com.apple.menuextra.clock ShowAMPM -bool true
 
   # Restart the service to pick up the new values immediately.
-  killall ControlCenter
+  [ -z "${changed}" ] || killall ControlCenter
 }
 
 siri() {
@@ -199,6 +214,8 @@ keyboard() {
 }
 
 finder() {
+  changed=''
+
   # Show these items on the desktop -> Hard disks = Disabled
   write com.apple.finder ShowHardDrivesOnDesktop -bool false
   # Show these items on the desktop -> External disks = Enabled
@@ -223,7 +240,7 @@ finder() {
   write com.apple.finder ShowStatusBar -bool false
 
   # Restart the service to pick up the new values immediately.
-  killall Finder
+  [ -z "${changed}" ] || killall Finder
 }
 
 calendar() {
@@ -512,37 +529,43 @@ syncthing() {
   write com.github.xor-gate.syncthing-macosx SUSendProfileInfo -bool false
 }
 
-# Overrides
-# shellcheck source=/dev/null
-. "$(dirname -- "$0")/${profile}.sh"
+main() {
+  changed=''
 
-# System Settings
-network_firewall
-general_software_update
-general_airdrop_and_continuity
-general_language_and_region
-general_time_machine
-appearance
-desktop_and_dock
-menu_bar
-siri
-wallpaper
-lock_screen
-privacy_and_security
-users_and_groups
-keyboard
+  # Overrides
+  # shellcheck source=/dev/null
+  . "$(dirname -- "$0")/${profile}.sh"
 
-# Apple's Built-in Applications
-finder
-calendar
-safari
-textedit
-terminal
+  # System Settings
+  network_firewall
+  general_software_update
+  general_airdrop_and_continuity
+  general_language_and_region
+  general_time_machine
+  appearance
+  desktop_and_dock
+  menu_bar
+  siri
+  wallpaper
+  lock_screen
+  privacy_and_security
+  users_and_groups
+  keyboard
 
-# Applications
-firefox
-ghostty
-rectangle
-syncthing
+  # Apple's Built-in Applications
+  finder
+  calendar
+  safari
+  textedit
+  terminal
 
-printf '%s\n' "Log out to apply the keyboard settings."
+  # Applications
+  firefox
+  ghostty
+  rectangle
+  syncthing
+
+  printf '%s\n' "Log out to apply the keyboard settings."
+}
+
+main "$@"
