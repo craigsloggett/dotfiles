@@ -10,6 +10,7 @@ brew "tree-sitter-cli"
 brew "ykman"
 brew "zsh-autosuggestions"
 
+cask "claude-code@latest"
 cask "1password"
 cask "firefox"
 cask "ghostty"
