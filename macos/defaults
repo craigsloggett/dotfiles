@@ -18,10 +18,16 @@ write() {
     *) want="$4" ;;
   esac
 
-  if [ "$(defaults read "$1" "$2" 2>/dev/null)" != "${want}" ]; then
-    printf '%s %s: %s\n' "$1" "$2" "$4"
-    defaults write "$@"
-  fi
+  [ "$(defaults read "$1" "$2" 2>/dev/null)" != "${want}" ] || return 0
+  printf '%s %s: %s\n' "$1" "$2" "$4"
+
+  case "$1" in
+    /*)
+      sudo -n -v 2>/dev/null || printf '%s\n' "Writing $1 needs sudo access."
+      sudo defaults write "$@"
+      ;;
+    *) defaults write "$@" ;;
+  esac
 }
 
 dock() {
@@ -50,17 +56,20 @@ dock() {
 }
 
 network_firewall() {
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on >/dev/null
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on >/dev/null
+  /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate | grep -q 'State = 1' ||
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on >/dev/null
+
+  /usr/libexec/ApplicationFirewall/socketfilterfw --getstealthmode | grep -q 'mode is on' ||
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on >/dev/null
 }
 
 general_software_update() {
-  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutoUpdate -bool true
-  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true
-  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
-  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
-  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
-  sudo defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool false
+  write /Library/Preferences/com.apple.SoftwareUpdate AutoUpdate -bool true
+  write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true
+  write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
+  write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
+  write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
+  write /Library/Preferences/com.apple.commerce AutoUpdate -bool false
 }
 
 general_airdrop_and_continuity() {
@@ -169,9 +178,9 @@ lock_screen() {
 
 privacy_and_security() {
   # Analytics & Improvements -> Share Mac Analytics = Disabled
-  sudo defaults write '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' AutoSubmit -bool false
+  write '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' AutoSubmit -bool false
   # Analytics & Improvements -> Share with App Developers = Disabled
-  sudo defaults write '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' ThirdPartyDataSubmit -bool false
+  write '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' ThirdPartyDataSubmit -bool false
 
   # Apple Advertising -> Personalized Ads = Disabled
   write com.apple.AdLib allowApplePersonalizedAdvertising -bool false
@@ -179,7 +188,7 @@ privacy_and_security() {
 
 users_and_groups() {
   # Guest User = Off
-  sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
+  write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
 }
 
 keyboard() {

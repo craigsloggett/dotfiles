@@ -1,9 +1,11 @@
 # shellcheck shell=sh
 
 # Privacy & Security -> Analytics & Improvements -> Share Mac Analytics = Managed by MDM
-sudo defaults delete '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' AutoSubmit 2>/dev/null || :
+! defaults read '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' AutoSubmit >/dev/null 2>&1 ||
+  sudo defaults delete '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' AutoSubmit
 # Privacy & Security -> Analytics & Improvements -> Share with App Developers = Managed by MDM
-sudo defaults delete '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' ThirdPartyDataSubmit 2>/dev/null || :
+! defaults read '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' ThirdPartyDataSubmit >/dev/null 2>&1 ||
+  sudo defaults delete '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' ThirdPartyDataSubmit
 
 # Firefox -> Privacy & Security -> History -> Clear history when Firefox closes -> Manage Exceptions
 write org.mozilla.firefox SanitizeOnShutdown__Exceptions__0 -string https://google.com
