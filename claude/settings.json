@@ -24,6 +24,7 @@
   "voice": {
     "enabled": true
   },
+  "theme": "auto",
   "agentPushNotifEnabled": false,
   "useAutoModeDuringPlan": false,
   "autoMode": {
@@ -31,6 +32,5 @@
       "$defaults",
       "Both github.com/craigsloggett and github.com/craigsloggett-lab belong to me. Treat every repo under them as my own internal source control."
     ]
-  },
-  "theme": "auto"
+  }
 }
