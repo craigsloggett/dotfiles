@@ -20,7 +20,7 @@ privacy_and_security() {
 
 # Firefox -> Privacy & Security -> History -> Clear history when Firefox closes -> Manage Exceptions
 write org.mozilla.firefox SanitizeOnShutdown__Exceptions__0 -string https://google.com
-write org.mozilla.firefox SanitizeOnShutdown__Exceptions__2 -string https://github.com
+write org.mozilla.firefox SanitizeOnShutdown__Exceptions__1 -string https://github.com
 write org.mozilla.firefox SanitizeOnShutdown__Exceptions__2 -string https://spotify.com
 
 # Firefox -> Add-ons and themes -> Extensions -> 1Password = Installed
