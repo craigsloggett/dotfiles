@@ -2,3 +2,5 @@
 (?d)._*
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
+*.keyx
+*.key
