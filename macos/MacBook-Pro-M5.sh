@@ -42,4 +42,4 @@ write org.mozilla.firefox 'ExtensionSettings__{d634138d-c276-4fc8-924b-40a0ea21d
 write org.mozilla.firefox 'ExtensionSettings__{d634138d-c276-4fc8-924b-40a0ea21d284}__default_area' -string menupanel
 
 # Dock items, left to right
-dock Mail Calendar Firefox Ghostty KeePassXC Slack
+dock Mail Calendar Firefox Ghostty Slack KeePassXC Obsidian
