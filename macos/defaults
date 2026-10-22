@@ -186,7 +186,11 @@ wallpaper() {
 
 lock_screen() {
   # Require password after screen saver begins or display is turned off = After 5 minutes
-  sysadminctl -screenLock status 2>&1 | grep -q 'delay is 300 seconds' || sysadminctl -screenLock 300 -password -
+  sysadminctl -screenLock status 2>&1 | grep -q 'delay is 300 seconds' ||
+    (
+      printf '%s\n' "Setting the screen lock delay needs your login password."
+      sysadminctl -screenLock 300 -password -
+    )
   # Reopen windows when logging back in = Disabled
   write com.apple.loginwindow TALLogoutSavesState -bool false
 }

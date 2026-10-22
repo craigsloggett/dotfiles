@@ -1,5 +1,16 @@
 # shellcheck shell=sh
 
+lock_screen() {
+  # Require password after screen saver begins or display is turned off = Immediately
+  sysadminctl -screenLock status 2>&1 | grep -q 'delay is immediate' ||
+    (
+      printf '%s\n' "Setting the screen lock delay needs your login password."
+      sysadminctl -screenLock immediate -password -
+    )
+  # Reopen windows when logging back in = Disabled
+  write com.apple.loginwindow TALLogoutSavesState -bool false
+}
+
 privacy_and_security() {
   # Analytics & Improvements -> Share Mac Analytics = Unset
   ! defaults read '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' AutoSubmit >/dev/null 2>&1 ||
