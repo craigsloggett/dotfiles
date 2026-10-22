@@ -1,0 +1,4 @@
+(?d).DS_Store
+(?d)._*
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json

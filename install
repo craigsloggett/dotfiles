@@ -500,6 +500,7 @@ configure_codex() {
 configure_syncthing() (
   env_file="${XDG_CONFIG_HOME}/homebrew/services/syncthing.env"
   default_home="${HOME}/Library/Application Support/Syncthing"
+  ignores="${dotfiles}/syncthing/ignores"
 
   if [ "$(cat "${env_file}" 2>/dev/null)" != "STHOMEDIR=${STHOMEDIR}" ]; then
     make_dirs "${env_file%/*}"
@@ -524,6 +525,49 @@ configure_syncthing() (
     syncthing cli config options "${option}" set -- "${value}"
     printf '%s\n' "Set Syncthing ${option} to ${value}."
   done <"${dotfiles}/syncthing/options"
+
+  while read -r option value; do
+    [ "$(syncthing cli config defaults folder "${option}" get)" != "${value}" ] || continue
+    syncthing cli config defaults folder "${option}" set -- "${value}"
+    printf '%s\n' "Set Syncthing default folder ${option} to ${value}."
+  done <"${dotfiles}/syncthing/folder"
+
+  while read -r option value; do
+    [ "$(syncthing cli config defaults device "${option}" get)" != "${value}" ] || continue
+    syncthing cli config defaults device "${option}" set -- "${value}"
+    printf '%s\n' "Set Syncthing default device ${option} to ${value}."
+  done <"${dotfiles}/syncthing/device"
+
+  if [ "$(syncthing cli config defaults ignores dump-json | jq -r '.lines[]')" != "$(cat "${ignores}")" ]; then
+    syncthing cli operations default-ignores "${ignores}"
+    printf '%s\n' "Set Syncthing default ignores."
+  fi
+
+  while read -r device name address; do
+    ! syncthing cli config devices list | grep -Fqx "${device}" || continue
+    syncthing cli config devices add --device-id "${device}" --name "${name}" --addresses "${address}"
+    printf '%s\n' "Added Syncthing device ${name}."
+  done <"${dotfiles}/syncthing/devices"
+
+  while read -r id path; do
+    symlink "${ignores}" "${HOME}/${path}/.stignore"
+
+    if ! syncthing cli config folders list | grep -Fqx "${id}"; then
+      syncthing cli config folders add --id "${id}" --path "~/${path}"
+      printf '%s\n' "Added Syncthing folder ${id}."
+    fi
+
+    if [ "$(syncthing cli config folders "${id}" path get)" != "~/${path}" ]; then
+      syncthing cli config folders "${id}" path set -- "~/${path}"
+      printf '%s\n' "Set Syncthing folder ${id} path to ~/${path}."
+    fi
+
+    while read -r device _; do
+      ! syncthing cli config folders "${id}" devices list | grep -Fqx "${device}" || continue
+      syncthing cli config folders "${id}" devices add --device-id "${device}"
+      printf '%s\n' "Shared Syncthing folder ${id} with ${device}."
+    done <"${dotfiles}/syncthing/devices"
+  done <"${dotfiles}/syncthing/folders"
 )
 
 configure_macos() (
