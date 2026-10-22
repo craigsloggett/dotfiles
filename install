@@ -549,17 +549,22 @@ configure_syncthing() (
     printf '%s\n' "Added Syncthing device ${name}."
   done <"${dotfiles}/syncthing/devices"
 
-  while read -r id path; do
+  while read -r id path label; do
     symlink "${ignores}" "${HOME}/${path}/.stignore"
 
     if ! syncthing cli config folders list | grep -Fqx "${id}"; then
-      syncthing cli config folders add --id "${id}" --path "~/${path}"
+      syncthing cli config folders add --id "${id}" --path "~/${path}" --label "${label}"
       printf '%s\n' "Added Syncthing folder ${id}."
     fi
 
     if [ "$(syncthing cli config folders "${id}" path get)" != "~/${path}" ]; then
       syncthing cli config folders "${id}" path set -- "~/${path}"
       printf '%s\n' "Set Syncthing folder ${id} path to ~/${path}."
+    fi
+
+    if [ "$(syncthing cli config folders "${id}" label get)" != "${label}" ]; then
+      syncthing cli config folders "${id}" label set -- "${label}"
+      printf '%s\n' "Set Syncthing folder ${id} label to ${label}."
     fi
 
     while read -r device _; do
