@@ -453,6 +453,7 @@ configure_claude() {
     for conf in settings.json CLAUDE.md statusline-command.sh agents hooks rules skills; do
       symlink "${dotfiles}/claude/${conf}" "${config_dir}/${conf}"
     done
+    symlink "${dotfiles}/claude/mcp${config_dir##*/claude}.json" "${config_dir}/mcp.json"
   done
 }
 
