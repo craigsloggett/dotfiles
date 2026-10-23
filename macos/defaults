@@ -31,17 +31,18 @@ write() {
   esac
 }
 
+application_directory() {
+  for directory in /System/Applications /System/Applications/Utilities /Applications; do
+    [ ! -d "${directory}/$1.app" ] || break
+  done
+  printf '%s\n' "${directory}"
+}
+
 dock() {
   apps="$*"
   urls=''
   for application in "$@"; do
-    directory=/Applications
-    if [ -d "/System/Applications/${application}.app" ]; then
-      # The App is one of Apple's built-in applications.
-      directory=/System/Applications
-    else
-      directory=/Applications
-    fi
+    directory="$(application_directory "${application}")"
 
     [ -d "${directory}/${application}.app" ] || printf '%s\n' "${application}.app not found" >&2
 
@@ -180,6 +181,33 @@ menu_bar() {
 siri() {
   # Siri = Disabled
   write com.apple.assistant.support 'Assistant Enabled' -bool false
+
+  for application in \
+    Calendar \
+    Contacts \
+    Firefox \
+    Ghostty \
+    KeePassXC \
+    Mail \
+    Messages \
+    Notes \
+    Obsidian \
+    Photos \
+    Rectangle \
+    Reminders \
+    Safari \
+    Signal \
+    Slack \
+    Terminal \
+    TextEdit; do
+    directory="$(application_directory "${application}")"
+    [ -d "${directory}/${application}.app" ] || continue
+    set -- "$@" "$(defaults read "${directory}/${application}.app/Contents/Info" CFBundleIdentifier)"
+  done
+  # App Access -> <App Name> -> Learn from this application = Disabled
+  defaults write com.apple.suggestions SiriCanLearnFromAppBlacklist -array "$@"
+  # App Access -> <App Name> -> Show Siri Suggestions in application = Disabled
+  defaults write com.apple.suggestions AppCanShowSiriSuggestionsBlacklist -array "$@"
 }
 
 wallpaper() {
