@@ -308,6 +308,10 @@ configure_zsh() {
   remove "${HOME}/.zcompdump" "${HOME}/.zsh_sessions" "${HOME}/.zprofile" "${HOME}/.zshrc"
 }
 
+configure_editorconfig() {
+  symlink "${dotfiles}/editorconfig/.editorconfig" "${HOME}/.editorconfig"
+}
+
 configure_vim() {
   symlink "${dotfiles}/vim" "${XDG_CONFIG_HOME}/vim"
   migrate "${HOME}/.viminfo" "${XDG_STATE_HOME}/vim/viminfo"
@@ -624,6 +628,7 @@ main() {
   configure_homebrew
   pull_ssh_keys
   configure_zsh
+  configure_editorconfig
 
   for tool in \
     aws \

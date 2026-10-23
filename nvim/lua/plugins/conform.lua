@@ -9,11 +9,6 @@ require("conform").setup({
   formatters_by_ft = {
     sh = { "shfmt" }
   },
-  formatters = {
-    shfmt = {
-      args = { "-i", "2", "-ci", "--filename", "$FILENAME" }
-    }
-  },
   format_on_save = {
     lsp_format = "fallback"
   }
