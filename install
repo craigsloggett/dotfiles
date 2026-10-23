@@ -435,7 +435,7 @@ configure_ghostty() {
   done
 }
 
-configure_claude() {
+configure_claude() (
   migrate "${HOME}/.claude" "${CLAUDE_CONFIG_DIR}"
   migrate "${HOME}/.claude.json" "${CLAUDE_CONFIG_DIR}/.claude.json"
 
@@ -453,8 +453,31 @@ configure_claude() {
     for conf in settings.json CLAUDE.md statusline-command.sh agents hooks rules skills; do
       symlink "${dotfiles}/claude/${conf}" "${config_dir}/${conf}"
     done
+
+    declared="${dotfiles}/claude/mcp${config_dir##*/claude}.json"
+    [ -e "${declared}" ] || continue
+
+    state="${config_dir}/.claude.json"
+    wanted_names="$(jq -r '.mcpServers | keys[]' "${declared}")"
+    current_names="$(jq -r '.mcpServers // {} | keys[]' "${state}" 2>/dev/null || :)"
+
+    for name in ${wanted_names}; do
+      wanted="$(jq -Sc --arg name "${name}" '.mcpServers[$name]' "${declared}")"
+      current="$(jq -Sc --arg name "${name}" '.mcpServers[$name]' "${state}" 2>/dev/null || :)"
+      [ "${current}" != "${wanted}" ] || continue
+
+      CLAUDE_CONFIG_DIR="${config_dir}" claude mcp remove --scope user "${name}" >/dev/null 2>&1 || :
+      CLAUDE_CONFIG_DIR="${config_dir}" claude mcp add-json --scope user "${name}" "${wanted}" >/dev/null
+      printf '%s\n' "Added Claude MCP server ${name} to ${config_dir##*/}."
+    done
+
+    for name in ${current_names}; do
+      ! printf '%s\n' "${wanted_names}" | grep -Fqx "${name}" || continue
+      CLAUDE_CONFIG_DIR="${config_dir}" claude mcp remove --scope user "${name}" >/dev/null
+      printf '%s\n' "Removed Claude MCP server ${name} from ${config_dir##*/}."
+    done
   done
-}
+)
 
 configure_rustup() {
   migrate "${HOME}/.rustup" "${RUSTUP_HOME}"
