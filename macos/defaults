@@ -54,7 +54,10 @@ dock() {
     shift
   done
 
-  current="$({ defaults read com.apple.dock persistent-apps; defaults read com.apple.dock persistent-others; } 2>/dev/null |
+  current="$({
+    defaults read com.apple.dock persistent-apps
+    defaults read com.apple.dock persistent-others
+  } 2>/dev/null |
     sed -n 's/.*"_CFURLString" = "\(.*\)";/\1/p' | paste -s -d ' ' -)"
   [ "${current}" != "${urls}" ] || return 0
 

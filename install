@@ -403,11 +403,15 @@ configure_terraform() {
   remove_empty "${HOME}/.terraform.d"
 }
 
-configure_tflint() {
+configure_tflint() (
   symlink "${dotfiles}/tflint" "${XDG_CONFIG_HOME}/tflint"
   migrate "${HOME}/.tflint.d" "${XDG_DATA_HOME}/tflint"
   make_dirs "${XDG_DATA_HOME}/tflint"
-}
+
+  directory="$(mktemp -d)"
+  tflint --chdir "${directory}" >/dev/null 2>&1 || tflint --chdir "${directory}" --init
+  rmdir "${directory}"
+)
 
 configure_yamllint() {
   symlink "${dotfiles}/yamllint" "${XDG_CONFIG_HOME}/yamllint"
@@ -621,7 +625,32 @@ main() {
   pull_ssh_keys
   configure_zsh
 
-  for tool in vim nvim git gpg go pass less python3 bundle terraform tflint yamllint yamlfmt ghostty claude rustup cargo npm bun docker colima aws kubectl codex syncthing; do
+  for tool in \
+    aws \
+    bun \
+    bundle \
+    cargo \
+    claude \
+    codex \
+    colima \
+    docker \
+    ghostty \
+    git \
+    go \
+    gpg \
+    kubectl \
+    less \
+    npm \
+    nvim \
+    pass \
+    python3 \
+    rustup \
+    syncthing \
+    terraform \
+    tflint \
+    vim \
+    yamlfmt \
+    yamllint; do
     command -v "${tool}" >/dev/null || continue
     "configure_${tool}"
   done

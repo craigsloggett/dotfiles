@@ -4,3 +4,9 @@ vim.diagnostic.config({
 })
 
 vim.keymap.set("n", "gd", vim.lsp.buf.definition)
+
+vim.lsp.enable({
+  "lua_ls",
+  "terraformls",
+  "tflint"
+})
