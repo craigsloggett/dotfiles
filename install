@@ -445,8 +445,13 @@ configure_claude() {
     migrate "${entry}" "${CLAUDE_CODE_PLUGIN_CACHE_DIR}/${entry##*/}"
   done
 
-  for conf in settings.json CLAUDE.md statusline-command.sh agents hooks rules skills; do
-    symlink "${dotfiles}/claude/${conf}" "${CLAUDE_CONFIG_DIR}/${conf}"
+  make_dirs "${CLAUDE_CONFIG_DIR}"
+
+  for config_dir in "${CLAUDE_CONFIG_DIR}" "${XDG_CONFIG_HOME}"/claude-*; do
+    [ -d "${config_dir}" ] || continue
+    for conf in settings.json CLAUDE.md statusline-command.sh agents hooks rules skills; do
+      symlink "${dotfiles}/claude/${conf}" "${config_dir}/${conf}"
+    done
   done
 }
 

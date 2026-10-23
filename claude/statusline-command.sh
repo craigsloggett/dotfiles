@@ -64,6 +64,10 @@ main() {
 
   statusline="${statusline} · ${short_workspace_directory}"
 
+  account="${CLAUDE_CONFIG_DIR##*/}"
+  account="${account#claude-}"
+  [ "${account}" = claude ] || statusline="${account} · ${statusline}"
+
   printf '%s' "${statusline}"
 }
 
