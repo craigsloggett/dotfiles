@@ -415,6 +415,7 @@ configure_tflint() (
   directory="$(mktemp -d)"
   tflint --chdir "${directory}" >/dev/null 2>&1 || tflint --chdir "${directory}" --init
   rmdir "${directory}"
+  remove "${HOME}/.sigstore"
 )
 
 configure_yamllint() {
