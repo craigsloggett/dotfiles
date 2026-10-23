@@ -18,12 +18,9 @@ privacy_and_security() {
       sudo -n -v 2>/dev/null || printf '%s\n' "Unsetting DiagnosticMessagesHistory AutoSubmit needs sudo access."
       sudo defaults delete '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' AutoSubmit
     )
-  # Analytics & Improvements -> Share with App Developers = Unset
-  ! defaults read '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' ThirdPartyDataSubmit >/dev/null 2>&1 ||
-    (
-      sudo -n -v 2>/dev/null || printf '%s\n' "Unsetting DiagnosticMessagesHistory ThirdPartyDataSubmit needs sudo access."
-      sudo defaults delete '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' ThirdPartyDataSubmit
-    )
+
+  # Analytics & Improvements -> Share with App Developers = Disabled
+  write '/Library/Application Support/CrashReporter/DiagnosticMessagesHistory' ThirdPartyDataSubmit -bool false
 
   # Apple Advertising -> Personalized Ads = Disabled
   write com.apple.AdLib allowApplePersonalizedAdvertising -bool false
