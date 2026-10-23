@@ -7,4 +7,4 @@ write org.mozilla.firefox SanitizeOnShutdown__Exceptions__2 -string https://gith
 write org.mozilla.firefox SanitizeOnShutdown__Exceptions__3 -string https://spotify.com
 
 # Dock items, left to right
-dock Mail Calendar Firefox Ghostty Slack KeePassXC Obsidian
+dock Mail Calendar Firefox Ghostty Slack Signal KeePassXC Obsidian Hark
