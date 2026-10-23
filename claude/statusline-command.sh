@@ -66,7 +66,10 @@ main() {
 
   account="${CLAUDE_CONFIG_DIR##*/}"
   account="${account#claude-}"
-  [ "${account}" = claude ] || statusline="${account} · ${statusline}"
+  if [ "${account}" != claude ] && [ -n "${account}" ]; then
+    first=$(printf '%s' "${account%"${account#?}"}" | tr '[:lower:]' '[:upper:]')
+    statusline="${first}${account#?} · ${statusline}"
+  fi
 
   printf '%s' "${statusline}"
 }
