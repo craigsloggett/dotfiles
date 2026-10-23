@@ -449,6 +449,7 @@ configure_claude() {
 
   for config_dir in "${CLAUDE_CONFIG_DIR}" "${XDG_CONFIG_HOME}"/claude-*; do
     [ -d "${config_dir}" ] || continue
+    [ -L "${config_dir}/settings.json" ] || remove "${config_dir}/settings.json"
     for conf in settings.json CLAUDE.md statusline-command.sh agents hooks rules skills; do
       symlink "${dotfiles}/claude/${conf}" "${config_dir}/${conf}"
     done
