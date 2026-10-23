@@ -560,6 +560,84 @@ rectangle() {
   write com.knollsoft.Rectangle SUEnableAutomaticChecks -bool true
 }
 
+utm() {
+  [ -d /Applications/UTM.app ] || return 0
+
+  # Application -> Keep UTM running after last window is closed and all VMs are shut down = Disabled
+  write com.utmapp.UTM KeepRunningAfterLastWindowClosed -bool false
+  # Application -> Show dock icon = Enabled
+  write com.utmapp.UTM HideDockIcon -bool false
+  # Application -> Show menu bar icon = Disabled
+  write com.utmapp.UTM ShowMenuIcon -bool false
+  # Application -> Prevent system from sleeping when any VM is running = Disabled
+  write com.utmapp.UTM PreventIdleSleep -bool false
+  # Application -> Running VMs on quit = Save State
+  write com.utmapp.UTM QuitRunningVirtualMachinesPolicy -int 0
+  # Application -> Do not show confirmation when closing a running VM = Disabled
+  write com.utmapp.UTM NoQuitConfirmation -bool false
+  # Application -> QEMU USB -> Do not show prompt when USB device is plugged in = Disabled
+  write com.utmapp.UTM NoUsbPrompt -bool false
+
+  # Display -> Disable VM screenshot = Disabled
+  write com.utmapp.UTM NoScreenshot -bool false
+  # Display -> Do not save VM screenshot to disk = Disabled
+  write com.utmapp.UTM NoSaveScreenshot -bool false
+  # Display -> Fill the area beside the camera housing in full screen = Disabled
+  write com.utmapp.UTM FullScreenUseCameraHousingArea -bool false
+  # Display -> QEMU Graphics Acceleration -> Renderer Backend = Default
+  write com.utmapp.UTM QEMURendererBackend -int 0
+  # Display -> QEMU Graphics Acceleration -> Vulkan Driver = Default
+  write com.utmapp.UTM QEMUVulkanDriver -int 0
+  # Display -> QEMU Graphics Acceleration -> DirectX Driver = Default
+  write com.utmapp.UTM QEMUDirectXDriver -int 0
+  # Display -> QEMU Graphics Acceleration -> FPS Limit = None
+  write com.utmapp.UTM QEMURendererFPSLimit -int 0
+
+  # Sound -> QEMU Sound -> Sound Backend = Default
+  write com.utmapp.UTM QEMUSoundBackend -int 0
+
+  # Input -> Mouse/Keyboard -> Capture input automatically when entering full screen = Disabled
+  write com.utmapp.UTM FullScreenAutoCapture -bool false
+  # Input -> Mouse/Keyboard -> Capture input automatically when window is focused = Disabled
+  write com.utmapp.UTM WindowFocusAutoCapture -bool false
+  # Input -> Console -> Option is Meta key = Disabled
+  write com.utmapp.UTM OptionAsMetaKey -bool false
+  # Input -> QEMU Pointer -> Hold Control for right click = Disabled
+  write com.utmapp.UTM CtrlRightClick -bool false
+  # Input -> QEMU Pointer -> Invert scrolling = Disabled
+  write com.utmapp.UTM InvertScroll -bool false
+  # Input -> QEMU Pointer -> Handle input on initial click = Disabled
+  write com.utmapp.UTM HandleInitialClick -bool false
+  # Input -> QEMU Keyboard -> Use Command+Option for input capture/release = Disabled
+  write com.utmapp.UTM AlternativeCaptureKey -bool false
+  # Input -> QEMU Keyboard -> Caps Lock is treated as a key = Disabled
+  write com.utmapp.UTM IsCapsLockKey -bool false
+  # Input -> QEMU Keyboard -> Num Lock is forced on = Disabled
+  write com.utmapp.UTM IsNumLockForced -bool false
+  # Input -> QEMU Keyboard -> Control, Option, and Command keys = Default
+  write com.utmapp.UTM IsCtrlCmdSwapped -bool false
+  write com.utmapp.UTM IsCmdOptSwapped -bool false
+  # Input -> QEMU Keyboard -> Swap the leftmost key on the number row and the key next to left shift on ISO keyboards = Disabled
+  write com.utmapp.UTM IsISOKeySwapped -bool false
+
+  # Network -> Cloning -> Regenerate MAC addresses on clone = Disabled
+  write com.utmapp.UTM IsRegenerateMACOnClone -bool false
+
+  # Files -> QEMU Backend -> Lock drive images when in use = Enabled
+  write com.utmapp.UTM UseFileLock -bool true
+
+  # Server -> Startup -> Automatically start UTM server = Disabled
+  write com.utmapp.UTM ServerAutostart -bool false
+  # Server -> Network -> Reject unknown connections by default = Disabled
+  write com.utmapp.UTM ServerAutoblock -bool false
+  # Server -> Network -> Allow access from external clients = Disabled
+  write com.utmapp.UTM ServerExternal -bool false
+  # Server -> Network -> Port = Any
+  write com.utmapp.UTM ServerPort -int 0
+  # Server -> Authentication -> Require Password = Disabled
+  write com.utmapp.UTM ServerPasswordRequired -bool false
+}
+
 main() {
   changed=''
 
@@ -594,6 +672,7 @@ main() {
   firefox
   ghostty
   rectangle
+  utm
 }
 
 main "$@"
