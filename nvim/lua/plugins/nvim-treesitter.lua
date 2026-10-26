@@ -2,6 +2,7 @@ local parsers = {
   "bash",
   "comment",
   "hcl",
+  "json",
   "terraform",
   "yaml",
   "zsh"
