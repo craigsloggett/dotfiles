@@ -454,25 +454,12 @@ configure_claude() (
       symlink "${dotfiles}/claude/${conf}" "${config_dir}/${conf}"
     done
 
-    declared="${dotfiles}/claude/mcp${config_dir##*/claude}.json"
-    [ -e "${declared}" ] || continue
+    symlink "${dotfiles}/claude/mcp${config_dir##*/claude}.json" "${config_dir}/mcp.json"
 
     state="${config_dir}/.claude.json"
-    wanted_names="$(jq -r '.mcpServers | keys[]' "${declared}")"
     current_names="$(jq -r '.mcpServers // {} | keys[]' "${state}" 2>/dev/null || :)"
 
-    for name in ${wanted_names}; do
-      wanted="$(jq -Sc --arg name "${name}" '.mcpServers[$name]' "${declared}")"
-      current="$(jq -Sc --arg name "${name}" '.mcpServers[$name]' "${state}" 2>/dev/null || :)"
-      [ "${current}" != "${wanted}" ] || continue
-
-      CLAUDE_CONFIG_DIR="${config_dir}" claude mcp remove --scope user "${name}" >/dev/null 2>&1 || :
-      CLAUDE_CONFIG_DIR="${config_dir}" claude mcp add-json --scope user "${name}" "${wanted}" >/dev/null
-      printf '%s\n' "Added Claude MCP server ${name} to ${config_dir##*/}."
-    done
-
     for name in ${current_names}; do
-      ! printf '%s\n' "${wanted_names}" | grep -Fqx "${name}" || continue
       CLAUDE_CONFIG_DIR="${config_dir}" claude mcp remove --scope user "${name}" >/dev/null
       printf '%s\n' "Removed Claude MCP server ${name} from ${config_dir##*/}."
     done
