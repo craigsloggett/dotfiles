@@ -4,3 +4,7 @@ root = true
 indent_style = space
 indent_size = 2
 switch_case_indent = true
+simplify = true
+
+[*.zsh]
+ignore = true
