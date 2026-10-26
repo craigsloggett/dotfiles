@@ -2,6 +2,7 @@ tap "hashicorp/tap", trusted: true
 tap "terraform-linters/tap", trusted: true
 
 brew "actionlint"
+brew "container"
 brew "git"
 brew "gnupg"
 brew "hashicorp/tap/terraform", trusted: true
