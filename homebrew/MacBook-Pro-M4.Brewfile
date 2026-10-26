@@ -3,8 +3,10 @@ tap "terraform-linters/tap", trusted: true
 
 brew "actionlint"
 brew "container"
+brew "gh"
 brew "git"
 brew "gnupg"
+brew "go"
 brew "hashicorp/tap/terraform", trusted: true
 brew "jq"
 brew "neovim"
