@@ -1,1 +1,3 @@
+# shellcheck shell=sh
+
 export CODEX_HOME="${XDG_CONFIG_HOME}/codex"

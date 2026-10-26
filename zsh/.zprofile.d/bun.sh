@@ -1,3 +1,5 @@
+# shellcheck shell=sh
+
 export BUN_INSTALL="${XDG_DATA_HOME}/bun"
 export BUN_INSTALL_BIN="${XDG_BIN_HOME}"
 export BUN_CREATE_DIR="${XDG_DATA_HOME}/bun/create"

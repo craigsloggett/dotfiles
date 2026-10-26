@@ -590,11 +590,13 @@ configure_syncthing() (
   while read -r id path label; do
     symlink "${ignores}" "${HOME}/${path}/.stignore"
 
+    # shellcheck disable=SC2088
     if ! syncthing cli config folders list | grep -Fqx "${id}"; then
       syncthing cli config folders add --id "${id}" --path "~/${path}" --label "${label}"
       printf '%s\n' "Added Syncthing folder ${id}."
     fi
 
+    # shellcheck disable=SC2088
     if [ "$(syncthing cli config folders "${id}" path get)" != "~/${path}" ]; then
       syncthing cli config folders "${id}" path set -- "~/${path}"
       printf '%s\n' "Set Syncthing folder ${id} path to ~/${path}."
