@@ -1,6 +1,7 @@
 tap "hashicorp/tap", trusted: true
 tap "terraform-linters/tap", trusted: true
 
+brew "actionlint"
 brew "git"
 brew "gnupg"
 brew "hashicorp/tap/terraform", trusted: true
@@ -13,6 +14,8 @@ brew "shellcheck"
 brew "shfmt"
 brew "syncthing", start_service: true
 brew "tree-sitter-cli"
+brew "yamlfmt"
+brew "yamllint"
 brew "ykman"
 brew "zsh-autosuggestions"
 

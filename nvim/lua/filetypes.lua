@@ -3,3 +3,9 @@ vim.filetype.add({
     [".yamlfmt"] = "yaml"
   }
 })
+
+vim.filetype.add({
+  pattern = {
+    [".*/%.github/workflows/.*%.ya?ml"] = "yaml.ghaction"
+  }
+})

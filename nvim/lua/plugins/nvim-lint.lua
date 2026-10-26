@@ -6,7 +6,10 @@ vim.pack.add({
 })
 
 require("lint").linters_by_ft = {
-  sh = { "shellcheck" }
+  ghaction = { "actionlint" },
+  json = { "jq" },
+  sh = { "shellcheck" },
+  yaml = { "yamllint" }
 }
 
 vim.api.nvim_create_autocmd({ "FileType", "BufWritePost" }, {

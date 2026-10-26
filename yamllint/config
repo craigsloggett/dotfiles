@@ -1,8 +1,5 @@
 extends: relaxed
 
-ignore-from-file:
-  - .gitignore
-
 rules:
   comments:
     level: error
