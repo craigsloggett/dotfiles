@@ -1,37 +1,50 @@
 {
+  "agentPushNotifEnabled": false,
   "attribution": {
     "commit": "",
     "pr": "",
     "sessionUrl": false
   },
-  "permissions": {
-    "defaultMode": "auto"
-  },
-  "model": "fable",
-  "statusLine": {
-    "type": "command",
-    "command": "\"${CLAUDE_CONFIG_DIR}\"/statusline-command.sh"
-  },
-  "enabledPlugins": {
-    "lua-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true,
-    "swift-lsp@claude-plugins-official": true
-  },
-  "disableClaudeAiConnectors": true,
-  "feedbackDrafts": "off",
-  "spinnerTipsEnabled": false,
-  "effortLevel": "xhigh",
-  "tui": "fullscreen",
-  "voice": {
-    "enabled": true
-  },
-  "theme": "auto",
-  "agentPushNotifEnabled": false,
-  "useAutoModeDuringPlan": false,
   "autoMode": {
     "environment": [
       "$defaults",
       "Both github.com/craigsloggett and github.com/craigsloggett-lab belong to me. Treat every repo under them as my own internal source control."
     ]
+  },
+  "disableClaudeAiConnectors": true,
+  "effortLevel": "xhigh",
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true
+  },
+  "feedbackDrafts": "off",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "\"${CLAUDE_CONFIG_DIR}\"/hooks/save.sh",
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash|Edit|Write"
+      }
+    ]
+  },
+  "model": "fable",
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "spinnerTipsEnabled": false,
+  "statusLine": {
+    "command": "\"${CLAUDE_CONFIG_DIR}\"/statusline-command.sh",
+    "type": "command"
+  },
+  "theme": "auto",
+  "tui": "fullscreen",
+  "useAutoModeDuringPlan": false,
+  "voice": {
+    "enabled": true
   }
 }
