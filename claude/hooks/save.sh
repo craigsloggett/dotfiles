@@ -22,7 +22,7 @@ changed="$({
 })"
 
 status=0
-for type in shell json; do
+for type in shell json yaml; do
   printf '%s\n' "${changed}" | xargs "${0%/*}/${type}.sh" || status=2
 done
 exit "${status}"
