@@ -282,6 +282,18 @@ clone_dotfiles() {
   git clone "https://github.com/${repo}.git" "${dotfiles}"
 }
 
+require_app_store() (
+  brewfile="${XDG_CONFIG_HOME}/homebrew/Brewfile"
+
+  grep -q '^mas ' "${brewfile}" || return 0
+  HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew bundle check --global --no-upgrade --verbose 2>&1 |
+    grep -q '^→ App ' || return 0
+
+  need_sudo "Installing App Store apps needs sudo access."
+  open -a 'App Store'
+  ask 'Sign in to the App Store in the window that just opened, then press Enter' >/dev/null
+)
+
 configure_homebrew() {
   install_homebrew
   symlink "${dotfiles}/homebrew/brew.env" "${XDG_CONFIG_HOME}/homebrew/brew.env"
@@ -289,7 +301,9 @@ configure_homebrew() {
   [ -e "${XDG_CONFIG_HOME}/homebrew/Brewfile" ] || return 0
 
   if ! HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew bundle check --global --no-upgrade >/dev/null 2>&1; then
-    /opt/homebrew/bin/brew bundle install --global --no-upgrade
+    require_app_store
+    /opt/homebrew/bin/brew bundle install --global --no-upgrade ||
+      conflict "Homebrew could not install everything, sign in to the App Store if an App failed."
   fi
 
   HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew bundle cleanup --global --force

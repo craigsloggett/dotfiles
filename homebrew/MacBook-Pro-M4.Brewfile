@@ -9,6 +9,7 @@ brew "gnupg"
 brew "go"
 brew "hashicorp/tap/terraform", trusted: true
 brew "jq"
+brew "mas"
 brew "neovim"
 brew "openssh"
 brew "pass"
@@ -35,3 +36,5 @@ cask "signal"
 cask "slack"
 cask "terraform-linters/tap/tflint", trusted: true
 cask "utm"
+
+mas "WireGuard", id: 1451685025
