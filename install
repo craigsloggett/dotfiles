@@ -441,6 +441,10 @@ configure_yamlfmt() {
   symlink "${dotfiles}/yamlfmt" "${XDG_CONFIG_HOME}/yamlfmt"
 }
 
+configure_gh() {
+  symlink "${dotfiles}/gh/config.yml" "${XDG_CONFIG_HOME}/gh/config.yml"
+}
+
 configure_ghostty() {
   symlink "${dotfiles}/ghostty" "${XDG_CONFIG_HOME}/ghostty"
   migrate "${HOME}/.terminfo" "${TERMINFO}"
@@ -673,6 +677,7 @@ main() {
     codex \
     colima \
     docker \
+    gh \
     ghostty \
     git \
     go \
