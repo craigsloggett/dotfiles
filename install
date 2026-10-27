@@ -383,6 +383,7 @@ configure_gpg() (
 
 configure_go() {
   migrate "${HOME}/go" "${GOPATH}"
+  make_dirs "${GOBIN}"
 
   for binary in "${GOPATH}"/bin/*; do
     [ -e "${binary}" ] || continue

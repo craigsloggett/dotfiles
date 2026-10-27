@@ -7,6 +7,7 @@ brew "gh"
 brew "git"
 brew "gnupg"
 brew "go"
+brew "golangci-lint"
 brew "hashicorp/tap/terraform", trusted: true
 brew "jq"
 brew "mas"
@@ -23,6 +24,7 @@ brew "yamllint"
 brew "ykman"
 brew "zsh-autosuggestions"
 
+brew "gopls"
 brew "lua-language-server"
 brew "terraform-ls"
 

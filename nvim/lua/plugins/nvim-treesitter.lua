@@ -3,6 +3,7 @@ local parsers = {
   "comment",
   "hcl",
   "json",
+  "go",
   "terraform",
   "yaml",
   "zsh"

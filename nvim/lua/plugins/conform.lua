@@ -7,11 +7,15 @@ vim.pack.add({
 
 require("conform").setup({
   formatters_by_ft = {
+    go = { "golangci-lint" },
     json = { "jq" },
     sh = { "shfmt" },
     yaml = { "yamlfmt" }
   },
   formatters = {
+    ["golangci-lint"] = {
+      cwd = require("conform.util").root_file({ ".golangci.yml", "go.mod" })
+    },
     jq = {
       prepend_args = { "-S" }
     }
