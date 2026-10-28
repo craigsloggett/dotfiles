@@ -1,4 +1,4 @@
 {
-  "description": "Code conventions, comment policy, POSIX awk, and the consistency audit",
+  "description": "Conventions for writing and reviewing code.",
   "name": "conventions"
 }

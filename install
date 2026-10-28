@@ -472,13 +472,19 @@ configure_claude() (
     [ "${profile}" != default ] || config_dir="${CLAUDE_CONFIG_DIR}"
     make_dirs "${config_dir}"
 
-    [ -L "${config_dir}/settings.json" ] || remove "${config_dir}/settings.json"
+    [ -L "${config_dir}/settings.json" ] ||
+      remove "${config_dir}/settings.json"
     for conf in settings.json CLAUDE.md statusline-command.sh hooks; do
       symlink "${dotfiles}/claude/${conf}" "${config_dir}/${conf}"
     done
 
     for conf in mcp.json settings.json; do
-      [ -e "${profile_dir}${conf}" ] || conflict "The ${profile} profile cannot start, ${profile_dir}${conf} does not exist."
+      [ -e "${profile_dir}${conf}" ] ||
+        conflict "The ${profile} profile cannot start, ${profile_dir}${conf} does not exist."
+    done
+    find "${profile_dir}" -type l | while read -r link; do
+      [ -e "${link}" ] ||
+        conflict "The ${profile} profile links ${link#"${profile_dir}"} to $(readlink "${link}"), which does not exist."
     done
     symlink "${profile_dir%/}" "${config_dir}/profile"
     symlink "${profile_dir%/}/rules" "${config_dir}/rules"
