@@ -25,6 +25,7 @@ status=0
 for type in \
   go \
   json \
+  markdown \
   shell \
   terraform \
   yaml; do

@@ -5,9 +5,10 @@ paths:
 
 ## Style
 
+- Format with rumdl and ensure the file passes `rumdl check`.
 - Use Title Case for headings.
 - Be clear and concise as possible by asking the question "if I remove this, will the reader misunderstand?", if they won't, remove it.
-- Set no line length limit on prose; never wrap to satisfy a character count, but keep wording clear and concise.
+- Wrap prose at 80 columns; tables, fenced code blocks, and a line whose only overflow is a URL are exempt.
 - Do not lead a bullet with a bold label. If `**Foo**: bar` is the whole bullet, write `Foo: bar` or drop the label.
 - Do not use `—` to describe a bullet point; migrate to a table in a new section if possible.
 - Keep lists tight: no blank lines between list items, or between a list and its introductory line.
