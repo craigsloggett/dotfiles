@@ -1,6 +1,7 @@
 # dotfiles
 
-Configuration and setup for macOS, applied by a single idempotent `install` script. It sets up a new machine and converges an old one to the same result.
+Configuration and setup for macOS, applied by a single idempotent `install`
+script. It sets up a new machine and converges an old one to the same result.
 
 ## Install
 
