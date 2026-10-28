@@ -441,6 +441,10 @@ configure_yamlfmt() {
   symlink "${dotfiles}/yamlfmt" "${XDG_CONFIG_HOME}/yamlfmt"
 }
 
+configure_rumdl() {
+  symlink "${dotfiles}/rumdl" "${XDG_CONFIG_HOME}/rumdl"
+}
+
 configure_gh() {
   symlink "${dotfiles}/gh/config.yml" "${XDG_CONFIG_HOME}/gh/config.yml"
 }
@@ -702,6 +706,7 @@ main() {
     nvim \
     pass \
     python3 \
+    rumdl \
     rustup \
     syncthing \
     terraform \

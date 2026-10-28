@@ -1,0 +1,59 @@
+[global]
+flavor = "obsidian"
+line-length = 80
+enable = [
+  "MD001",
+  "MD004",
+  "MD009",
+  "MD012",
+  "MD013",
+  "MD022",
+  "MD027",
+  "MD029",
+  "MD030",
+  "MD031",
+  "MD039",
+  "MD047",
+  "MD049",
+  "MD050",
+  "MD058",
+  "MD060",
+  "MD063",
+  "MD064",
+  "MD067",
+  "MD069",
+  "MD071",
+  "MD076"
+]
+
+[per-file-ignores]
+"~/.local/share/obsidian/**/*.md" = ["MD013"]
+
+[MD004]
+style = "consistent"
+
+[MD009]
+br-spaces = 0
+
+[MD013]
+code-blocks = false
+tables = false
+reflow = true
+
+[MD029]
+style = "ordered"
+
+[MD049]
+style = "consistent"
+
+[MD050]
+style = "consistent"
+
+[MD060]
+style = "aligned"
+
+[MD063]
+style = "title-case"
+
+[MD076]
+style = "tight"
