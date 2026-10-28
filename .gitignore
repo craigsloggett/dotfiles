@@ -1,5 +1,5 @@
 **/.stfolder
 **/.stignore
 git/config-*
-claude/skills/synced/**
-claude/mcp-*.json
+claude/profiles/*
+!claude/profiles/default

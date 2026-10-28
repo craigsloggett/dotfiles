@@ -1,7 +1,7 @@
 ---
 paths:
   - '**/.claude/rules/*.md'
-  - '**/claude/rules/*.md'
+  - '**/claude/profiles/*/rules/*.md'
 ---
 
 ## Frontmatter

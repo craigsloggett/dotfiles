@@ -1,7 +1,7 @@
 ---
 paths:
   - '**/.claude/agents/*.md'
-  - '**/claude/agents/*.md'
+  - '**/claude/profiles/*/plugins/*/agents/*.md'
 ---
 
 ## Frontmatter
