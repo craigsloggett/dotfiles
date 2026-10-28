@@ -15,6 +15,7 @@ brew "neovim"
 brew "openssh"
 brew "pass"
 brew "ripgrep"
+brew "rumdl"
 brew "shellcheck"
 brew "shfmt"
 brew "syncthing", start_service: true
