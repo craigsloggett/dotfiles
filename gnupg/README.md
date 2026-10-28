@@ -37,13 +37,15 @@ Please specify how long the key should be valid.
 Key is valid for? (0) 1y
 ```
 
-At this point, it will ask for your name and email and a password for the key pair. To confirm the key,
+At this point, it will ask for your name and email and a password for the key
+pair. To confirm the key,
 
 ```shell
 gpg --list-secret-keys --with-subkey-fingerprints
 ```
 
-For increased security, it is recommended that you use only subkeys on your regular machine and store your master key offline.
+For increased security, it is recommended that you use only subkeys on your
+regular machine and store your master key offline.
 
 ## Generate the GPG Signing Subkey
 
@@ -86,7 +88,8 @@ Please specify how long the key should be valid.
 Key is valid for? (0) 1y
 ```
 
-To remove the Sign capability from the primary key, type `change-usage` at the `gpg>` prompt:
+To remove the Sign capability from the primary key, type `change-usage` at the
+`gpg>` prompt:
 
 ```shell
 Possible actions for this ECC key: Sign Certify Authenticate
@@ -117,14 +120,16 @@ We need to remove the primary key from our main machine:
 gpg --delete-secret-keys XXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
-Then import just the subkeys which allow us to sign and encrypt from our local device, but not
-be able to generate new subkeys without re-importing the master key.
+Then import just the subkeys which allow us to sign and encrypt from our local
+device, but not be able to generate new subkeys without re-importing the master
+key.
 
 ```shell
 gpg --import secret-subkeys.gpg
 ```
 
-Now, we want to trust the imported keys by entering in `trust` in the `gpg>` prompt:
+Now, we want to trust the imported keys by entering in `trust` in the `gpg>`
+prompt:
 
 ```shell
 gpg --edit-key XXXXXXXXXXXXXXXXXXXXXXXXXXXX
