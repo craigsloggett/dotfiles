@@ -37,6 +37,7 @@ br-spaces = 0
 
 [MD013]
 code-blocks = false
+code-spans = false
 tables = false
 reflow = true
 
@@ -54,6 +55,7 @@ style = "aligned"
 
 [MD063]
 style = "title-case"
+min-level = 2
 
 [MD076]
 style = "tight"
