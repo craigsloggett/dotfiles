@@ -56,6 +56,26 @@ style = "aligned"
 [MD063]
 style = "title-case"
 min-level = 2
+ignore-words = [
+  "API",
+  "Auth0",
+  "GitHub",
+  "ID",
+  "JSON",
+  "JWT",
+  "JWT-SVID",
+  "LLM",
+  "MCP",
+  "mTLS",
+  "OIDC",
+  "Redpanda",
+  "RFC",
+  "SCIM",
+  "SPIFFE",
+  "SPIRE",
+  "SVID",
+  "X.509-SVID"
+]
 
 [MD076]
 style = "tight"
