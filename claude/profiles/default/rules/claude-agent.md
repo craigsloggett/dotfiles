@@ -38,7 +38,7 @@ description: Use when a branch is ready for review to audit it against the rules
 
 - Use `##` for the document title and `###` for sections; do not use `#` (H1).
 
-## When To Create
+## When to Create
 
 - Create a subagent only for context isolation: verbose work you will not
   reference again that returns a summary to the main thread.
@@ -82,7 +82,7 @@ description: Use when a branch is ready for review to audit it against the rules
 - Note the trigger in the body: run an auditor at true handoff, behind green
   format and lint.
 
-## Model And Effort
+## Model and Effort
 
 - High-stakes judgment auditing gets `model: opus` or `effort: high`; low effort
   produces shallow misses.

@@ -27,14 +27,25 @@ Existing descriptions, tagged with their topics:
 
 !`gh repo list --json description,repositoryTopics -L 200 | jq -r '.[] | select(.description != null and .description != "") | "[\([.repositoryTopics[]?.name] | join(","))] \(.description)"'`
 
-1. Pre-flight. Run `gh auth status`; if it fails, hand back to the user to run `gh auth login`.
+1. Pre-flight. Run `gh auth status`; if it fails, hand back to the user to run
+   `gh auth login`.
 2. Resolve new-repo metadata.
-   - Owner `<owner>`: `$owner` if non-empty, else the authenticated user. Confirm.
-   - Name `<name>`: `$name` if non-empty, else ask. Reject anything not matching `^[A-Za-z0-9._-]+$`.
+   - Owner `<owner>`: `$owner` if non-empty, else the authenticated user.
+     Confirm.
+   - Name `<name>`: `$name` if non-empty, else ask. Reject anything not matching
+     `^[A-Za-z0-9._-]+$`.
    - Visibility: default public; use private only when asked.
-3. Propose topics from the vocabulary above, matching the user's phrasing. Examples: "composite action" or "GitHub action" becomes `composite-action`; "terraform module/provider" becomes `terraform` (add `hashicorp` for a HashiCorp product); "vault plugin" becomes `vault`; "shell script" or "POSIX" becomes `shell`. Let the user add, remove, or override; accept topics outside the vocabulary only if the user explicitly types them.
-4. Propose a one-sentence description in the style of the corpus samples whose topics overlap the proposed ones; show the samples used so the user can sanity-check. Empty is allowed but discouraged.
-5. Create the repo with an initial commit so the default branch exists (the ruleset, and any later release, need a branch to target):
+3. Propose topics from the vocabulary above, matching the user's phrasing.
+   Examples: "composite action" or "GitHub action" becomes `composite-action`;
+   "terraform module/provider" becomes `terraform` (add `hashicorp` for a
+   HashiCorp product); "vault plugin" becomes `vault`; "shell script" or "POSIX"
+   becomes `shell`. Let the user add, remove, or override; accept topics outside
+   the vocabulary only if the user explicitly types them.
+4. Propose a one-sentence description in the style of the corpus samples whose
+   topics overlap the proposed ones; show the samples used so the user can
+   sanity-check. Empty is allowed but discouraged.
+5. Create the repo with an initial commit so the default branch exists (the
+   ruleset, and any later release, need a branch to target):
 
    ```
    gh repo create <owner>/<name> \
@@ -57,8 +68,11 @@ Existing descriptions, tagged with their topics:
      --add-topic <topic1>,<topic2>,...
    ```
 
-   `--add-topic` takes a comma-separated list; omit it if no topics. If `gh` rejects a flag, stop and surface the error.
-7. Create the default branch ruleset (every repo gets this). Write the body to a temp file (`mktemp`) and post it with `gh api -X POST repos/<owner>/<name>/rulesets --input <file>`:
+   `--add-topic` takes a comma-separated list; omit it if no topics. If `gh`
+   rejects a flag, stop and surface the error.
+7. Create the default branch ruleset (every repo gets this). Write the body to a
+   temp file (`mktemp`) and post it with
+   `gh api -X POST repos/<owner>/<name>/rulesets --input <file>`:
 
    ```json
    {
@@ -79,9 +93,12 @@ Existing descriptions, tagged with their topics:
    }
    ```
 
-   `actor_id` 5 is the Repository admin role, a well-known value GitHub does not officially document. If the API rejects `bypass_actors`, surface the error rather than guessing another id.
+   `actor_id` 5 is the Repository admin role, a well-known value GitHub does not
+   officially document. If the API rejects `bypass_actors`, surface the error
+   rather than guessing another id.
 8. Report the created `<owner>/<name>`.
 
 ## Rules
 
-- `--add-readme` seeds an initial commit so the default branch exists; without it the ruleset POST has no branch to target.
+- `--add-readme` seeds an initial commit so the default branch exists; without
+  it the ruleset POST has no branch to target.

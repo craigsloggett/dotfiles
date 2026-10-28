@@ -8,12 +8,14 @@ paths:
 
 - Extract non-trivial shell logic into scripts in the `src/` directory.
 - Name the script after its composite action: `src/<action-name>.sh`.
-- Reference scripts via `${{ github.action_path }}/src/<action-name>.sh` with `shell: sh`.
+- Reference scripts via `${{ github.action_path }}/src/<action-name>.sh` with
+  `shell: sh`.
 - Never inline multi-line shell logic in `action.yml`.
 
 ## README
 
-- Document the action's interface with `## Inputs` and `## Outputs` tables as the final two README sections.
+- Document the action's interface with `## Inputs` and `## Outputs` tables as
+  the final two README sections.
 
 The inputs section columns, in order:
 

@@ -55,7 +55,8 @@ description: Use when ...
   folder lets you add `templates/`, `examples/`, or reference docs later without
   restructuring.
 - Split a section into its own file only when it is a standalone format spec, or
-  when the file would otherwise sprawl past ~150 lines. Otherwise keep it inline.
+  when the file would otherwise sprawl past ~150 lines. Otherwise keep it
+  inline.
 - Create supporting files lazily, only when you have something to write.
 
 ## Prose
