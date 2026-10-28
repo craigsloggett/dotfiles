@@ -14,6 +14,8 @@ require("lint").linters_by_ft = {
   yaml = { "yamllint" }
 }
 
+require("lint").linters.rumdl.stream = "stdout"
+
 vim.api.nvim_create_autocmd({ "FileType", "BufWritePost" }, {
   group = "UserAutoCmds",
   callback = function()
