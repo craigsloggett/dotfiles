@@ -9,6 +9,7 @@ require("conform").setup({
   formatters_by_ft = {
     go = { "golangci-lint" },
     json = { "jq" },
+    markdown = { "rumdl" },
     sh = { "shfmt" },
     yaml = { "yamlfmt" }
   },
@@ -18,6 +19,11 @@ require("conform").setup({
     },
     jq = {
       prepend_args = { "-S" }
+    },
+    rumdl = {
+      command = "rumdl",
+      args = { "fmt", "--stdin-filename", "$FILENAME", "-" },
+      stdin = true
     }
   },
   format_on_save = {
