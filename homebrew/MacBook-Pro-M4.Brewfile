@@ -19,6 +19,7 @@ brew "rumdl"
 brew "shellcheck"
 brew "shfmt"
 brew "syncthing", start_service: true
+brew "terraform-docs"
 brew "tree-sitter-cli"
 brew "yamlfmt"
 brew "yamllint"
