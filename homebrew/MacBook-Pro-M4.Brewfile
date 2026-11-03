@@ -8,6 +8,7 @@ brew "git"
 brew "gnupg"
 brew "go"
 brew "golangci-lint"
+brew "govulncheck"
 brew "hashicorp/tap/terraform", trusted: true
 brew "jq"
 brew "mas"
