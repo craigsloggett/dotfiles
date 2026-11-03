@@ -31,6 +31,25 @@ write() {
   esac
 }
 
+night_shift() {
+  plist=/private/var/root/Library/Preferences/com.apple.CoreBrightness
+  user="CBUser-$(dscl . -read "/Users/$(id -un)" GeneratedUID | cut -d ' ' -f 2)"
+
+  sudo -n -v 2>/dev/null || printf '%s\n' "Reading the Night Shift schedule needs sudo access."
+  current="$(sudo defaults export "${plist}" - | plutil -extract "${user}.CBBlueReductionStatus" xml1 -o - - 2>/dev/null)" || return 0
+  wanted="$(printf '%s' "${current}" |
+    plutil -replace BlueReductionMode -integer 2 -o - - |
+    plutil -replace BlueLightReductionSchedule.NightStartHour -integer "${1%:*}" -o - - |
+    plutil -replace BlueLightReductionSchedule.NightStartMinute -integer "${1#*:}" -o - - |
+    plutil -replace BlueLightReductionSchedule.DayStartHour -integer "${2%:*}" -o - - |
+    plutil -replace BlueLightReductionSchedule.DayStartMinute -integer "${2#*:}" -o - -)"
+  [ "${current}" != "${wanted}" ] || return 0
+
+  printf '%s\n' "com.apple.CoreBrightness BlueLightReductionSchedule: $1 to $2"
+  changed=1
+  sudo defaults write "${plist}" "${user}" -dict-add CBBlueReductionStatus "${wanted}"
+}
+
 application_directory() {
   for directory in /System/Applications /System/Applications/Utilities /Applications; do
     [ ! -d "${directory}/$1.app" ] || break
@@ -66,6 +85,76 @@ dock() {
   defaults write com.apple.dock persistent-apps -array "$@"
   defaults write com.apple.dock persistent-others -array
   killall Dock
+}
+
+coordinates() {
+  defaults read /Library/Preferences/.GlobalPreferences com.apple.TimeZonePref.Last_Selected_City |
+    sed -n '2,3p' | tr -d ' ",' | paste -s -d ' ' -
+}
+
+sun() {
+  awk -v latitude="$1" -v longitude="$2" -v day="$(date +%j)" -v offset="$(date +%z)" '
+    function rad(degrees) { return degrees * pi / 180 }
+    function deg(radians) { return radians * 180 / pi }
+    function asin(x) { return atan2(x, sqrt(1 - x * x)) }
+    function acos(x) { return atan2(sqrt(1 - x * x), x) }
+
+    function mod(x, m) {
+      x = x % m
+      return x < 0 ? x + m : x
+    }
+
+    function clock(hours,   minutes) {
+      minutes = int(hours * 60 + 0.5)
+      return sprintf("%02d:%02d", int(minutes / 60), minutes % 60)
+    }
+
+    # Sunrise/Sunset Algorithm from the Almanac for Computers (1990), accurate to about a minute.
+    function event(rising,
+      approximate_time, mean_anomaly, equation_of_center, true_longitude,
+      right_ascension, sin_declination, cos_declination, cos_hour_angle,
+      hour_angle, local_mean_time)
+    {
+      approximate_time = day + ((rising ? 6 : 18) - longitude / degrees_per_hour) / 24
+      mean_anomaly = mean_motion * approximate_time + mean_anomaly_at_year_start
+      equation_of_center = equation_of_center_first * sin(rad(mean_anomaly)) + equation_of_center_second * sin(rad(2 * mean_anomaly))
+      true_longitude = mod(mean_anomaly + equation_of_center + perihelion_longitude, 360)
+      right_ascension = mod(deg(atan2(cos_obliquity * sin(rad(true_longitude)), cos(rad(true_longitude)))), 360) / degrees_per_hour
+      sin_declination = sin_obliquity * sin(rad(true_longitude))
+      cos_declination = cos(asin(sin_declination))
+      cos_hour_angle = (cos(rad(zenith)) - sin_declination * sin(rad(latitude))) / (cos_declination * cos(rad(latitude)))
+
+      # The sun never crosses the horizon on this day (polar day or night).
+      if (cos_hour_angle > 1 || cos_hour_angle < -1) return "none"
+
+      hour_angle = (rising ? 360 - deg(acos(cos_hour_angle)) : deg(acos(cos_hour_angle))) / degrees_per_hour
+      local_mean_time = hour_angle + right_ascension - sidereal_gain_per_day * approximate_time - sidereal_time_at_year_start
+
+      return clock(mod(local_mean_time - longitude / degrees_per_hour + utc_offset, 24))
+    }
+    BEGIN {
+      pi = atan2(0, -1)
+      degrees_per_hour = 15
+
+      # Orbital elements of the Sun from the Almanac (angles in degrees, mean motion in degrees per day).
+      mean_motion = 0.9856
+      mean_anomaly_at_year_start = -3.289
+      equation_of_center_first = 1.916
+      equation_of_center_second = 0.020
+      perihelion_longitude = 282.634
+      cos_obliquity = 0.91764
+      sin_obliquity = 0.39782
+
+      # Greenwich sidereal time in hours at the start of the year, and its daily gain over solar time.
+      sidereal_time_at_year_start = 6.622
+      sidereal_gain_per_day = 0.06571
+
+      zenith = 90.833
+      utc_offset = (substr(offset, 1, 1) == "-" ? -1 : 1) * (substr(offset, 2, 2) + substr(offset, 4, 2) / 60)
+
+      print event(1), event(0)
+    }
+  '
 }
 
 network_firewall() {
@@ -208,6 +297,20 @@ siri() {
   defaults write com.apple.suggestions SiriCanLearnFromAppBlacklist -array "$@"
   # App Access -> <App Name> -> Show Siri Suggestions in application = Disabled
   defaults write com.apple.suggestions AppCanShowSiriSuggestionsBlacklist -array "$@"
+}
+
+displays() {
+  changed=''
+
+  location="$(coordinates)"
+  times="$(sun "${location% *}" "${location#* }")"
+
+  # Night Shift -> Schedule = Custom
+  # Night Shift -> From = Sunset, To = Sunrise
+  night_shift "${times#* }" "${times% *}"
+
+  # Restart the service to pick up the new values immediately.
+  [ -z "${changed}" ] || sudo killall corebrightnessd
 }
 
 wallpaper() {
@@ -655,6 +758,7 @@ main() {
   desktop_and_dock
   menu_bar
   siri
+  displays
   wallpaper
   lock_screen
   privacy_and_security
