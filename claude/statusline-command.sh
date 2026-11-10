@@ -33,11 +33,9 @@ main() {
   check_prerequisites || return 0
 
   now="$(date +%s)"
-  settings="${CLAUDE_CONFIG_DIR}/settings.json"
-  effort_level="$(jq -r '.effortLevel // empty' "${settings}" 2>/dev/null)"
-
   model_display_name="$(printf '%s' "${STATUSLINE_INPUT}" | jq -r '.model.display_name // empty')"
-  context_remaining="$(printf '%s' "${STATUSLINE_INPUT}" | jq -r '.context_window.remaining_percentage // 100')"
+  context_used="$(printf '%s' "${STATUSLINE_INPUT}" | jq -r '.context_window.used_percentage // 0')"
+  effort_level="$(printf '%s' "${STATUSLINE_INPUT}" | jq -r '.effort.level // empty')"
 
   workspace_directory="$(printf '%s' "${STATUSLINE_INPUT}" | jq -r '.workspace.current_dir // empty')"
   short_workspace_directory="$(printf '%s' "${workspace_directory}" | sed "s|^${HOME}|~|")"
@@ -49,8 +47,11 @@ main() {
   seven_day_resets_at="$(printf '%s' "${STATUSLINE_INPUT}" | jq -r '.rate_limits.seven_day.resets_at // empty')"
 
   statusline="${model_display_name}"
-  statusline="${statusline} · $((100 - context_remaining))%"
-  statusline="${statusline} · ${effort_level}"
+  statusline="${statusline} · $(printf '%.0f' "${context_used}")%"
+
+  if [ -n "${effort_level}" ]; then
+    statusline="${statusline} · ${effort_level}"
+  fi
 
   if [ -n "${five_hour_used}" ] && [ -n "${five_hour_resets_at}" ]; then
     five_hour_reset_in="$(format_duration $((five_hour_resets_at - now)))"

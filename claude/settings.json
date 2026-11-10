@@ -1,12 +1,7 @@
 {
   "agentPushNotifEnabled": false,
-  "attribution": {
-    "commit": "",
-    "pr": "",
-    "sessionUrl": false
-  },
+  "attribution": false,
   "disableClaudeAiConnectors": true,
-  "effortLevel": "xhigh",
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
@@ -26,13 +21,19 @@
       }
     ]
   },
-  "model": "claude-fable-5-1[1m]",
+  "model": "opus",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    }
+  },
   "permissions": {
     "defaultMode": "auto"
   },
   "spinnerTipsEnabled": false,
   "statusLine": {
     "command": "\"${CLAUDE_CONFIG_DIR}\"/statusline-command.sh",
+    "refreshInterval": 60,
     "type": "command"
   },
   "theme": "auto",
