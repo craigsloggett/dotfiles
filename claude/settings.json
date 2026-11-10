@@ -1,7 +1,11 @@
 {
   "agentPushNotifEnabled": false,
-  "attribution": false,
-  "disableClaudeAiConnectors": true,
+  "allowedMcpServers": [],
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
@@ -21,7 +25,7 @@
       }
     ]
   },
-  "model": "opus",
+  "model": "claude-fable-5-1[1m]",
   "modelSettings": {
     "claude-opus-5-5": {
       "effortLevel": "medium"

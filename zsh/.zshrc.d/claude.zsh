@@ -5,7 +5,6 @@ claude() {
 
   local -a options
   options=(
-    --strict-mcp-config
     --mcp-config="${config_dir}/profile/mcp.json"
     --settings="${config_dir}/profile/settings.json"
     --plugin-dir="${config_dir}/profile/plugins"
