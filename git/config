@@ -31,3 +31,5 @@
 # 	signingKey = ~/.ssh/id_ed25519_sk_rk
 # [includeIf "gitdir:~/Developer/GitHub/<COMPANY>/"]
 # 	path = ~/.config/git/config-work
+# [claude "file:///Users/<NAME>/<NON-REPO-DIR>"]
+# 	configDir = ~/.config/claude-work

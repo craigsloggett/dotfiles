@@ -1,6 +1,6 @@
 claude() {
   local config_dir
-  config_dir="$(git config --type=path --get claude.configDir 2>/dev/null)"
+  config_dir="$(git config --type=path --get-urlmatch claude.configDir "file://${PWD}" 2>/dev/null)"
   config_dir="${config_dir:-${CLAUDE_CONFIG_DIR}}"
 
   local -a options
