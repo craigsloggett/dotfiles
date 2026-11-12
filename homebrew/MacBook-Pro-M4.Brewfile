@@ -35,6 +35,7 @@ brew "terraform-ls"
 
 cask "azure-cli"
 cask "claude-code@latest"
+cask "devtunnel"
 cask "firefox"
 cask "ghostty"
 cask "keepassxc"

@@ -546,7 +546,24 @@ configure_colima() {
 }
 
 configure_aws() {
-  migrate "${HOME}/.aws" "${AWS_CONFIG_FILE%/*}"
+  migrate "${HOME}/.aws/config" "${AWS_CONFIG_FILE}"
+  migrate "${HOME}/.aws/credentials" "${AWS_SHARED_CREDENTIALS_FILE}"
+}
+
+configure_az() {
+  migrate "${HOME}/.azure" "${AZURE_CONFIG_DIR}"
+}
+
+configure_bazelisk() {
+  migrate "${HOME}/Library/Caches/bazelisk" "${BAZELISK_HOME}"
+}
+
+configure_devtunnel() {
+  migrate "${HOME}/Library/Application Support/DevTunnels" "${DEVTUNNELS_USER_STATE_DIR}"
+  # devtunnel ignores DEVTUNNELS_USER_STATE_DIR unless the directory exists.
+  make_dirs "${DEVTUNNELS_USER_STATE_DIR}"
+  remove "${HOME}/.net/osx-arm64-devtunnel"
+  remove_empty "${HOME}/.net"
 }
 
 configure_kubectl() {
@@ -688,12 +705,15 @@ main() {
 
   for tool in \
     aws \
+    az \
+    bazelisk \
     bun \
     bundle \
     cargo \
     claude \
     codex \
     colima \
+    devtunnel \
     docker \
     gh \
     ghostty \
