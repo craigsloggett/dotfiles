@@ -1,3 +1,6 @@
+Host github.com
+  IdentityFile ~/.ssh/id_ed25519
+
 Match exec "/opt/homebrew/bin/ykman list --serials 2>/dev/null | grep -qx 33135027"
   IdentityFile ~/.ssh/id_ed25519_sk_rk_33135027
 
