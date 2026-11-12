@@ -33,3 +33,4 @@
 # 	path = ~/.config/git/config-work
 # [claude "file:///Users/<NAME>/<NON-REPO-DIR>"]
 # 	configDir = ~/.config/claude-work
+# 	settingSources = user,project,local
