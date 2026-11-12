@@ -2,6 +2,8 @@ tap "hashicorp/tap", trusted: true
 tap "terraform-linters/tap", trusted: true
 
 brew "actionlint"
+brew "awscli"
+brew "bazelisk"
 brew "container"
 brew "gh"
 brew "git"
@@ -31,6 +33,7 @@ brew "gopls"
 brew "lua-language-server"
 brew "terraform-ls"
 
+cask "azure-cli"
 cask "claude-code@latest"
 cask "firefox"
 cask "ghostty"
