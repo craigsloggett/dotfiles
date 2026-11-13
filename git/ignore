@@ -3,3 +3,5 @@ CONTEXT.md
 **/.claude
 **/.agents
 **/.foundations
+
+**/.claude/settings.local.json
