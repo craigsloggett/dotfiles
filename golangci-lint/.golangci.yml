@@ -1,0 +1,109 @@
+version: '2'
+
+run:
+  allow-parallel-runners: true
+  relative-path-mode: gomod
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+linters:
+  default: standard
+  enable:
+    - containedctx
+    - embeddedstructfieldcheck
+    - err113
+    - errname
+    - errorlint
+    - exhaustive
+    - forcetypeassert
+    - funlen
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - godot
+    - goprintffuncname
+    - interfacebloat
+    - ireturn
+    - maintidx
+    - nakedret
+    - nestif
+    - nilerr
+    - nonamedreturns
+    - predeclared
+    - revive
+    - thelper
+    - tparallel
+    - unparam
+    - varnamelen
+    - wrapcheck
+    - wsl_v5
+  settings:
+    errorlint:
+      errorf: true
+    exhaustive:
+      default-signifies-exhaustive: false
+    funlen:
+      lines: 60
+      statements: 40
+      ignore-comments: true
+    gocognit:
+      min-complexity: 15
+    govet:
+      enable:
+        - shadow
+    interfacebloat:
+      max: 4
+    nestif:
+      min-complexity: 4
+    revive:
+      enable-default-rules: true
+      rules:
+        - name: package-comments
+          disabled: true
+        - name: argument-limit
+          arguments:
+            - 5
+        - name: early-return
+        - name: enforce-map-style
+        - name: enforce-slice-style
+        - name: flag-parameter
+        - name: function-result-limit
+          arguments:
+            - 3
+        - name: import-shadowing
+        - name: package-naming
+        - name: use-any
+    staticcheck:
+      checks:
+        - all
+    varnamelen:
+      ignore-type-assert-ok: true
+      ignore-map-index-ok: true
+      ignore-chan-recv-ok: true
+      ignore-decls:
+        - i int
+        - t *testing.T
+        - b *testing.B
+        - r *http.Request
+        - w http.ResponseWriter
+        - r io.Reader
+        - w io.Writer
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+    rules:
+      - path: _test\.go$
+        linters:
+          - funlen
+          - maintidx
+          - wrapcheck
+
+formatters:
+  enable:
+    - gofumpt
+  exclusions:
+    generated: lax
