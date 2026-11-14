@@ -7,6 +7,9 @@ run:
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
+  new-from-rev: HEAD
+  whole-files: true
+  fix: true
 
 linters:
   default: standard
@@ -28,6 +31,7 @@ linters:
     - interfacebloat
     - ireturn
     - maintidx
+    - modernize
     - nakedret
     - nestif
     - nilerr
