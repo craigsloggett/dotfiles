@@ -25,13 +25,13 @@
       }
     ]
   },
-  "model": "claude-fable-5-2[1m]",
+  "model": "opus",
   "modelSettings": {
     "claude-fable-5-2": {
       "effortLevel": "xhigh"
     },
     "claude-opus-5-5": {
-      "effortLevel": "xhigh"
+      "effortLevel": "medium"
     }
   },
   "permissions": {
