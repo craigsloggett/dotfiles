@@ -142,9 +142,6 @@ It is applied by hand, not linted.
   `wrapcheck`, staticcheck with `checks: [all]`, and govet `shadow`.
 - Fix a finding through the type system first; a `//nolint` needs a trailing
   comment giving the reason.
-- Do not enable `wsl_v5`, `nlreturn`, `lll`, `golines`, `funlen`, `gocognit`,
-  `cyclop`, `mnd`, `goconst`, `noinlineerr`, `tagliatelle`, or `paralleltest`.
-  They enforce rules the canonical guides reject or stay silent on.
 
 ## Module Versioning
 
