@@ -393,6 +393,11 @@ configure_go() {
   remove_empty "${GOPATH}/bin"
 }
 
+configure_golangci_lint() {
+  symlink "${dotfiles}/golangci-lint" "${XDG_CONFIG_HOME}/golangci-lint"
+  migrate "${HOME}/Library/Caches/golangci-lint" "${GOLANGCI_LINT_CACHE}"
+}
+
 configure_pass() {
   migrate "${HOME}/.password-store" "${PASSWORD_STORE_DIR}"
 }
@@ -719,6 +724,7 @@ main() {
     ghostty \
     git \
     go \
+    golangci-lint \
     gpg \
     kubectl \
     less \
@@ -735,7 +741,7 @@ main() {
     yamlfmt \
     yamllint; do
     command -v "${tool}" >/dev/null || continue
-    "configure_${tool}"
+    "configure_$(printf '%s' "${tool}" | tr - _)"
   done
 
   configure_macos
