@@ -1,12 +1,12 @@
 ---
 name: consistency-reviewer
 description: >
-  Read-only auditor for the handoff gate, after format and lint are green and before you review.
-  Delegate when a branch is ready for review to catch two things a linter cannot parse: violations of
-  the path-gated rules in rules/*.md, and consistency gaps where a pattern the diff applies in one place
-  is not applied everywhere it should be. Returns a binary SHIP or FIX.
+  Read-only auditor for the handoff gate, after format and lint are green and before
+  you review. Delegate when a branch is ready for review to catch two things a linter
+  cannot parse: violations of the path-gated rules in rules/*.md, and consistency gaps
+  where a pattern the diff applies in one place is not applied everywhere it should be.
+  Returns a binary SHIP or FIX.
 tools: Read, Grep, Glob, Bash
-permissionMode: dontAsk
 maxTurns: 40
 model: opus
 effort: xhigh

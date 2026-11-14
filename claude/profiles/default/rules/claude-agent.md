@@ -14,7 +14,6 @@ paths:
 | `disallowedTools` | Denylist, applied first. Ignores Bash; a `tools` allowlist is tighter.    |
 | `model`           | Alias, full ID, or `inherit`. `opus` for high-stakes auditing.            |
 | `effort`          | Effort override. `high` for judgment work.                                |
-| `permissionMode`  | `dontAsk` (auto-deny unlisted, read Bash runs) or `plan` for read-only.   |
 | `maxTurns`        | Turn ceiling. Set it on auditors so a misfire cannot loop forever.        |
 | `skills`          | Preload full skill content. No `disable-model-invocation: true` skills.   |
 | `hooks`           | Inline lifecycle hooks. Not the read-only mechanism; see Tools.           |
@@ -59,11 +58,6 @@ description: Use when a branch is ready for review to audit it against the rules
 
 - Allowlist the minimum a reader needs, `tools: Read, Grep, Glob, Bash`.
   Allowlisting is bounded where a denylist is not.
-- Enforce read-only with `permissionMode: dontAsk` (or `plan`), not by
-  pattern-matching commands in a hook; shell has unbounded ways to express a
-  write, so a hook guard fails open.
-- `dontAsk` still runs read-only Bash, so read-only git (`git diff`, `git log`,
-  `git show`) works while mutations are denied by default.
 - Scope non-recognized read-only commands (`shellcheck`, `tflint`) in
   `.claude/settings.json` `permissions.allow`, not frontmatter; the allowlist is
   project-wide, so allowlist only genuinely read-only commands.
