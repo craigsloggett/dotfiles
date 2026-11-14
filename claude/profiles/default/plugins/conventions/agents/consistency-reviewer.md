@@ -40,7 +40,7 @@ see what changed, not just file names.
 
 ## 2. Layer 1 - Rules Conformance
 
-- Locate rule files: glob `~/.claude/rules/*.md` and, if present,
+- Locate rule files with `ls "${CLAUDE_CONFIG_DIR}/rules/*.md` and, if present,
   `<repo-root>/.claude/rules/*.md`.
 - Each rule file's frontmatter has a `paths:` list of globs (`**` matches across
   directories).
