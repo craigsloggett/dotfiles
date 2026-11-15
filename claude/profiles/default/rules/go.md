@@ -21,6 +21,9 @@ Write code a reviewer can understand one piece at a time.
   Return concrete types.
 - Standard library first. A new dependency needs a reason.
 - Each package does one job and has a short, specific name.
+- A method that does not use its receiver does not belong on the type: make it
+  a function or a constant. Leave the receiver unnamed only when the method
+  exists to satisfy an interface. Never silence the linter by dropping the name.
 
 ## Readability
 
@@ -64,7 +67,10 @@ Write code a reviewer can understand one piece at a time.
 
 ## Scope
 
-- Change only what the task needs. Note other improvements instead of making
-  them.
 - Where the repo's conventions differ from these rules, follow the repo.
 - Leave formatting and mechanical style to the formatter and linters.
+- When a change removes the reason a declaration has its shape, change the
+  shape in the same step (e.g. a method that no longer uses its receiver, a
+  function that now returns a constant, a parameter every caller passes the
+  same value for, or an interface left with one implementation).
+- Finishing a refactor is part of the task, not an extra improvement.
