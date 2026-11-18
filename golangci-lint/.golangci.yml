@@ -79,6 +79,7 @@ linters:
             - 3
         - name: import-shadowing
         - name: package-naming
+        - name: unused-receiver
         - name: use-any
     staticcheck:
       checks:
