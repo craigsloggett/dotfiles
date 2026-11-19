@@ -22,6 +22,8 @@ brew "ripgrep"
 brew "rumdl"
 brew "shellcheck"
 brew "shfmt"
+brew "swiftformat"
+brew "swiftlint"
 brew "syncthing", start_service: true
 brew "terraform-docs"
 brew "tree-sitter-cli"
