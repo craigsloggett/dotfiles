@@ -68,7 +68,6 @@ ignore-words = [
   "MCP",
   "mTLS",
   "OIDC",
-  "Redpanda",
   "RFC",
   "SCIM",
   "SPIFFE",
