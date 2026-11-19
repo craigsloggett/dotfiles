@@ -6,6 +6,8 @@
     "pr": "",
     "sessionUrl": false
   },
+  "disableAllHooks": false,
+  "enableAllProjectMcpServers": false,
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
@@ -34,6 +36,7 @@
       "effortLevel": "xhigh"
     }
   },
+  "outputStyle": "default",
   "permissions": {
     "defaultMode": "auto"
   },
