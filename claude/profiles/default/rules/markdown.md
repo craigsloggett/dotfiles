@@ -6,8 +6,7 @@ paths:
 ## Style
 
 - Format with rumdl and ensure the file passes `rumdl check`.
-- Use Title Case for headings from H2 down; a README's H1 is the repository
-  name, written verbatim.
+- Match the heading case the repo already uses; default to Title Case.
 - Be clear and concise as possible by asking the question "if I remove this,
   will the reader misunderstand?", if they won't, remove it.
 - Wrap prose at 80 columns; tables, fenced code blocks, and a line whose only
