@@ -11,6 +11,7 @@ require("conform").setup({
     json = { "jq" },
     markdown = { "rumdl" },
     sh = { "shfmt" },
+    swift = { "swiftformat" },
     yaml = { "yamlfmt" }
   },
   formatters = {

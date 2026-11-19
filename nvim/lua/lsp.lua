@@ -8,6 +8,7 @@ vim.keymap.set("n", "gd", vim.lsp.buf.definition)
 vim.lsp.enable({
   "gopls",
   "lua_ls",
+  "sourcekit",
   "terraformls",
   "tflint"
 })

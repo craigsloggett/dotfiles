@@ -4,6 +4,7 @@ local parsers = {
   "hcl",
   "json",
   "go",
+  "swift",
   "terraform",
   "yaml",
   "zsh"

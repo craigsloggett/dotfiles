@@ -11,6 +11,7 @@ require("lint").linters_by_ft = {
   json = { "jq" },
   markdown = { "rumdl" },
   sh = { "shellcheck" },
+  swift = { "swiftlint" },
   yaml = { "yamllint" }
 }
 
