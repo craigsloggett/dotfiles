@@ -1,0 +1,38 @@
+{
+  "add_people": [
+    "Tyler Akidau"
+  ],
+  "keep": [
+    "s305"
+  ],
+  "moves": [
+    {
+      "lines": [
+        "s8",
+        "s88"
+      ],
+      "speaker": "Tyler Akidau"
+    },
+    {
+      "lines": [
+        "s9"
+      ],
+      "speaker": "Slavo Vojacek"
+    },
+    {
+      "from": 2396.96,
+      "speaker": "S8",
+      "to": 2397.44
+    },
+    {
+      "lines": [
+        "s120"
+      ],
+      "speaker": "new:guest"
+    }
+  ],
+  "name": {
+    "S4": null,
+    "S6": "Tyler Akidau"
+  }
+}
