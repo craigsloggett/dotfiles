@@ -78,9 +78,9 @@ nobody can name yet. A person with no voice in the conversation gets one.
 - A burst of greetings or goodbyes is several people. Split it where the words
   let you and leave the rest; never give the whole burst to one speaker.
 - Two people who sound alike score alike, so a `MERGED` voice can hide a third
-  person the scores never separate. Michael Golfi scores as Mustafa El-Hilo.
+  person the scores never separate.
   Look for the name being addressed.
-- The recognizer spells names by ear ("Tyler Akido"). Ask the user for the
+- The recognizer spells names by ear. Ask the user for the
   spelling before using `add_people`, and never invent a person.
 - Leave a line where it is when nothing settles it, and tell the user you did.
 
