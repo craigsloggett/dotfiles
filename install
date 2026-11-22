@@ -453,6 +453,7 @@ configure_rumdl() {
 configure_vale() {
   symlink "${dotfiles}/vale" "${XDG_CONFIG_HOME}/vale"
   symlink "${dotfiles}/vale/vocabularies/Global" "${XDG_DATA_HOME}/vale/styles/config/vocabularies/Global"
+  symlink "${dotfiles}/vale/styles/Global" "${XDG_DATA_HOME}/vale/styles/Global"
   vale --config "${XDG_CONFIG_HOME}/vale/.vale.ini" sync >/dev/null 2>&1 ||
     conflict "Vale could not sync its packages, run install again when online."
 }

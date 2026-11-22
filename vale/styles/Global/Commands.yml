@@ -1,0 +1,46 @@
+extends: existence
+message: Format the command '%s' as code.
+level: error
+vocab: false
+action:
+  name: edit
+  params:
+    - wrap
+    - '`'
+append: true
+# Skip a name inside a path, file name, address, or longer hyphenated name.
+raw:
+  - (?![\w/`@-]|\.\w)(?<=(?<![\w/.`@-])[a-z0-9]+(?:-[a-z0-9]+)*)
+tokens:
+  - actionlint
+  - awk
+  - brew
+  - curl
+  - gawk
+  - gh
+  - gofmt
+  - golangci-lint
+  - gopls
+  - govulncheck
+  - gpg
+  - grep
+  - jq
+  - kubectl
+  - mawk
+  - npm
+  - nvim
+  - python3
+  - rg
+  - rumdl
+  - sed
+  - shellcheck
+  - shfmt
+  - ssh
+  - swiftformat
+  - swiftlint
+  - tflint
+  - xargs
+  - yamlfmt
+  - yamllint
+  - yq
+  - zsh

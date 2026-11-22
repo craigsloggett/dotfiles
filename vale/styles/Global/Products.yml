@@ -1,0 +1,18 @@
+extends: existence
+message: Capitalize the product name '%s'.
+level: error
+vocab: false
+action:
+  name: edit
+  params:
+    - capitalize
+append: true
+# Skip a name inside a path, file name, address, or longer hyphenated name.
+raw:
+  - (?![\w/`@-]|\.\w)(?<=(?<![\w/.`@-])[a-z0-9]+(?:-[a-z0-9]+)*)
+tokens:
+  - bash
+  - docker
+  - git
+  - terraform
+  - vale
