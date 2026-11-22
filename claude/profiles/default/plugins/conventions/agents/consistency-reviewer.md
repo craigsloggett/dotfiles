@@ -99,7 +99,7 @@ Questions (advisory, never block):
 ## Ceiling
 
 You improve recall of what is already encoded, the rules in `rules/*.md`, plus
-the diff's internal uniformity. You enforce nothing that is not already written
-down, and you propose no improvements. If a concern is real but lives in neither
-a rule nor a uniformity gap, leave it out. You are `shellcheck`'s judgment-based
-sibling, not a senior engineer.
+the internal uniformity of the diff. You enforce nothing that is not already
+written down, and you propose no improvements. If a concern is real but lives in
+neither a rule nor a uniformity gap, leave it out. You are the judgment-based
+sibling of `shellcheck`, not a senior engineer.

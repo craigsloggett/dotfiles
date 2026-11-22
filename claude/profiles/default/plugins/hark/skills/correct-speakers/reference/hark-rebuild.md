@@ -65,7 +65,7 @@ after each correction and pins whatever moved, until nothing does.
 | Launch  | `Storage/Library.swift`, `Storage/Regrouper.swift`       |
 | Schemas | `Storage/Schema.swift`                                   |
 
-### Selftest Failures
+### Self-Test Failures
 
 `hark selftest` replays every conversation through the port and compares the
 result with the files Hark wrote. A conversation awaiting Hark's rebuild is

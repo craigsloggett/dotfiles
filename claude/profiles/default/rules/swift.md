@@ -21,8 +21,8 @@ paths:
 - Open a parameter list with a preposition that reads at the call site: of, for,
   in, from, at, to. Never with, using, or by. Drop the label when the method
   name already names the argument.
-- Construct a session with static func begin(...) and end it with an explicit
-  method its owner calls. Never clean up in deinit.
+- Construct a session with `static func begin(...)` and end it with an explicit
+  method its owner calls. Never clean up in `deinit`.
 - A namespace is a caseless enum, never a struct with no stored properties.
 
 ## Comments

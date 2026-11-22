@@ -14,5 +14,5 @@ paths:
   workflow.
 - Give the workflow, every job, and every step a Title Case `name:`; name the
   checkout step `Checkout`.
-- In mikefarah `yq` (v4), `select(.uses | test(...))` needs no `// ""` guard,
+- In `mikefarah/yq` (v4), `select(.uses | test(...))` needs no `// ""` guard,
   since `test()` on null returns false.

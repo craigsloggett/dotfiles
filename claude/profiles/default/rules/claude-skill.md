@@ -10,7 +10,7 @@ paths:
 | -------------------------- | ---------------------------------------------------------------------------- |
 | `name`                     | Required. kebab-case, action-oriented (verb-noun).                           |
 | `description`              | Required. When to invoke, not what it does; what Claude reads for relevance. |
-| `arguments`                | Positional arg names (string or list) enabling `$name` substitution.         |
+| `arguments`                | Positional argument names (string or list) enabling `$name` substitution.    |
 | `disable-model-invocation` | `true` for side-effecting skills only; leave off read-only ones to auto-run. |
 | `allowed-tools`            | The minimum set the skill needs.                                             |
 

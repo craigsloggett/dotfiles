@@ -1,10 +1,11 @@
 ---
 name: posix-awk
 description: >
-  Write strictly POSIX-conformant `awk` and flag gawk/mawk extensions
-  (gensub, asort, length(array), systime, FIELDWIDTHS, bitwise fns).
-  Invoke for any awk you write, edit, or review, including one-liners in
-  shell scripts, pipelines, Makefiles, or CI. If awk appears, invoke this skill.
+  Write strictly POSIX-conformant `awk` and flag `gawk`/`mawk` extensions
+  (`gensub`, `asort`, `length(array)`, `systime`, `FIELDWIDTHS`, bitwise
+  functions). Invoke for any `awk` you write, edit, or review, including
+  one-liners in shell scripts, pipelines, Makefiles, or CI. If `awk` appears,
+  invoke this skill.
 ---
 
 ## POSIX Awk
@@ -44,15 +45,16 @@ Non-POSIX features to avoid by default:
 ### Regex Patterns
 
 - Embed constant regex as `/regex/` literals; reserve `-v var=...` for dynamic
-  values (user input, env data).
+  values (user input, environment data).
 - `awk -v` runs C-style string-escape processing on the value before the regex
   engine sees it.
 - POSIX leaves unknown escapes like `\.` undefined; `mawk` strips the backslash
   (with a warning), so `\.` becomes `.` (any char), not a literal dot.
 - Don't rely on this: the one true `awk` strips `\.` too, and behavior varies
-  across awks and versions. Never count on a bare `\.` surviving the `-v` layer.
+  across `awk` implementations and versions. Never count on a bare `\.`
+  surviving the `-v` layer.
 - Regex literals (`/.../`) skip the string layer and behave consistently across
-  awks.
+  `awk` implementations.
 - For genuinely dynamic patterns, the caller owns the double-escape (e.g.
   shell-level `\\.` to survive both layers).
 - `sub(/regex/, repl)` returns the substitution count, so it doubles as a
@@ -75,7 +77,7 @@ Non-POSIX features to avoid by default:
   `print` or `next`; let the passthrough print the modified record.
 - When the caller needs "did anything match?", set a flag in the matching block,
   check it in `END`, and `exit 2` (a distinct non-zero) so "no match" is
-  distinguishable from `awk`'s own errors.
+  distinguishable from the errors `awk` itself reports.
 - Don't mutate `-v` inputs in place. Copy to a working local
   (`output = replacement`) before `sub`/`gsub`, so the input stays visible and
   reusable.
