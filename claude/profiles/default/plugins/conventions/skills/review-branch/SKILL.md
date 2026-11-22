@@ -30,7 +30,7 @@ Working tree: !`git status --short`
   or what you suspect. A reviewer handed a hypothesis tends to confirm it; it
   must derive intent from the code.
 - The `save.sh` hook runs on every Bash call, the reviewer's included. A failing
-  lint check feeds its errors into the review, and a golangci-lint config with
+  lint check feeds its errors into the review, and a `golangci-lint` config with
   `fix: true` rewrites files mid-review. Run behind green lint. If the working
   tree differs from the one above after the review, tell the user which files
   changed.

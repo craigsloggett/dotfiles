@@ -17,7 +17,7 @@ paths:
 | `maxTurns`        | Turn ceiling. Set it on auditors so a misfire cannot loop forever.        |
 | `skills`          | Preload full skill content. No `disable-model-invocation: true` skills.   |
 | `hooks`           | Inline lifecycle hooks. Not the read-only mechanism; see Tools.           |
-| `isolation`       | `worktree` runs in a temp git worktree, auto-cleaned if unchanged.        |
+| `isolation`       | `worktree` runs in a temp Git worktree, auto-cleaned if unchanged.        |
 | `mcpServers`      | MCP servers the agent may reach.                                          |
 | `memory`          | Persistent memory scope: `user`, `project`, or `local`.                   |
 | `background`      | `true` runs the agent as a background task.                               |

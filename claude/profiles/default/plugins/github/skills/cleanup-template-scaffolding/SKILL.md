@@ -21,7 +21,7 @@ Run hands-off: apply confidently-inferable replacements without prompting, keep
 skeleton files, and stop to ask only when a placeholder's value is genuinely
 ambiguous.
 
-1. Read the repo name, directory structure, git remote, and any existing README
+1. Read the repo name, directory structure, Git remote, and any existing README
    to learn what the repo is for and which template it came from.
 2. Launch Explore agents in parallel to scan for template artifacts. A value is
    a placeholder if a reader would conclude "this exists only because the
@@ -42,7 +42,7 @@ ambiguous.
    Record file path, line, current value, and the signal for each candidate.
 3. Apply replacements.
    - Infer and replace what you can: repo name from the directory, owner from
-     the git remote, GitHub username from the login above, and the `LICENSE`
+     the Git remote, GitHub username from the login above, and the `LICENSE`
      copyright from the name and current year above.
    - Remove pure template-marketing files and instruction comments ("this is a
      template for X" metadata, file checklists, "Replace with" / "Delete this").

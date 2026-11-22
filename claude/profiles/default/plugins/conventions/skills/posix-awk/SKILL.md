@@ -1,7 +1,7 @@
 ---
 name: posix-awk
 description: >
-  Write strictly POSIX-conformant awk and flag gawk/mawk extensions
+  Write strictly POSIX-conformant `awk` and flag gawk/mawk extensions
   (gensub, asort, length(array), systime, FIELDWIDTHS, bitwise fns).
   Invoke for any awk you write, edit, or review, including one-liners in
   shell scripts, pipelines, Makefiles, or CI. If awk appears, invoke this skill.
@@ -9,9 +9,9 @@ description: >
 
 ## POSIX Awk
 
-mawk is the default `/usr/bin/awk` on Ubuntu and GitHub-hosted runners, so a
+`mawk` is the default `/usr/bin/awk` on Ubuntu and GitHub-hosted runners, so a
 gawk-ism that runs locally can break or behave differently in CI. Write to POSIX
-awk; reach for an extension only when the runtime is known to be gawk.
+`awk`; reach for an extension only when the runtime is known to be `gawk`.
 
 ### POSIX Vs Gawk
 
@@ -21,8 +21,8 @@ Non-POSIX features to avoid by default:
   gawk-only. Use POSIX `sub`/`gsub`/`split`/`match`.
 - `gensub` backreferences: no POSIX equivalent; restructure with `match` +
   `substr`.
-- Time functions `systime`, `strftime`, `mktime`: gawk extensions, not portable
-  (mawk support is version-dependent).
+- Time functions `systime`, `strftime`, `mktime`: `gawk` extensions, not
+  portable (`mawk` support is version-dependent).
 - For dates, run shell `date` and pass the value in with `-v`.
 - Bit and type functions `and`, `or`, `xor`, `lshift`, `rshift`, `compl`,
   `isarray`, `typeof`: gawk-only.
@@ -47,9 +47,9 @@ Non-POSIX features to avoid by default:
   values (user input, env data).
 - `awk -v` runs C-style string-escape processing on the value before the regex
   engine sees it.
-- POSIX leaves unknown escapes like `\.` undefined; mawk strips the backslash
+- POSIX leaves unknown escapes like `\.` undefined; `mawk` strips the backslash
   (with a warning), so `\.` becomes `.` (any char), not a literal dot.
-- Don't rely on this: the one true awk strips `\.` too, and behavior varies
+- Don't rely on this: the one true `awk` strips `\.` too, and behavior varies
   across awks and versions. Never count on a bare `\.` surviving the `-v` layer.
 - Regex literals (`/.../`) skip the string layer and behave consistently across
   awks.
@@ -75,7 +75,7 @@ Non-POSIX features to avoid by default:
   `print` or `next`; let the passthrough print the modified record.
 - When the caller needs "did anything match?", set a flag in the matching block,
   check it in `END`, and `exit 2` (a distinct non-zero) so "no match" is
-  distinguishable from awk's own errors.
+  distinguishable from `awk`'s own errors.
 - Don't mutate `-v` inputs in place. Copy to a working local
   (`output = replacement`) before `sub`/`gsub`, so the input stays visible and
   reusable.

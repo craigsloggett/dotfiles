@@ -16,14 +16,14 @@ Positional and optional. Invoke as `/sync-conventions <source>`.
 1. The source is `$source`; the target is the current working directory.
 2. Explore both directories. Launch Explore agents in parallel:
    - Source: read the directory structure, key configuration files, and recent
-     git history (`git -C $source log --oneline -20`) to understand what has
+     Git history (`git -C $source log --oneline -20`) to understand what has
      changed recently.
    - Target: read the directory structure and the same categories of files to
      understand the current state.
 
 3. Compare across categories. For each category present in both projects, diff
    the approach:
-   - Shell scripts: shebang and dialect (POSIX `sh` vs bash), strict-mode flags
+   - Shell scripts: shebang and dialect (POSIX `sh` vs Bash), strict-mode flags
      (`set -ef`), `main()` entrypoint pattern, function style (subshell `()` for
      resource-owning scopes with their own `trap EXIT INT TERM HUP`, brace `{}`
      for plain helpers that never set EXIT traps), session-scoped

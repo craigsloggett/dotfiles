@@ -49,7 +49,7 @@ Existing descriptions, tagged with their topics:
    - Visibility: default public; use private only when asked.
 4. Propose topics from the vocabulary above, matching the user's phrasing.
    Examples: "composite action" or "GitHub action" becomes `composite-action`;
-   "terraform module/provider" becomes `terraform` (add `hashicorp` for a
+   "Terraform module/provider" becomes `terraform` (add `hashicorp` for a
    HashiCorp product); "vault plugin" becomes `vault`; "shell script" or "POSIX"
    becomes `shell`. Let the user add, remove, or override; accept topics outside
    the vocabulary only if the user explicitly types them.

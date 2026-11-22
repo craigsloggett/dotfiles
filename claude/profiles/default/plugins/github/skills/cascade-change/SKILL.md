@@ -27,7 +27,7 @@ Positional and optional. Invoke as
    - If `$repos` is an explicit list, use it as-is.
    - If it is a discovery description, identify the scope (e.g. a parent
      directory), then use `grep`, `find`, or repo contents to find the locally
-     cloned git repos matching the predicate. Do not invent repos.
+     cloned Git repos matching the predicate. Do not invent repos.
    - Present the resolved list with file paths and confirm before fanning out.
      Stop and ask on zero matches, or a suspicious count (the description
      implied "a few" but matched dozens).

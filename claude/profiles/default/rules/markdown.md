@@ -5,7 +5,7 @@ paths:
 
 ## Style
 
-- Format with rumdl and ensure the file passes `rumdl check`.
+- Format with `rumdl` and ensure the file passes `rumdl check`.
 - Match the heading case the repo already uses; default to Title Case.
 - Be clear and concise as possible by asking the question "if I remove this,
   will the reader misunderstand?", if they won't, remove it.

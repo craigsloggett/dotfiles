@@ -55,7 +55,7 @@ Working tree: !`git status --short`
 - Acting on a finding moves code, and a defect review of the old shape no
   longer covers it. Run `/conventions:review-branch` again afterwards.
 - The `save.sh` hook runs on every Bash call, the reviewer's included. A failing
-  lint check feeds its errors into the review, and a golangci-lint config with
+  lint check feeds its errors into the review, and a `golangci-lint` config with
   `fix: true` rewrites files mid-review. Run behind green lint. If the working
   tree differs from the one above after the review, tell the user which files
   changed.
