@@ -25,7 +25,7 @@ Invoke these step skills in order:
 ## Rules
 
 - A from-scratch repo has no template scaffolding to clean up and no initial
-  dependabot PRs, so there is no settle, cleanup, or PR step. Scaffold content
+  Dependabot PRs, so there is no settle, cleanup, or PR step. Scaffold content
   yourself in the local clone.
 - No release by default. Run `create-initial-release` in the clone only if the
   user asks for one.

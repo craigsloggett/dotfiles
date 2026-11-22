@@ -42,7 +42,7 @@ exactly that instead. Read the diff itself, not just file names.
 For each changed unit, read enough of its callers, callees, and tests to know
 its contract, then try to break it. Work through, among others:
 
-- Inputs at the edges: empty, nil, zero, negative, maximum, duplicate, unicode,
+- Inputs at the edges: empty, nil, zero, negative, maximum, duplicate, Unicode,
   malformed, and out-of-order values.
 - Error paths: every error that is dropped, swallowed, wrapped without context,
   or returned after a partial side effect that is never undone.

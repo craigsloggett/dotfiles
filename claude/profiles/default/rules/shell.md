@@ -145,7 +145,7 @@ paths:
 - Keep functions short and focused: prefer scripts under ~100 lines and
   functions under ~50 lines.
 - `snake_case` for functions and variables.
-- Format embedded program text (awk, jq, sed, sqlite, `python -c`, heredocs)
+- Format embedded program text (awk, jq, sed, SQLite, `python -c`, heredocs)
   across multiple lines when it exceeds one short line: open the quote on the
   command line, indent the body two spaces, close the quote on its own line
   dedented to the command with any remaining arguments and redirects there.

@@ -82,7 +82,7 @@ Non-POSIX features to avoid by default:
 
 ### Variable Naming
 
-- Use descriptive snake_case for `-v` variables (`pattern`, `replacement`,
+- Use descriptive `snake_case` for `-v` variables (`pattern`, `replacement`,
   `version`, `output`); the shell-side casing need not match.
 
 ### Comments

@@ -1,6 +1,6 @@
 ---
 name: merge-dependabot
-description: Use when the user wants to merge the open dependabot PRs in the current repo.
+description: Use when the user wants to merge the open Dependabot PRs in the current repo.
 ---
 
 ## Workflow
@@ -14,8 +14,8 @@ and rebases PR branches and needs a clean tree. Record the current branch with
 `git rev-parse --abbrev-ref HEAD` to return to it at the end, and
 `git fetch origin` so rebases target the latest default branch.
 
-1. Identify the dependabot PRs above (author `app/dependabot`). Report any
-   non-dependabot PR for review; never touch it.
+1. Identify the Dependabot PRs above (author `app/dependabot`). Report any
+   non-Dependabot PR for review; never touch it.
 2. Order the work: a PR that redefines the checks (touches `.github/workflows/`,
    bumps a CI or lint action ref, or changes a linter config) must merge before
    the PRs it gates, because merging it changes what "green" means for the rest.
@@ -24,7 +24,7 @@ and rebases PR branches and needs a clean tree. Record the current branch with
 3. Bring the next PR up to date with the default branch. If it is behind
    (merging an earlier PR moved main), rebase it: `gh pr checkout <number>`,
    `git rebase origin/main`, regenerate any derived files (step 5), then
-   `git push --force-with-lease`. On a rebase conflict, prefer the dependabot
+   `git push --force-with-lease`. On a rebase conflict, prefer the Dependabot
    version bump and regenerate derived files rather than hand-merging them; if a
    conflict needs judgment, stop and ask.
 4. Read its check status with `gh pr checks <number>` (add `--watch` if runs are
@@ -52,8 +52,8 @@ and rebases PR branches and needs a clean tree. Record the current branch with
    merge with the matching `gh pr merge <number> --merge | --squash | --rebase`.
 7. After a merge the default branch moved. `git fetch origin`, then loop back to
    step 1: re-list (catching PRs opened meanwhile), re-evaluate, and rebase any
-   remaining dependabot PR that is now behind. Continue until no mergeable
-   dependabot PR remains.
+   remaining Dependabot PR that is now behind. Continue until no mergeable
+   Dependabot PR remains.
 8. Return to the recorded branch with `git checkout <original-branch>` and
    report which PRs merged, which were fixed or rebased first, and which were
    handed back as complex. If a feature branch is in flight, `rebase-on-main`
@@ -62,7 +62,7 @@ and rebases PR branches and needs a clean tree. Record the current branch with
 ## Rules
 
 - Never put `[dependabot skip]` in a commit message: a plain human commit makes
-  dependabot stop force-pushing the branch (preserving the fix), but the skip
+  Dependabot stop force-pushing the branch (preserving the fix), but the skip
   string re-grants it permission to clobber.
 - Dependabot opens PRs asynchronously, so this settles whatever is open now; run
   it again if more appear.
