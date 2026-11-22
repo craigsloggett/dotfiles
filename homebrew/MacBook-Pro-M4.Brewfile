@@ -27,6 +27,7 @@ brew "swiftlint"
 brew "syncthing", start_service: true
 brew "terraform-docs"
 brew "tree-sitter-cli"
+brew "vale"
 brew "yamlfmt"
 brew "yamllint"
 brew "ykman"

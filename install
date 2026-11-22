@@ -450,6 +450,13 @@ configure_rumdl() {
   symlink "${dotfiles}/rumdl" "${XDG_CONFIG_HOME}/rumdl"
 }
 
+configure_vale() {
+  symlink "${dotfiles}/vale" "${XDG_CONFIG_HOME}/vale"
+  symlink "${dotfiles}/vale/vocabularies/Global" "${XDG_DATA_HOME}/vale/styles/config/vocabularies/Global"
+  vale --config "${XDG_CONFIG_HOME}/vale/.vale.ini" sync >/dev/null 2>&1 ||
+    conflict "Vale could not sync its packages, run install again when online."
+}
+
 configure_gh() {
   symlink "${dotfiles}/gh/config.yml" "${XDG_CONFIG_HOME}/gh/config.yml"
 }
@@ -737,6 +744,7 @@ main() {
     syncthing \
     terraform \
     tflint \
+    vale \
     vim \
     yamlfmt \
     yamllint; do
