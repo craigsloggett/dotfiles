@@ -1,4 +1,5 @@
 tap "hashicorp/tap", trusted: true
+tap "lucassabreu/tap", trusted: true
 tap "terraform-linters/tap", trusted: true
 
 brew "actionlint"
@@ -43,6 +44,7 @@ cask "devtunnel"
 cask "firefox"
 cask "ghostty"
 cask "keepassxc"
+cask "lucassabreu/tap/clockify-cli", trusted: true
 cask "obsidian"
 cask "rectangle"
 cask "signal"
