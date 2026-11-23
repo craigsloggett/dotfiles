@@ -1,5 +1,6 @@
 extends: existence
 message: Question '%s' is answered at once. State the answer.
+vocab: false
 raw:
   - \b[A-Z][a-z]+
   - (?:\s+[a-z]+){0,4}

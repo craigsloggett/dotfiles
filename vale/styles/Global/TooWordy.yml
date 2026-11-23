@@ -1,0 +1,11 @@
+extends: write-good.TooWordy
+tokens-:
+  - equivalent
+  - implement
+  - it is
+  - it was
+  - maximum
+  - minimum
+  - requirement
+  - satisfy
+  - validate

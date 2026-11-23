@@ -1,0 +1,5 @@
+extends: repetition
+message: Two never clauses in '%s'. Vary the structure.
+ignorecase: true
+tokens:
+  - never

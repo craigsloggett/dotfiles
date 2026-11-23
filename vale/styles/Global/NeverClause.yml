@@ -1,0 +1,5 @@
+extends: existence
+message: Trailing never clause in '%s'. State the prohibition in its own sentence.
+vocab: false
+raw:
+  - ',\s+never\b'

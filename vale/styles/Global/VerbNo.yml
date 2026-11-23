@@ -1,10 +1,11 @@
 extends: existence
 message: Verb and negative in '%s'. Write the plain negative or the positive.
 ignorecase: true
+vocab: false
 raw:
-  - \b(?!(?:across|always|as|its|plus|this|thus|unless|yes)\b)
-  - (?:[a-z]+(?:s|ed)|are|did|do|had|have|know|need|use|were)\s+
+  - \b(?!(?:a|across|always|an|and|as|at|because|but|by|for|from|if|in|into|its|of|on|or|plus|since|so|than|that|the|then|this|thus|to|unless|until|when|where|while|with|yes)\b)
+  - '[a-z]+\s+'
 tokens:
-  - no(?! longer| later)
+  - no(?! longer| later| one\b| matter\b)
   - none of
   - nothing

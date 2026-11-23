@@ -1,5 +1,6 @@
 extends: existence
 message: Check '%s' for a contrast nobody claimed. State the point directly.
+vocab: false
 ignorecase: true
 raw:
   - \b(?!or\s+not\b)
