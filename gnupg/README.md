@@ -44,8 +44,8 @@ pair. To confirm the key,
 gpg --list-secret-keys --with-subkey-fingerprints
 ```
 
-For increased security, it is recommended that you use only subkeys on your
-regular machine and store your master key offline.
+For increased security, use only subkeys on your regular machine and store your
+master key offline.
 
 ## Generate the GPG Signing Subkey
 
