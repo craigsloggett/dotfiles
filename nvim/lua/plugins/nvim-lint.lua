@@ -7,7 +7,7 @@ vim.pack.add({
 
 require("lint").linters_by_ft = {
   ghaction = { "actionlint" },
-  go = { "golangcilint" },
+  go = { "golangcilint", "vale" },
   json = { "jq" },
   markdown = { "rumdl", "vale" },
   sh = { "shellcheck" },
