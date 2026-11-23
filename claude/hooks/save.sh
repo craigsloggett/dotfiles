@@ -29,6 +29,7 @@ for type in \
   shell \
   swift \
   terraform \
+  vale \
   yaml; do
   printf '%s\n' "${changed}" | xargs "${0%/*}/${type}.sh" || status=2
 done
