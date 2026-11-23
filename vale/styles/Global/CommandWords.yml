@@ -1,0 +1,13 @@
+extends: existence
+message: Format '%s' as code if it is the command.
+level: suggestion
+vocab: false
+append: true
+raw:
+  - (?![/`@-])
+  - (?!\.\w)
+  - (?<=(?<![\w/.`@-])[a-z0-9]+(?:-[a-z0-9]+)*)
+tokens:
+  - brew
+  - curl
+  - find

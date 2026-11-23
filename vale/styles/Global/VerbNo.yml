@@ -1,0 +1,10 @@
+extends: existence
+message: Verb and negative in '%s'. Write the plain negative or the positive.
+ignorecase: true
+raw:
+  - \b(?!(?:across|always|as|its|plus|this|thus|unless|yes)\b)
+  - (?:[a-z]+(?:s|ed)|are|did|do|had|have|know|need|use|were)\s+
+tokens:
+  - no(?! longer| later)
+  - none of
+  - nothing

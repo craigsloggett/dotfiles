@@ -1,0 +1,13 @@
+extends: existence
+message: Heading '%s' reads like a guide. Use a plain label.
+ignorecase: true
+nonword: true
+scope:
+  - heading
+  - table.header
+tokens:
+  - ^how\b.*
+  - ^what\b.*
+  - ^when\b.*
+  - ^where\b.*
+  - ^why\b.*

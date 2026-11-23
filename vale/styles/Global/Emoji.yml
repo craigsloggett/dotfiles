@@ -1,0 +1,7 @@
+extends: existence
+message: Remove emoji '%s'.
+nonword: true
+tokens:
+  - '[#*0-9]\x{FE0F}?\x{20E3}'
+  - (?![#*0-9])\p{Emoji}\x{FE0F}?
+  - (?=\p{Extended_Pictographic})[\x{1F000}-\x{1FFFF}]

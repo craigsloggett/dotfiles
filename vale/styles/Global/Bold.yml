@@ -1,0 +1,6 @@
+extends: existence
+message: Bold on '%s'. Remove the bold.
+nonword: true
+scope: strong
+tokens:
+  - .+

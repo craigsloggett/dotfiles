@@ -1,0 +1,11 @@
+extends: existence
+message: Stacked hedges in '%s'. Hedge once, where the uncertainty is real.
+ignorecase: true
+raw:
+  - \b(?:can|could|may|might)\s+
+tokens:
+  - often
+  - perhaps
+  - possibly
+  - potentially
+  - sometimes

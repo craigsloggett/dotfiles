@@ -1,0 +1,22 @@
+extends: existence
+message: Stock vocabulary '%s'. Use the plain word.
+ignorecase: true
+tokens:
+  - comprehensive
+  - crucial
+  - delv(?:e|es|ed|ing)
+  - elevat(?:e|es|ed|ing)
+  - foster(?:s|ed|ing)?
+  - landscape
+  - leverag(?:e|es|ed|ing)
+  - navigat(?:e|es|ed|ing)
+  - nuanced
+  - pivotal
+  - realm
+  - robust
+  - seamless(?:ly)?
+  - streamlin(?:e|es|ed|ing)
+  - tapestry
+  - testament
+  - underscor(?:e|es|ed|ing)
+  - unlock(?:s|ed|ing)?

@@ -1,0 +1,7 @@
+extends: existence
+message: Question '%s' is answered at once. State the answer.
+raw:
+  - \b[A-Z][a-z]+
+  - (?:\s+[a-z]+){0,4}
+  - \?
+  - (?=\s+[A-Z])

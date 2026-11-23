@@ -1,0 +1,23 @@
+extends: write-good.Weasel
+tokens+:
+  - absolutely
+  - definitely
+  - especially
+  - fortunately
+  - frankly
+  - genuinely
+  - honestly
+  - incredibly
+  - literally
+  - luckily
+  - maybe
+  - particularly
+  - perfectly
+  - presumably
+  - really
+  - sadly
+  - seriously
+  - simply
+  - truly
+  - truthfully
+  - unfortunately

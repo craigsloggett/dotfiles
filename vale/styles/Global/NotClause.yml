@@ -1,0 +1,6 @@
+extends: existence
+message: Check '%s' for a contrast nobody claimed. State the point directly.
+raw:
+  - ',\s+not\b'
+  - (?!\s+(?:all|every|everyone|everything|many|much)\b)
+  - '[^.,;:!?—–]{1,60}'

@@ -1,0 +1,20 @@
+extends: existence
+message: Check '%s' for a contrast nobody claimed. State the point directly.
+ignorecase: true
+raw:
+  - \b(?!or\s+not\b)
+  - (?:\w+n['’]t|[\w'’]+\s+not)\b
+  - '[^.,;:!?—–]{1,60}'
+  - (?:[,;.]\s+|\s*[—–]\s*|\s+(?=but\b))
+tokens:
+  - it['’]s
+  - it is
+  - it was
+  - they['’]re
+  - they are
+  - they were
+  - that['’]s
+  - this is
+  - but
+  - instead
+  - rather

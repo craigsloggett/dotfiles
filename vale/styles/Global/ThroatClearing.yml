@@ -1,0 +1,15 @@
+extends: existence
+message: Throat-clearing '%s'. Delete it.
+ignorecase: true
+tokens:
+  - a few things that should help
+  - here['’]s the thing
+  - it['’]s worth noting
+  - it is worth noting
+  - when it comes to
+  - feel free to
+  - great question
+  - i hope this helps
+  - in conclusion
+  - in summary
+  - let me know if

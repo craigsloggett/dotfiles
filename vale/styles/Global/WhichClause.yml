@@ -1,0 +1,5 @@
+extends: existence
+message: Split the ', which' clause into two sentences.
+nonword: true
+tokens:
+  - ', which\b'
