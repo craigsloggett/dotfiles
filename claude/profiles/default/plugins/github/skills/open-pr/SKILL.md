@@ -19,7 +19,7 @@ Positional and optional. Invoke as `/open-pr <dir> <branch> <title>`.
 
 ## Workflow
 
-Work in `<dir>` (the local clone; blank means the current directory).
+Work in `<dir>` (the local clone, or the current directory when blank).
 
 1. If `git -C <dir> status --porcelain` is empty, report that the working tree
    is clean and stop.
@@ -27,18 +27,18 @@ Work in `<dir>` (the local clone; blank means the current directory).
    onto it).
 3. Stage and commit signed: `git -C <dir> add -A` then
    `git -C <dir> commit -S -m "<title>"`. If signing fails, hand back to the
-   user to unlock the GPG key; do not commit unsigned.
+   user to unlock the GPG key. Do not commit unsigned.
 4. Push: `git -C <dir> push -u origin <branch>`.
 5. Open the PR: `gh pr create --title "<title>" --body "<brief summary>"` (run
-   from `<dir>`; pass a body so it does not open an editor). Then invoke
+   from `<dir>`, and pass a body so it does not open an editor). Then invoke
    `update-pr-description` on the new PR for a declarative body.
-6. Report the PR URL; leave the branch checked out with a clean tree.
+6. Report the PR URL and leave the branch checked out with a clean tree.
 
 ## Rules
 
 - The default branch's ruleset requires a PR and signed commits, so always
-  branch and sign; never commit to the default branch directly.
-- Do not merge the PR here; leave it open unless the caller asks otherwise.
+  branch and sign. Never commit to the default branch directly.
+- Do not merge the PR here. Leave it open unless the caller asks otherwise.
 - The PR title and body should not have anything that doesn't declaratively
   state what is functionally changing in this branch.
 - If the reader looks at the PR, they should be able to understand at the

@@ -34,11 +34,11 @@ Working tree: !`git status --short`
 ### Gotchas
 
 - Never pass the reviewer your own read of the change, what it should do, or
-  what you suspect. A reviewer handed a hypothesis tends to confirm it; it
+  what you suspect. A reviewer handed a hypothesis tends to confirm it, so it
   must derive the design from the code.
-- A reviewer can end without sending its report, at its turn limit or before.
-  It has still done the reading. Resume it with SendMessage and ask for the
-  report; a new reviewer starts the reading again.
+- A reviewer can end without sending its report, at its turn limit or before. It
+  has still done the reading. Resume it with SendMessage and ask for the report,
+  because a new reviewer starts the reading again.
 - One reviewer does not get through a large branch. A code review of four new
   packages ran out of turns before it reported, and step 3 splits by package
   for that reason. Each reviewer still needs the rest of the delta, because a

@@ -14,7 +14,7 @@ Write code a reviewer can understand one piece at a time.
 ## Design
 
 - Make invalid states unrepresentable. Parse input into trusted types at the
-  boundary; inner code does not revalidate.
+  boundary. Inner code does not revalidate.
 - Prefer fewer, deeper modules. No pass-through layers or
   speculative abstractions.
 - Interfaces belong to the consumer and appear only when a consumer needs one.
@@ -55,7 +55,7 @@ Write code a reviewer can understand one piece at a time.
 
 - Test behaviour through the exported API, so tests read like a spec.
 - Use a table with named subtests once three or more cases share a shape. Name
-  each case for the behaviour it checks; a case that needs its own setup is its
+  each case for the behaviour it checks. A case that needs its own setup is its
   own test.
 - If a test is hard to write cleanly, fix the design instead of adding
   scaffolding.

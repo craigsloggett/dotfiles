@@ -9,8 +9,8 @@ Current branch and status:
 
 !`git status -sb`
 
-1. Refuse if this is the default branch or the working tree is dirty; this
-   rebases a feature branch and needs a clean tree.
+1. Refuse if this is the default branch or the working tree is dirty, because
+   this rebases a feature branch and needs a clean tree.
 2. Update the default branch, prune merged branches, and rebase:
 
    ```sh

@@ -20,7 +20,7 @@ Authenticated GitHub user, the default owner:
 1. Delegate to the `github:repo-scaffolder` agent (via the Agent tool) with
    template `craigsloggett-lab/composite-action-template`, name `$name`, the
    authenticated user above as owner, public visibility, and topic
-   `composite-action`. Wait for its summary; if it reports a collision or
+   `composite-action`. Wait for its summary. If it reports a collision or
    failure, surface that and stop.
 2. Invoke `settle-open-prs` in `~/Developer/GitHub/<owner>/$name`.
 3. Invoke `cleanup-template-scaffolding` in the local clone.

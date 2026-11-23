@@ -7,9 +7,9 @@ paths:
 ## Formatting
 
 - Format with `yamlfmt` and ensure the file passes `yamllint`.
-- Indent two spaces; indent sequence items under their key.
+- Indent two spaces, and indent sequence items under their key.
 - Omit document markers: no leading `---` or trailing `...`.
-- Single-quote strings only when needed; never quote a value that parses
+- Single-quote strings only when needed. Never quote a value that parses
   correctly bare.
 - Keep lines to 120 characters or fewer.
 - Allow at most one consecutive blank line.
@@ -18,8 +18,8 @@ paths:
 
 ## Inline Shell
 
-- Set `shell: sh` on `run:` steps; the runner defaults to Bash, and the shell
-  rules assume POSIX sh.
+- Set `shell: sh` on `run:` steps, because the runner defaults to Bash and the
+  shell rules assume POSIX sh.
 - Keep `run:` steps short. Extract non-trivial or multi-line logic to
   `src/<name>.sh` and invoke it, as the composite-actions rule requires.
 - Inline snippets follow the POSIX compliance, quoting, and error-handling rules

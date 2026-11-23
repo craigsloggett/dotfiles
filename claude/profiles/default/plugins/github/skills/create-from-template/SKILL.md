@@ -21,7 +21,7 @@ Positional and optional, passed to the create step. Invoke as
 
 Invoke these step skills in order:
 
-1. `create-repo-from-template` with `$template`, `$name`, `$owner`; note the
+1. `create-repo-from-template` with `$template`, `$name`, `$owner`. Note the
    resulting `<owner>/<name>`.
 2. `clone-repo-locally` with `<owner>/<name>`.
 3. `create-initial-release` with `<owner>/<name>`.

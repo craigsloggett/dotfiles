@@ -17,7 +17,7 @@ Positional and optional. Invoke as `/create-from-scratch <name> <owner>`.
 
 Invoke these step skills in order:
 
-1. `create-repo` with `$name`, `$owner`; note the resulting `<owner>/<name>`.
+1. `create-repo` with `$name`, `$owner`. Note the resulting `<owner>/<name>`.
 2. `clone-repo-locally` with `<owner>/<name>`.
 3. Report the repo URL and the local path at
    `~/Developer/GitHub/<owner>/<name>`.

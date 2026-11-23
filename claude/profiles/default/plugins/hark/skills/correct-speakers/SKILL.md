@@ -22,7 +22,7 @@ judgment. It scores each line of remote speech against every speaker, proposes
 the moves the scores settle, writes them as Hark's own corrections, and proves
 that Hark's rebuild of those corrections gives every word its intended speaker.
 Your part is the lines it cannot settle, and what the user tells you. Run it by
-that path; `hark` below is short for it.
+that path. Below, `hark` is short for it.
 
 Recent conversations:
 
@@ -77,7 +77,7 @@ nobody can name yet. A person with no voice in the conversation gets one.
 - A reply belongs to the person addressed or to whoever asked the question,
   even when Hark folded it into another speaker's turn.
 - A burst of greetings or goodbyes comes from more than one person. Split it
-  where the words let you and leave the rest; never give the whole burst to one
+  where the words let you and leave the rest. Never give the whole burst to one
   speaker.
 - Two people who sound alike score alike, so a `MERGED` voice can hide a third
   person the scores never separate. Look for the name the speakers address.
@@ -97,7 +97,7 @@ nobody can name yet. A person with no voice in the conversation gets one.
 - `install` appends its corrections after the user's own and leaves theirs in
   order.
 - A plan depends on the files it read. After the user edits anything in Hark,
-  gather the evidence again; `plan` and `install` refuse stale work.
+  gather the evidence again, because `plan` and `install` refuse stale work.
 - `hark check` failing means Hark's rules changed since this skill's last check
   against them. Stop planning, run `hark selftest`, and follow
   `reference/hark-rebuild.md`.

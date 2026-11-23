@@ -21,10 +21,10 @@ The diff this PR introduces, against its base branch:
    user names a different number, fetch it instead
    (`gh pr view <number> --json number,body,baseRefName` and
    `git diff <base>...HEAD`).
-2. Write from the diff above, because the body describes the merged result.
-   Read changed files in their final form where the diff is hard to summarize.
-   Treat commit history (`git log <base>..HEAD`) as at most a grouping hint;
-   never transcribe it.
+2. Write from the diff above, because the body describes the merged result. Read
+   changed files in their final form where the diff is hard to summarize. Treat
+   commit history (`git log <base>..HEAD`) as at most a grouping hint. Never
+   transcribe it.
 3. Draft the body as declarative bullets (see Rules). Cover every meaningful
    change in the diff, including ones the commit messages bury (a test suite, a
    doc table, a renamed default).
@@ -47,8 +47,8 @@ The diff this PR introduces, against its base branch:
   `Documents`). Never narrate the process (`First I added`, `Then refactored`)
   or mirror the commit history.
 - Derive bullets from the final diff. A change added then reverted within the
-  branch is not in the description; a change in the diff that no commit subject
-  mentions still belongs.
+  branch is not in the description, and a change in the diff that no commit
+  subject mentions still belongs.
 - Group related changes into one bullet, one concern per bullet.
 - Backtick identifiers such as inputs, outputs, filenames, flags, and function
   names.

@@ -13,7 +13,7 @@ Positional and optional. Invoke as `/sync-conventions <source>`.
 
 ## Workflow
 
-1. The source is `$source`; the target is the current working directory.
+1. The source is `$source`, and the target is the current working directory.
 2. Explore both directories. Launch Explore agents in parallel:
    - In the source, read the directory structure, key configuration files, and
      recent Git history (`git -C $source log --oneline -20`) to understand what

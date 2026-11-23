@@ -27,7 +27,7 @@ Working tree: !`git status --short`
 ### Gotchas
 
 - Never pass the reviewer your own read of the change, what it should do, or
-  what you suspect. A reviewer handed a hypothesis tends to confirm it; it
+  what you suspect. A reviewer handed a hypothesis tends to confirm it, so it
   must derive intent from the code.
 - The `save.sh` hook runs on every Bash call, the reviewer's included. A failing
   lint check feeds its errors into the review, and a `golangci-lint` config with

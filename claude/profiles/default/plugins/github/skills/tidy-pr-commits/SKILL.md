@@ -10,7 +10,7 @@ builds the squash commit's body on main by concatenating every branch commit's
 full message. A branch commit body lands verbatim in main's history. The
 standing rule is that branch commits carry a subject line only (conventional
 prefix, capitalized first word, imperative, under 70 characters, no trailing
-period, no body); the why belongs in the PR description. This skill is the
+period, no body). The why belongs in the PR description. This skill is the
 retroactive fix for commits that have bodies anyway.
 
 ## Preconditions

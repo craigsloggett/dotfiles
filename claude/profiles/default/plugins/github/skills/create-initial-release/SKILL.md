@@ -17,7 +17,7 @@ Positional and optional. Invoke as
 - `notes`: release notes. Blank defaults to `Initial release`. Quote multi-word
   notes.
 
-Prerelease is on by default; ask for a full release to drop it.
+Prerelease is on by default. Ask for a full release to drop it.
 
 ## Workflow
 

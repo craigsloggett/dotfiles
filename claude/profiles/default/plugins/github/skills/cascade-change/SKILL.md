@@ -37,7 +37,7 @@ Positional and optional. Invoke as
    - Apply the change: locate the change site semantically per `$change` and
      make the minimal edit. Do not expand scope.
    - Show the diff and confirm it matches the invocation's intent. This is the
-     only per-edit review; subagents apply the same pattern to every other repo.
+     only per-edit review. Subagents apply the same pattern to every other repo.
    - Revert: `git restore .` so the canonical repo starts the fan-out from a
      clean main, like every other repo.
 3. Fan out one subagent per repo in a single tool-call batch so they run in
@@ -73,7 +73,7 @@ Positional and optional. Invoke as
    them.
 5. Hand off. If the user gave `$consumer`, invoke `bump-consumer` with
    `$consumer` and the `{repo, new_tag, tag_sha}` list to re-pin the references.
-   Without it, report the list and stop; the user can run `bump-consumer` later.
+   Without it, report the list and stop. The user can run `bump-consumer` later.
 
 ## Rules
 
@@ -82,4 +82,4 @@ Positional and optional. Invoke as
   unlock the key before retrying.
 - The canonical preview is the only per-edit human review. Subagents cannot
   prompt the user, so do not add per-repo confirmation gates inside the fan-out.
-- Use the upstream repo's default merge style; do not override.
+- Use the upstream repo's default merge style. Do not override it.

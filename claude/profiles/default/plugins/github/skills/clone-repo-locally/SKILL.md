@@ -21,11 +21,11 @@ Authenticated GitHub user, for owner-prefixing a bare repo name:
 
 !`gh api user --jq .login`
 
-1. Resolve `$repo` into `<owner>/<name>`; prefix a bare name with the
+1. Resolve `$repo` into `<owner>/<name>`. Prefix a bare name with the
    authenticated user above. If `$repo` is blank, ask.
 2. The destination is `$dest` if non-empty, else
    `~/Developer/GitHub/<owner>/<name>`. If it already exists, stop and ask the
-   user to rename or remove it; never delete it.
+   user to rename or remove it. Never delete it.
 3. Clone over SSH:
    - `mkdir -p` the destination's parent.
    - `git clone git@github.com:<owner>/<name>.git <destination>`.

@@ -29,7 +29,7 @@ Default scope is the full feature-branch delta:
 
 - Resolve the default branch with
   `git symbolic-ref --short refs/remotes/origin/HEAD` (strip the `origin/`
-  prefix); fall back to `main`, then `master`, if that fails.
+  prefix). Fall back to `main`, then `master`, if that fails.
 - Committed changes: `git diff $(git merge-base HEAD <default>)...HEAD`.
 - Uncommitted changes: `git diff HEAD`.
 - Untracked files: `git ls-files -o --exclude-standard`.
@@ -65,12 +65,12 @@ scenario, report the suspicion as a question.
 - A defect is a confirmed failure scenario with a concrete input or state, the
   path it takes, and the wrong output, crash, or corruption it produces.
 - A concern you could not confirm, or a behavior change that is plausibly
-  intentional, is a question. List it separately; it never affects the verdict.
+  intentional, is a question. List it separately. It never affects the verdict.
 
 ### Verdict
 
-End with exactly one verdict line, then the supporting blocks. Do not iterate or
-re-review; produce the verdict once and stop.
+End with exactly one verdict line, then the supporting blocks. Produce the
+verdict once and stop.
 
 VERDICT: FIX if there is at least one defect. Otherwise VERDICT: SHIP.
 

@@ -1,13 +1,13 @@
 ---
 name: reduce-comments
-description: Use when the user wants comments removed or thinned, whether a specific quoted comment, named files, or the current branch's diff. Deletes by default; a comment survives only when removing it would cost the reader something the code cannot say.
+description: Use when the user wants comments removed or thinned, whether a specific quoted comment, named files, or the current branch's diff. Deletes by default. A comment survives only when removing it would cost the reader something the code cannot say.
 ---
 
 ## The Bar
 
-The user's dislike of a comment is enough reason to remove it. When they
-point at one, delete it; do not defend it, negotiate, or restate its value. The
-tests below guide sweeps, but taste outranks them, so when in doubt, delete.
+The user's dislike of a comment is enough reason to remove it. When they point
+at one, delete it. Do not defend it, negotiate, or restate its value. The tests
+below guide sweeps, but taste outranks them, so when in doubt, delete.
 
 ## Scope
 

@@ -12,7 +12,7 @@ description: >
 
 `mawk` is the default `/usr/bin/awk` on Ubuntu and GitHub-hosted runners, so a
 gawk-ism that runs locally can break or behave differently in CI. Write to POSIX
-`awk`; reach for an extension only when you know the runtime is `gawk`.
+`awk`, and reach for an extension only when you know the runtime is `gawk`.
 
 ### POSIX Vs Gawk
 
@@ -20,7 +20,7 @@ Non-POSIX features to avoid by default:
 
 - String functions `gensub`, `patsplit`, `strtonum`, `asort`, `asorti`:
   gawk-only. Use POSIX `sub`/`gsub`/`split`/`match`.
-- `gensub` backreferences: no POSIX equivalent; restructure with `match` +
+- `gensub` backreferences: no POSIX equivalent. Restructure with `match` +
   `substr`.
 - Time functions `systime`, `strftime`, `mktime`: `gawk` extensions that are
   not portable (`mawk` support is version-dependent).
@@ -44,11 +44,11 @@ Non-POSIX features to avoid by default:
 
 ### Regex Patterns
 
-- Embed constant regex as `/regex/` literals; reserve `-v var=...` for dynamic
-  values (user input, environment data).
+- Embed constant regex as `/regex/` literals, and reserve `-v var=...` for
+  dynamic values (user input, environment data).
 - `awk -v` runs C-style string-escape processing on the value before the regex
   engine sees it.
-- POSIX leaves unknown escapes like `\.` undefined; `mawk` strips the backslash
+- POSIX leaves unknown escapes like `\.` undefined. `mawk` strips the backslash
   (with a warning), so a literal dot written as `\.` becomes `.` (any char).
 - Don't rely on this: the one true `awk` strips `\.` too, and behavior varies
   across `awk` implementations and versions. Never count on a bare `\.`
@@ -75,7 +75,7 @@ Non-POSIX features to avoid by default:
 - When a matching block prints its own output, end it with `next` to skip the
   passthrough and avoid double-printing.
 - When a matching block mutates `$0` in place (e.g. two-argument `sub`), don't
-  `print` or `next`; let the passthrough print the modified record.
+  `print` or `next`. Let the passthrough print the modified record.
 - When the caller needs "did anything match?", set a flag in the matching block,
   check it in `END`, and `exit 2` (a distinct non-zero) so "no match" is
   distinguishable from the errors `awk` itself reports.
@@ -86,7 +86,7 @@ Non-POSIX features to avoid by default:
 ### Variable Naming
 
 - Use descriptive `snake_case` for `-v` variables (`pattern`, `replacement`,
-  `version`, `output`); the shell-side casing need not match.
+  `version`, `output`). The shell-side casing need not match.
 
 ### Comments
 

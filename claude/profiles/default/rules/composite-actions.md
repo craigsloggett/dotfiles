@@ -23,7 +23,7 @@ The inputs section columns, in order:
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Input`       | Input name in backticks (e.g. `` `base-branch` ``).                                                                                                                                       |
 | `Required`    | `Yes` or `No`.                                                                                                                                                                            |
-| `Default`     | Blank if required; `Empty` for an empty-string default; literal values in backticks (e.g. `` `${{ github.token }}` ``); computed defaults as prose with backticks around code references. |
+| `Default`     | Blank if required. `Empty` for an empty-string default. Literal values in backticks (e.g. `` `${{ github.token }}` ``). Computed defaults as prose with backticks around code references. |
 | `Description` | One sentence, capitalized, ending with a period.                                                                                                                                          |
 
 The outputs section columns, in order:

@@ -55,7 +55,7 @@ skeleton files, and stop to ask only when a placeholder's value is ambiguous.
    skeleton's structure.
 5. Write a fresh README for the actual project using the repo name, structure,
    and file contents. Preserve auto-generated markers (e.g.
-   `<!-- BEGIN_TF_DOCS -->` / `<!-- END_TF_DOCS -->`). Report what you wrote;
+   `<!-- BEGIN_TF_DOCS -->` / `<!-- END_TF_DOCS -->`). Report what you wrote so
    the user can refine it.
 6. Run linters: `make lint` if a `Makefile` exists, else by type:
    - Terraform: `terraform fmt -check`, `terraform validate`
@@ -65,5 +65,5 @@ skeleton files, and stop to ask only when a placeholder's value is ambiguous.
 ## Rules
 
 - Surrounding context distinguishes a placeholder from a real value.
-  `@craigsloggett` in `CODEOWNERS` is the real owner; `TODO` about future work
-  is project notes.
+  `@craigsloggett` in `CODEOWNERS` is the real owner, and `TODO` about future
+  work is project notes.

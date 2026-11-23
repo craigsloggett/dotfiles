@@ -21,8 +21,8 @@ paths:
 
 ## Headings
 
-- Use `##` for section headings; omit a document title heading. Do not use `#`
-  (H1).
+- Use `##` for section headings and omit a document title heading. Do not use
+  `#` (H1).
 
 ## New Files
 
@@ -34,12 +34,12 @@ paths:
 
 - Phrase rules as a clean imperative bullet matching the voice and format of
   sibling bullets.
-- Keep each bullet to a single scannable point (one idea); split a bullet that
-  bundles distinct rules. A rule paired with its rationale or exception counts
-  as one idea.
-- Do not duplicate an existing rule or contradict one; if a new rule would,
+- Keep each bullet to a single scannable point (one idea), and split a bullet
+  that bundles distinct rules. A rule paired with its rationale or exception
+  counts as one idea.
+- Do not duplicate an existing rule or contradict one. If a new rule would,
   surface it without changing anything.
-- Append a rule under the best-fitting existing heading; if none fits, add a new
+- Append a rule under the best-fitting existing heading. If none fits, add a new
   one.
 - Always ensure rules are concise and declarative: ask yourself “Would removing
   this cause Claude to make a mistake?”

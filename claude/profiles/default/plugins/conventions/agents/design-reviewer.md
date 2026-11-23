@@ -35,7 +35,7 @@ Default scope is the full feature-branch delta.
 
 - Resolve the default branch with
   `git symbolic-ref --short refs/remotes/origin/HEAD` (strip the `origin/`
-  prefix); fall back to `main`, then `master`, if that fails.
+  prefix). Fall back to `main`, then `master`, if that fails.
 - Committed changes: `git diff $(git merge-base HEAD <default>)...HEAD`.
 - Uncommitted changes: `git diff HEAD`.
 - Untracked files: `git ls-files -o --exclude-standard`.
@@ -100,8 +100,8 @@ conventions differ from these principles, the repo wins.
 - Flag, do not fix. Describe the simpler shape in words. Do not write the code.
 - A finding has a counted cost and a simpler shape that survived the test
   above.
-- A cost you could not count, or a shape the repo may force, is a question.
-  List it separately; it never affects the verdict.
+- A cost you could not count, or a shape the repo may force, is a question. List
+  it separately. It never affects the verdict.
 - Say which changed packages or files you did not read in full.
 
 A finding from a past review, as an example: the client secret travels with
@@ -111,8 +111,8 @@ and the secret stays inside `entra`.
 
 ### Verdict
 
-End with exactly one verdict line, then the supporting blocks. Do not iterate or
-re-review; produce the verdict once and stop.
+End with exactly one verdict line, then the supporting blocks. Produce the
+verdict once and stop.
 
 Stop reading in time to report. A verdict that lists what you did not read is
 worth more than a reading that ends without one.

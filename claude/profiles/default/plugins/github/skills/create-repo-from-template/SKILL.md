@@ -31,7 +31,7 @@ Existing descriptions, tagged with their topics:
 
 !`gh repo list --json description,repositoryTopics -L 200 | jq -r '.[] | select(.description != null and .description != "") | "[\([.repositoryTopics[]?.name] | join(","))] \(.description)"'`
 
-1. Pre-flight. Run `gh auth status`; if it fails, hand back to the user to run
+1. Pre-flight. Run `gh auth status`. If it fails, hand back to the user to run
    `gh auth login`.
 2. Resolve the template into `<template>` (full `owner/repo`).
    - If `$template` is non-empty, call
@@ -46,15 +46,17 @@ Existing descriptions, tagged with their topics:
      Confirm.
    - Name `<name>`: `$name` if non-empty, else ask. Reject anything not matching
      `^[A-Za-z0-9._-]+$`.
-   - Visibility: default public; use private only when asked.
-4. Propose topics from the vocabulary above, matching the user's phrasing.
-   Examples: "composite action" or "GitHub action" becomes `composite-action`;
-   "Terraform module/provider" becomes `terraform` (add `hashicorp` for a
-   HashiCorp product); "vault plugin" becomes `vault`; "shell script" or "POSIX"
-   becomes `shell`. Let the user add, remove, or override; accept topics outside
-   the vocabulary only if the user explicitly types them.
+   - Visibility: default public. Use private only when asked.
+4. Propose topics from the vocabulary above, matching the user's phrasing. Let
+   the user add, remove, or override. Accept topics outside the vocabulary only
+   if the user explicitly types them. Examples:
+   - "composite action" or "GitHub action" becomes `composite-action`
+   - "Terraform module/provider" becomes `terraform`
+   - A HashiCorp product also gets `hashicorp`
+   - "vault plugin" becomes `vault`
+   - "shell script" or "POSIX" becomes `shell`
 5. Propose a one-sentence description in the style of the corpus samples whose
-   topics overlap the proposed ones; show the samples used so the user can
+   topics overlap the proposed ones, and show the samples used so the user can
    sanity-check. Allow an empty description but discourage it.
 6. Create the repo with the REST generate endpoint. Do not use
    `gh repo create --template`, because its GraphQL clone fails for a
@@ -69,7 +71,7 @@ Existing descriptions, tagged with their topics:
      -F private=false
    ```
 
-   Set `-F private=true` for private; omit `-f description` if empty.
+   Set `-F private=true` for private, and omit `-f description` if empty.
 7. Apply settings and topics:
 
    ```
@@ -83,7 +85,7 @@ Existing descriptions, tagged with their topics:
      --add-topic <topic1>,<topic2>,...
    ```
 
-   `--add-topic` takes a comma-separated list; omit it if no topics. If `gh`
+   `--add-topic` takes a comma-separated list. Omit it if no topics. If `gh`
    rejects a flag, stop and surface the error.
 8. Create the default branch ruleset (every repo gets this). Write the body to a
    temp file (`mktemp`) and post it with

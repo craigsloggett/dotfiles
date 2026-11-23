@@ -13,7 +13,7 @@ Positional and optional. Invoke as `/settle-open-prs <dir>`.
 
 ## Workflow
 
-Work in `<dir>` (the local clone; blank means the current directory).
+Work in `<dir>` (the local clone, or the current directory when blank).
 
 1. List open PRs: `gh pr list --state open --json number,title,author`.
 2. For each Dependabot PR (author `app/dependabot`):
@@ -26,7 +26,7 @@ Work in `<dir>` (the local clone; blank means the current directory).
    - Verify checks with `gh pr checks <number>` (add `--watch` if still
      running). If all green and the title is correct, merge with
      `gh pr merge <number> --squash`.
-3. Report any non-Dependabot PR for review; do not merge it.
+3. Report any non-Dependabot PR for review. Do not merge it.
 4. Pull the default branch: `git -C <dir> pull --ff-only` (a fresh clone is
    already on it).
 

@@ -9,10 +9,11 @@ paths:
 - Use `snake_case` for all resource names, variable names, and output names.
 - Use descriptive names, as in `aws_s3_bucket.application_logs`. Avoid names
   like `aws_s3_bucket.bucket1`.
-- Don't include the resource type in a resource name; the address already
-  carries it (`aws_instance.web_api_instance` becomes `aws_instance.web_api`).
+- Don't include the resource type in a resource name, because the address
+  already carries it (`aws_instance.web_api_instance` becomes
+  `aws_instance.web_api`).
 - Define resources and data sources after what they reference so the code builds
-  on itself; place a data source before the resource that uses it.
+  on itself. Place a data source before the resource that uses it.
 - Order resource parameters with `count`/`for_each` first, then non-block
   arguments, then nested blocks, then `lifecycle`, then `depends_on`.
 - Group related arguments logically.
@@ -40,18 +41,18 @@ paths:
 - Every module has `variables.tf`, `outputs.tf`, `main.tf`, and `terraform.tf`.
 - Keep modules focused on a single concern.
 - Compose modules at the root, keeping the tree flat (one level of child
-  modules); wire them together with expressions like `module.network.vpc_id`
+  modules). Wire them together with expressions like `module.network.vpc_id`
   rather than nesting modules inside modules.
 - Pass a module's dependencies in as input variables instead of creating them
   inside the module, so the root can rewire modules or swap inputs for data
   sources without changing the module.
 - Don't write a module that detects whether an object exists and creates it
-  conditionally; accept it as an input variable and let the caller pass either a
+  conditionally. Accept it as an input variable and let the caller pass either a
   managed `resource` or a `data` source.
 - Type such a dependency variable as an `object({...})` listing only the
   attributes the module uses, so either a resource or a data source satisfies
   it.
-- Declare provider configurations only in the root module; reusable modules must
+- Declare provider configurations only in the root module. Reusable modules must
   not contain `provider` blocks, because they break `count`, `for_each`, and
   `depends_on` on the module block.
 - Pass providers to child modules implicitly by inheritance, or explicitly with
@@ -82,7 +83,7 @@ paths:
 
 ## Local Values
 
-- Use local values sparingly; overuse obscures intent.
+- Use local values sparingly, because overuse obscures intent.
 - Define a local in `locals.tf` if referenced across files, or at the top of the
   single file that uses it.
 
@@ -119,7 +120,7 @@ paths:
 ## Configuration Validation
 
 - Reserve variable `validation` blocks for uniquely restrictive input
-  requirements beyond type checking; they run at plan time.
+  requirements beyond type checking. They run at plan time.
 - Where an assumption (a condition that must hold for a resource to be usable)
   or a guarantee (behavior consumers rely on) is worth enforcing, consider a
   `precondition` or `postcondition` block so the violation fails early and in

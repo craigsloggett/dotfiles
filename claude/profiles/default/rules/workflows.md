@@ -12,7 +12,7 @@ paths:
   it when `latest` moves. Never use `ubuntu-latest` itself.
 - Declare an explicit least-privilege `permissions:` block at the top of each
   workflow.
-- Give the workflow, every job, and every step a Title Case `name:`; name the
+- Give the workflow, every job, and every step a Title Case `name:`. Name the
   checkout step `Checkout`.
 - In `mikefarah/yq` (v4), `select(.uses | test(...))` works without a `// ""`
   guard, since `test()` on null returns false.

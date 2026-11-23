@@ -6,20 +6,20 @@ paths:
 ## Style
 
 - Format with `rumdl` and ensure the file passes `rumdl check`.
-- Match the heading case the repo already uses; default to Title Case.
+- Match the heading case the repo already uses. Default to Title Case.
 - Be clear and concise as possible by asking the question "if I remove this,
   will the reader misunderstand?", if they won't, remove it.
-- Wrap prose at 80 columns; tables, fenced code blocks, and a line whose only
+- Wrap prose at 80 columns. Tables, fenced code blocks, and a line whose only
   overflow is a URL are exempt.
 - Do not lead a bullet with a bold label. If `**Foo**: bar` is the whole bullet,
   write `Foo: bar` or drop the label.
-- Do not use `—` to describe a bullet point; migrate to a table in a new section
+- Do not use `—` to describe a bullet point. Migrate to a table in a new section
   if possible.
 - Keep lists tight: no blank lines between list items, or between a list and its
   introductory line.
 - Keep nested list items to a single line, with no fenced code block beneath
-  them; Obsidian mis-renders text or a fence indented under a sub-bullet. Lift a
-  multi-line block to the top level instead.
+  them, because Obsidian mis-renders text or a fence indented under a
+  sub-bullet. Lift a multi-line block to the top level instead.
 - Indent with spaces. Do not use tabs.
 - Write every code block as a fenced block.
 - The YAML frontmatter of a Markdown document must pass a `yamllint` check.

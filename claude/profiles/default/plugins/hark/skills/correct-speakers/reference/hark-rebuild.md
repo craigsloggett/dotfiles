@@ -13,7 +13,7 @@ line-for-line port of it, checked against Hark at commit `c7cccfa` (version
 | Adding or undoing a correction        | Rebuilds the transcript and voiceprints |
 | Launch, `voiceprints.jsonl` missing   | The same rebuild                        |
 | Launch, `transcript.jsonl` unreadable | The same rebuild                        |
-| Naming a speaker                      | Nothing; only `attributions` changes    |
+| Naming a speaker                      | Nothing. Only `attributions` changes    |
 
 ### Rules
 
@@ -27,11 +27,11 @@ line-for-line port of it, checked against Hark at commit `c7cccfa` (version
    its span and pins it. `merge` moves one voice's words to another. `discard`
    drops system words that start in its span, or a microphone turn inside it.
 5. Words run together until the voice changes, the speaker pauses (1 second
-   after a sentence end, 2 seconds inside a sentence), or a microphone turn
-   cuts in. A microphone turn that starts in a pause of 0.4 seconds ends the
-   run there; one that started any time during the run ends it at the next
-   sentence end. Hark measures the pause between diarized segments, except for
-   a pinned word or one that sits more than 0.25 seconds outside its segment.
+   after a sentence end, 2 seconds inside a sentence), or a microphone turn cuts
+   in. A microphone turn that starts in a pause of 0.4 seconds ends the run
+   there, and one that started any time during the run ends it at the next
+   sentence end. Hark measures the pause between diarized segments, except for a
+   pinned word or one that sits more than 0.25 seconds outside its segment.
 6. When the next run is another voice, the last one or two unpinned words after
    a run's final sentence end move to that voice. Three or more stay, and so
    does a tail that is the whole run.
@@ -80,6 +80,6 @@ rebuild and does not count it as a failure.
    the commit named at the top of this file.
 
 Hark's source is at `~/Developer/GitHub/craigsloggett/hark`. The installed app
-can be older than the checkout; compare `CFBundleShortVersionString` in
+can be older than the checkout, so compare `CFBundleShortVersionString` in
 `/Applications/Hark.app/Contents/Info.plist` with the checkout's history before
 blaming the port.

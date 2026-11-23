@@ -9,9 +9,9 @@ paths:
 | Field                      | Use                                                                          |
 | -------------------------- | ---------------------------------------------------------------------------- |
 | `name`                     | Required. kebab-case, action-oriented (verb-noun).                           |
-| `description`              | Required. When to invoke; Claude reads it for relevance. Omit what it does.  |
+| `description`              | Required. When to invoke. Claude reads it for relevance. Omit what it does.  |
 | `arguments`                | Positional argument names (string or list) enabling `$name` substitution.    |
-| `disable-model-invocation` | `true` for side-effecting skills only; leave off read-only ones to auto-run. |
+| `disable-model-invocation` | `true` for side-effecting skills only. Leave off read-only ones to auto-run. |
 | `allowed-tools`            | The smallest set the skill needs.                                            |
 
 Example:
@@ -25,7 +25,7 @@ description: Use when ...
 
 ## Headings
 
-- Use `##` for the document title and `###` for sections; do not use `#` (H1).
+- Use `##` for the document title and `###` for sections. Do not use `#` (H1).
 
 ## Scope
 
@@ -35,8 +35,8 @@ description: Use when ...
 
 ## Body
 
-- Gotchas are the load-bearing content. Conventions are derivable from the code;
-  gotchas are what justify the skill.
+- Gotchas are the load-bearing content. Conventions are derivable from the code,
+  but gotchas are what justify the skill.
 - Show, do not tell. A conformant example in `examples/` beats a paragraph
   describing the shape.
 - Inline shell with `!` injects real state. Prefer `!git diff HEAD` over "look

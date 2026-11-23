@@ -7,13 +7,13 @@ paths:
 
 - Follow the
   [Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/).
-- `UpperCamelCase` for types and protocols; `lowerCamelCase` for everything else
-  (functions, methods, properties, enum cases, parameters).
-- Name methods and functions as phrases that read at the call site; omit
+- Use `UpperCamelCase` for types and protocols and `lowerCamelCase` for
+  everything else (functions, methods, properties, enum cases, parameters).
+- Name methods and functions as phrases that read at the call site. Omit
   needless words and don't repeat type information a parameter already conveys.
 - Name booleans as assertions such as `isEmpty` and `hasSuffix`. Never `empty`
   or `suffix`.
-- Suffix a capability protocol `-able`/`-ible` (`Equatable`); name a noun
+- Suffix a capability protocol `-able`/`-ible` (`Equatable`), and name a noun
   protocol for what it is (`Collection`).
 - Case acronyms uniformly, as in `urlString` and `parseHTML`. Never
   `uRLString`.
@@ -29,7 +29,7 @@ paths:
 
 ## Comments
 
-- Do not write comments. Names, types, and structure carry the meaning; the
+- Do not write comments. Names, types, and structure carry the meaning, and the
   design conversation and the record carry the why.
 - Only a tunable constant or a platform trap the code cannot show earns a
   `///`. For a constant, say what it bounds and what you measured it against.
@@ -39,13 +39,13 @@ paths:
 
 ## Optionals and Safety
 
-- Never force-unwrap (`!`), force-try (`try!`), or force-cast (`as!`); each
-  crashes on bad input. The sole exception is a value a local precondition
+- Never force-unwrap (`!`), force-try (`try!`), or force-cast (`as!`), because
+  each crashes on bad input. The sole exception is a value a local precondition
   guarantees, with a comment saying why.
 - Use `guard let value else { ... }` for early exit and `if let value` for the
-  narrow branch; both take the shorthand that omits `= value`.
+  narrow branch. Both take the shorthand that omits `= value`.
 - Chain with `?.` instead of unwrapping then branching. Prefer `if let` with a
-  defaulted `var` over `??` embedded mid-expression (`(f(x) ?? 0) + 1`); a bare
+  defaulted `var` over `??` embedded mid-expression (`(f(x) ?? 0) + 1`). A bare
   trailing default (`name ?? "Unknown"`) is fine.
 - Avoid implicitly unwrapped optionals (`String!`) outside Interface Builder
   outlets.
@@ -54,9 +54,9 @@ paths:
 
 - Throw a specific `Error`-conforming type (usually an `enum` of cases). Never
   throw a string or an ad-hoc generic error.
-- Use typed throws (`throws(SomeError)`) for a closed, known failure set; leave
-  throws untyped when callers cannot list the failures.
-- Reserve `Result` for stored or deferred outcomes; prefer `throws` for
+- Use typed throws (`throws(SomeError)`) for a closed, known failure set, and
+  leave throws untyped when callers cannot list the failures.
+- Reserve `Result` for stored or deferred outcomes, and prefer `throws` for
   synchronous call-and-return.
 - Use `try?` only when nil is a meaningful result. Never use it to silence an
   error you should handle.
@@ -70,9 +70,9 @@ paths:
 
 ## Types and Immutability
 
-- Reach for `struct` and `enum` first; choose `class` only when you need
+- Reach for `struct` and `enum` first. Choose `class` only when you need
   reference identity, inheritance, or shared mutable state.
-- Declare `let` by default; promote to `var` only where the value has to
+- Declare `let` by default, and promote to `var` only where the value has to
   change.
 - Mark every non-subclassed `class` `final`.
 - Model mutually exclusive states as an `enum` with associated values. Avoid
@@ -82,23 +82,23 @@ paths:
 ## Expressions
 
 - Split a dense expression by naming intermediate subexpressions with `let`. Do
-  not wrap the single expression across lines; the name documents intent where
-  a line break does not.
+  not wrap the single expression across lines, because the name documents intent
+  where a line break does not.
 - Write a multi-clause condition with the keyword alone on its line, one clause
   per line, and `{` or `else {` alone on the last.
-- Separate a block from the step after it with a blank line; a return directly
+- Separate a block from the step after it with a blank line. A return directly
   after a plain statement cuddles it.
 - Declare an empty collection with its type on the left: `var x: [T] = []`.
   Never write `[T]()`.
-- Give an optional accessor over an enum you own an arm for every nil case;
-  never use `default` or `guard case`, so a new case stops the compiler at the
+- Give an optional accessor over an enum you own an arm for every nil case.
+  Never use `default` or `guard case`, so a new case stops the compiler at the
   accessor.
 
 ## Concurrency
 
-- Target the Swift 6 language mode with strict concurrency checking on; resolve
+- Target the Swift 6 language mode with strict concurrency checking on. Resolve
   data-race warnings rather than suppressing them.
-- Use `async`/`await`; do not add completion-handler APIs or bridge async to
+- Use `async`/`await`. Do not add completion-handler APIs or bridge async to
   sync with `DispatchSemaphore`.
 - Isolate UI-facing state to `@MainActor`.
 - Type a callback the engine will call `@escaping @MainActor (X) -> Void` and
@@ -110,25 +110,26 @@ paths:
 
 ## Access Control
 
-- Default to the most restrictive access level that compiles; widen only when a
-  caller needs it.
+- Default to the most restrictive access level that compiles, and widen only
+  when a caller needs it.
 - Make stored properties `private`, or `private(set)` when read-only from
   outside, unless they are part of the type's contract.
-- Mark a library's intended API surface `public` or `package`; leave everything
-  else `internal`.
+- Mark a library's intended API surface `public` or `package`, and leave
+  everything else `internal`.
 
 ## Structure
 
 - Declare a struct's stored properties in the order the memberwise initializer
   should read at the call site. Put identity first, then defining facts, then
   content, and omittable overlays last. A `var` with a default becomes an
-  omittable trailing parameter; a `let` with a default leaves the initializer
-  entirely. Use a defaulted `let` to forbid callers from supplying the value.
+  omittable trailing parameter, and a `let` with a default leaves the
+  initializer entirely. Use a defaulted `let` to forbid callers from supplying
+  the value.
 - Order every parameter list a caller reads, whether a function, an explicit
-  initializer, or a struct's stored properties (its memberwise initializer).
-  Put data before closures, required before optional within the data, and
-  defaulted last. Closures include view-builder slots, so trailing-closure
-  syntax survives; a required parameter never follows an optional one.
+  initializer, or a struct's stored properties (its memberwise initializer). Put
+  data before closures, required before optional within the data, and defaulted
+  last. Closures include view-builder slots, so trailing-closure syntax
+  survives. A required parameter never follows an optional one.
 - When grouping-by-concept fights call-site readability, prefer the call site,
   because every caller sees the initializer's order, only the file sees the
   grouping, and `let`/`var` already mark each line's role.
@@ -145,7 +146,7 @@ paths:
 
 - A view never starts async work: no `.task`, no `Task { }` in a body. It calls
   a synchronous method on an app object. The app object owns the task.
-- A pane-level view reads app objects with `@Environment(T.self)`; a view
+- A pane-level view reads app objects with `@Environment(T.self)`. A view
   stamped per row, and a `Commands` struct, take values and closures as lets.
 - A conditional modifier is `@ViewBuilder` over `if let`, returning `self` when
   it doesn't add anything.
@@ -153,13 +154,13 @@ paths:
 
 ## Logging
 
-- Each type stores one `private let logger` from the app's one `Logger` factory;
-  never construct a logger inline or share a global.
+- Each type stores one `private let logger` from the app's one `Logger` factory.
+  Never construct a logger inline or share a global.
 - `error` for a failure handled by degrading, `notice` for a stage milestone,
   `info` for a measurement, `debug` for chatter, `fault` for data the app cannot
   load or save.
-- A log message is a capitalised sentence without a period; names and errors
-  interpolate with `privacy: .public`; hoist a member read to a local before the
+- A log message is a capitalised sentence without a period. Names and errors
+  interpolate with `privacy: .public`. Hoist a member read to a local before the
   call.
 
 ## Dependencies
@@ -171,12 +172,12 @@ paths:
 ## Formatting and Linting
 
 - SwiftFormat owns formatting. Run `swiftformat .` to format and
-  `swiftformat --lint .` in CI; keep settings in `.swiftformat` and pin
+  `swiftformat --lint .` in CI. Keep settings in `.swiftformat` and pin
   `--swift-version`.
 - SwiftLint owns semantic lint. Run `swiftlint` locally,
   `swiftlint lint --strict` in CI (warnings become errors), and
-  `swiftlint --fix` to autocorrect; keep rules in `.swiftlint.yml`.
+  `swiftlint --fix` to autocorrect. Keep rules in `.swiftlint.yml`.
 - Use `swiftlint analyze` for the compiler-backed rules that need a build log.
 - Disable any SwiftLint rule that overlaps SwiftFormat's formatting so the two
-  never fight; let SwiftFormat be the single source of formatting truth.
+  never fight.
 - Indent with 4 spaces.

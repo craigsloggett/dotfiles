@@ -13,17 +13,17 @@ paths:
   guaranteed builtin.
 - Use `$(( ))` for arithmetic. Never use `expr`.
 - Use `printf` for all output. Never use `echo`.
-- Single-quote `printf` format strings; pass expansions as `%s` with separate
+- Single-quote `printf` format strings and pass expansions as `%s` with separate
   double-quoted arguments: `printf '%s\n' "message: ${var}"`.
 - Pass values into embedded programs (`sed`, `awk`, `jq`) as data. Never splice
   them into program text.
-- `sed` is fine for static patterns; escape the value first if the replacement
+- `sed` is fine for static patterns. Escape the value first if the replacement
   is dynamic.
 
 ## Quoting and Variable Expansion
 
-- Always `"${var}"`. Positional parameters are the exception and use bare
-  double quotes (`"$1"`, `"$@"`, `"$#"`); never write `"${1}"`.
+- Always `"${var}"`. Positional parameters are the exception and use bare double
+  quotes (`"$1"`, `"$@"`, `"$#"`). Never write `"${1}"`.
 - Quote all command substitutions: `"$(command)"`.
 - Pass arguments through with `"$@"`. Never use `$*`.
 - Use `read -r`.
@@ -37,21 +37,21 @@ paths:
 - Validate inputs early.
 - On failure, exit non-zero with a clear message to stderr.
 - Set `trap cleanup EXIT INT TERM HUP` when creating temporary resources.
-- Traps don't inherit into subshells; set them in the scope that owns the
+- Traps don't inherit into subshells, so set them in the scope that owns the
   resource.
 - Single-statement failure: `cmd || die "msg"`.
 - Multi-statement failure: `if ! cmd; then ... fi`. Avoid the `{ }` block form.
 - One condition per statement, failing immediately with a specific message.
 - Don't collect errors to report at the end and don't nest checks.
 - Use `cond || die "msg"` for single conditions and
-  `if cond1 && cond2; then die "msg"; fi` for compound ones; avoid
+  `if cond1 && cond2; then die "msg"; fi` for compound ones. Avoid
   `cond1 && cond2 && die "msg"`.
 - Aggregating output from independent tools (e.g. linter findings) is
   reporting, so deferring it to the end is fine. The fail-fast rule governs
   validation conditions only.
-- Functions `return` a status so the caller decides what to do; this keeps them
+- Functions `return` a status so the caller decides what to do. That keeps them
   composable (`func || ...`) and sourceable by tests.
-- Only the top-level flow and `die()` use `exit`; reserve it for aborting the
+- Only the top-level flow and `die()` use `exit`. Reserve it for aborting the
   whole script.
 
 ## Linting
@@ -66,7 +66,7 @@ paths:
 ## Temporary Files
 
 - Use `mktemp` for files and `mktemp -d` for session-scoped directories. Respect
-  `$TMPDIR`; never hard-code `/tmp`.
+  `$TMPDIR`. Never hard-code `/tmp`.
 - Write atomically: `mktemp` a staging file in the target's directory, then `mv`
   into place.
 - No predictable `.new`/`.tmp`/`.bak` suffixes.
@@ -86,7 +86,7 @@ paths:
 - Include default assignments (`${VAR:=}`).
 - Include tool checks (`command -v`).
 - Place each validation in the scope that assigns its variable, after the
-  assignment; a check on an unset variable aborts under `set -u`.
+  assignment, because a check on an unset variable aborts under `set -u`.
 - With a `main()`, bind working variables there.
 - Without a `main()`, combine assert and bind:
   `file="${INPUT_FILE:?file input is required}"`.
@@ -96,7 +96,7 @@ paths:
 
 ## Script Structure
 
-- Wrap the script body in `main()`; call `main "$@"` as the last line. Small
+- Wrap the script body in `main()` and call `main "$@"` as the last line. Small
   single-purpose scripts (hooks, one-shot utilities) may omit `main()` and run
   linearly.
 - Define helper functions above `main()`.
@@ -114,7 +114,7 @@ paths:
     in both `/bin/sh` and `dash`.
 - Return via exit status (and optionally stdout). Never mutate caller variables
   to return a value.
-- State set once in `main()` may be global; don't use globals as a return
+- State set once in `main()` may be global. Don't use globals as a return
   channel from helpers.
 - Transformation helpers take inputs as positional arguments, assigned to named
   locals at the top (`file="${1:?file is required}"`).
@@ -134,7 +134,7 @@ paths:
 
 - In committed example files users copy and fill in (e.g.
   `environment.example.sh`), assign environment variables directly with
-  placeholder values; never invoke user-specific tooling (`pass`, credential
+  placeholder values. Never invoke user-specific tooling (`pass`, credential
   helpers, `eval "$(tool ...)"`).
 - When a tool would export variables on the user's behalf (e.g.
   `eval "$(doormat aws export ...)"`), list those variables with placeholders
