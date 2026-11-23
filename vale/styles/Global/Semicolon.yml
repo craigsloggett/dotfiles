@@ -1,0 +1,5 @@
+extends: existence
+message: Semicolon. Use two sentences or a conjunction.
+nonword: true
+tokens:
+  - ;
