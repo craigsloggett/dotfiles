@@ -3,8 +3,6 @@
 Each pair is a real fix, with the project's names replaced. The last five
 rows show a fix to avoid, a fix to flag, and three hits to keep.
 
-<!-- vale write-good.ThereIs = NO -->
-
 | Pattern                 | Before                                                                                                                   | After                                                                                                                                                         |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Contrast nobody claimed | Both surface to the caller as errors rather than wrong output.                                                           | Both surface to the caller as errors.                                                                                                                         |
@@ -31,5 +29,3 @@ rows show a fix to avoid, a fix to flag, and three hits to keep.
 | Kept on purpose         | `tenant_id` must be the directory id, not a domain name.                                                                 | Unchanged, because the contrast warns about a real mistake.                                                                                                   |
 | Kept on purpose         | `## Why this matters to the customer` in an RFC.                                                                         | Unchanged, because the heading comes from the RFC template.                                                                                                   |
 | Kept on purpose         | The sender tries again only if the failure is retryable.                                                                 | Unchanged, because the condition is what the sentence says.                                                                                                   |
-
-<!-- vale write-good.ThereIs = YES -->
