@@ -12,6 +12,7 @@ Dependabot
 Hark
 [Hh]eredocs?
 [Ii]nitializers?
+[Kk]anban
 [Mm]emberwise
 [Oo]mittable
 [Oo]ptionals?
