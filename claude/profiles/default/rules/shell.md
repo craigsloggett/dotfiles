@@ -6,25 +6,26 @@ paths:
 ## POSIX Compliance
 
 - Shebang `#!/bin/sh`. Never `#!/bin/bash` or `#!/usr/bin/env bash`.
-- No bashisms: no `[[ ]]`, no `local`, no arrays, no `source` (use `.`), no
+- Do not use bashisms such as `[[ ]]`, `local`, arrays, `source` (use `.`), or
   `set -o pipefail`.
-- Use `[ ... ]` for tests, never `test`.
-- `while :`, never `while true` (`true` is not a guaranteed builtin).
-- Use `$(( ))` for arithmetic, never `expr`.
-- Use `printf` for all output, never `echo`.
+- Use `[ ... ]` for tests. Never use `test`.
+- Loop with `while :`. Never use `while true`, because `true` is not a
+  guaranteed builtin.
+- Use `$(( ))` for arithmetic. Never use `expr`.
+- Use `printf` for all output. Never use `echo`.
 - Single-quote `printf` format strings; pass expansions as `%s` with separate
   double-quoted arguments: `printf '%s\n' "message: ${var}"`.
-- Pass values into embedded programs (`sed`, `awk`, `jq`) as data, not spliced
-  into program text.
+- Pass values into embedded programs (`sed`, `awk`, `jq`) as data. Never splice
+  them into program text.
 - `sed` is fine for static patterns; escape the value first if the replacement
   is dynamic.
 
 ## Quoting and Variable Expansion
 
-- Always `"${var}"`. Exception: positional parameters use bare double quotes
-  (`"$1"`, `"$@"`, `"$#"`), not `"${1}"`.
+- Always `"${var}"`. Positional parameters are the exception and use bare
+  double quotes (`"$1"`, `"$@"`, `"$#"`); never write `"${1}"`.
 - Quote all command substitutions: `"$(command)"`.
-- Pass arguments through with `"$@"`, never `$*`.
+- Pass arguments through with `"$@"`. Never use `$*`.
 - Use `read -r`.
 
 ## Error Handling
@@ -39,19 +40,19 @@ paths:
 - Traps don't inherit into subshells; set them in the scope that owns the
   resource.
 - Single-statement failure: `cmd || die "msg"`.
-- Multi-statement failure: `if ! cmd; then ... fi`, not the `{ }` block form.
+- Multi-statement failure: `if ! cmd; then ... fi`. Avoid the `{ }` block form.
 - One condition per statement, failing immediately with a specific message.
 - Don't collect errors to report at the end and don't nest checks.
 - Use `cond || die "msg"` for single conditions and
   `if cond1 && cond2; then die "msg"; fi` for compound ones; avoid
   `cond1 && cond2 && die "msg"`.
-- Aggregating output from independent tools (e.g. several linters' findings) is
-  reporting, not error collection; deferring it to the end is fine. The
-  fail-fast rule governs validation conditions only.
+- Aggregating output from independent tools (e.g. linter findings) is
+  reporting, so deferring it to the end is fine. The fail-fast rule governs
+  validation conditions only.
 - Functions `return` a status so the caller decides what to do; this keeps them
   composable (`func || ...`) and sourceable by tests.
 - Only the top-level flow and `die()` use `exit`; reserve it for aborting the
-  whole script, never for ending a reusable helper.
+  whole script.
 
 ## Linting
 
@@ -59,8 +60,8 @@ paths:
 
 ## Debugging
 
-- Use `:` with arguments as a silent trace marker: the line emits nothing
-  normally but prints its expansion under `set -x` (`+ : HOME is /home/user`).
+- Use `:` with arguments as a silent trace marker: the line prints its
+  expansion only under `set -x` (`+ : HOME is /home/user`).
 
 ## Temporary Files
 
@@ -72,10 +73,10 @@ paths:
 - Register cleanup via `trap` immediately after `mktemp`, before any failure
   path can leak the resource.
 - Set one trap covering all cleanup near the top of `main()` (or top-level for
-  scripts without `main`), not one per resource. A second `trap` for the same
-  signal silently disables the first.
-- Mark session variables `readonly` so the path the trap will `rm -rf` can't be
-  reassigned.
+  scripts without `main`). A second `trap` for the same signal silently
+  disables the first.
+- Mark session variables `readonly` so nothing can reassign the path the trap
+  will `rm -rf`.
 
 ## Prelude
 
@@ -84,14 +85,14 @@ paths:
   `: "${INPUT_FILE:?file input is required}"`.
 - Include default assignments (`${VAR:=}`).
 - Include tool checks (`command -v`).
-- Place each validation in the scope where its variable is assigned, after the
+- Place each validation in the scope that assigns its variable, after the
   assignment; a check on an unset variable aborts under `set -u`.
-- With a `main()`, bind working variables there, not in the prelude.
+- With a `main()`, bind working variables there.
 - Without a `main()`, combine assert and bind:
   `file="${INPUT_FILE:?file input is required}"`.
 - Add a `check_requirements` function called from `main()` when the script
-  supports `--help`, parses arguments before deciding what to do, or might be
-  sourced by tests.
+  supports `--help`, parses arguments before deciding what to do, or when tests
+  might source it.
 
 ## Script Structure
 
@@ -101,8 +102,8 @@ paths:
 - Define helper functions above `main()`.
 - Each logical step gets its own function.
 - Open the script with a comment explaining what it does and why it exists or
-  where it sits in a larger flow, not how it works line-by-line. The "how"
-  belongs in inline comments or is self-evident from the code.
+  where it sits in a larger flow. The "how" belongs in inline comments or is
+  self-evident from the code.
 - Document each function with a complete sentence beginning with the function's
   name, in a comment directly preceding the declaration with no intervening
   blank line.
@@ -111,8 +112,8 @@ paths:
   a variable for the caller to read.
   - `return` propagates function status correctly from subshell-body functions
     in both `/bin/sh` and `dash`.
-- Return via exit status (and optionally stdout), not by mutating caller
-  variables.
+- Return via exit status (and optionally stdout). Never mutate caller variables
+  to return a value.
 - State set once in `main()` may be global; don't use globals as a return
   channel from helpers.
 - Transformation helpers take inputs as positional arguments, assigned to named
@@ -141,17 +142,18 @@ paths:
 
 ## Formatting
 
-- `shfmt -i 2 -ci -s`: 2-space indent, indented case bodies, simplify.
+- Format with `shfmt -i 2 -ci -s` (2-space indent, indented case bodies,
+  simplify).
 - Keep functions short and focused: prefer scripts under ~100 lines and
   functions under ~50 lines.
 - `snake_case` for functions and variables.
-- Format embedded program text (`awk`, `jq`, `sed`, SQLite, `python -c`,
-  heredocs) across multiple lines when it exceeds one short line: open the quote
-  on the command line, indent the body two spaces, close the quote on its own
-  line dedented to the command with any remaining arguments and redirects there.
+- Split embedded program text (`awk`, `jq`, `sed`, SQLite, `python -c`,
+  heredocs) across lines when it exceeds one short line. Open the quote on the
+  command line, indent the body two spaces, and close the quote on its own line
+  dedented to the command with any remaining arguments and redirects there.
   One-liners stay one line.
 
 ## Gotchas
 
-- In `mikefarah/yq` (v4), `select(.uses | test(...))` needs no `// ""` guard,
-  since `test()` on null returns false.
+- In `mikefarah/yq` (v4), `select(.uses | test(...))` works without a `// ""`
+  guard, since `test()` on null returns false.

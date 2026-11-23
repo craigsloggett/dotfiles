@@ -1,6 +1,6 @@
 ---
 name: create-from-scratch
-description: Use when the user wants the full from-scratch flow (create an empty repo, configure it, clone it locally), not just creating the repo.
+description: Use when the user wants the full from-scratch flow (create an empty repo, configure it, clone it locally). For the repo alone, use create-repo.
 arguments:
   - name
   - owner
@@ -24,8 +24,8 @@ Invoke these step skills in order:
 
 ## Rules
 
-- A from-scratch repo has no template scaffolding to clean up and no initial
-  Dependabot PRs, so there is no settle, cleanup, or PR step. Scaffold content
-  yourself in the local clone.
+- A from-scratch repo starts without template scaffolding to clean up or
+  initial Dependabot PRs, so this flow skips the settle, cleanup, and PR steps.
+  Scaffold content yourself in the local clone.
 - No release by default. Run `create-initial-release` in the clone only if the
   user asks for one.

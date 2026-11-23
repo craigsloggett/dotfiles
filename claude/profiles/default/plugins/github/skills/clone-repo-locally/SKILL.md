@@ -10,8 +10,8 @@ arguments:
 
 Positional and optional. Invoke as `/clone-repo-locally <repo> <dest>`.
 
-- `repo`: owner/repo to clone. A bare name is prefixed with the authenticated
-  user. Blank asks.
+- `repo`: owner/repo to clone. A bare name takes the authenticated user as its
+  owner. Blank asks.
 - `dest`: destination directory. Blank defaults to
   `~/Developer/GitHub/<owner>/<name>`.
 

@@ -1,8 +1,8 @@
 ## Hark Rebuild
 
-Hark derives a conversation's transcript and voiceprints from three inputs: the
-recognized words, the diarized segments, and the corrections. `transcript.jsonl`
-and `voiceprints.jsonl` are caches of that derivation. `harklib/regroup.py` is a
+Hark derives a conversation's transcript and voiceprints from the recognized
+words, the diarized segments, and the corrections. `transcript.jsonl` and
+`voiceprints.jsonl` are caches of that derivation. `harklib/regroup.py` is a
 line-for-line port of it, checked against Hark at commit `c7cccfa` (version
 0.114.0), where it reproduced every conversation Hark had written byte for byte.
 
@@ -10,10 +10,10 @@ line-for-line port of it, checked against Hark at commit `c7cccfa` (version
 
 | Moment                                | Effect                                  |
 | ------------------------------------- | --------------------------------------- |
-| A correction is added or undone       | Rebuilds the transcript and voiceprints |
+| Adding or undoing a correction        | Rebuilds the transcript and voiceprints |
 | Launch, `voiceprints.jsonl` missing   | The same rebuild                        |
 | Launch, `transcript.jsonl` unreadable | The same rebuild                        |
-| A speaker is named                    | Nothing; only `attributions` changes    |
+| Naming a speaker                      | Nothing; only `attributions` changes    |
 
 ### Rules
 
@@ -30,14 +30,14 @@ line-for-line port of it, checked against Hark at commit `c7cccfa` (version
    after a sentence end, 2 seconds inside a sentence), or a microphone turn
    cuts in. A microphone turn that starts in a pause of 0.4 seconds ends the
    run there; one that started any time during the run ends it at the next
-   sentence end. The pause is measured between diarized segments unless a word
-   is pinned or sits more than 0.25 seconds outside its segment.
+   sentence end. Hark measures the pause between diarized segments, except for
+   a pinned word or one that sits more than 0.25 seconds outside its segment.
 6. When the next run is another voice, the last one or two unpinned words after
    a run's final sentence end move to that voice. Three or more stay, and so
    does a tail that is the whole run.
-7. Each run is cut into turns of whole sentences up to 300 characters. Fillers
-   ("um", "uh"), a restarted phrase, and a throwaway "like" leave the text but
-   keep their time.
+7. Hark cuts each run into turns of whole sentences up to 300 characters.
+   Fillers ("um", "uh"), a restarted phrase, and a throwaway "like" leave the
+   text but keep their time.
 8. `voices` lists the voices that have a turn, in order of first appearance.
 9. A voice's voiceprint is the mean of the diarizer's chunks that overlap its
    turns by 3 seconds or more. A voice that no chunk heard for that long
@@ -68,8 +68,8 @@ after each correction and pins whatever moved, until nothing does.
 ### Self-Test Failures
 
 `hark selftest` replays every conversation through the port and compares the
-result with the files Hark wrote. A conversation awaiting Hark's rebuild is
-reported, not failed.
+result with the files Hark wrote. It reports a conversation awaiting Hark's
+rebuild and does not count it as a failure.
 
 1. A schema error means Hark changed a file format. Read `Storage/Schema.swift`
    and the record it names before touching `harklib/store.py`.

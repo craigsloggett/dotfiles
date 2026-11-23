@@ -1,6 +1,6 @@
 ---
 name: create-from-template
-description: Use when the user wants the full from-template flow (create the repo, clone, release, settle PRs, clean up, open a PR), not just creating the repo.
+description: Use when the user wants the full from-template flow (create the repo, clone, release, settle PRs, clean up, open a PR). For the repo alone, use create-repo-from-template.
 arguments:
   - template
   - name
@@ -33,7 +33,7 @@ Invoke these step skills in order:
 
 ## Rules
 
-- Keep this order: the release tags the pristine template before cleanup, PRs
+- Keep this order. The release tags the pristine template before cleanup, PRs
   settle before cleanup so it starts from the merged default branch, and cleanup
   lands as its own PR because the ruleset blocks direct pushes to the default
   branch.

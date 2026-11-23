@@ -15,7 +15,7 @@ Write code a reviewer can understand one piece at a time.
 
 - Make invalid states unrepresentable. Parse input into trusted types at the
   boundary; inner code does not revalidate.
-- Prefer few deep modules over many shallow ones. No pass-through layers or
+- Prefer fewer, deeper modules. No pass-through layers or
   speculative abstractions.
 - Interfaces belong to the consumer and appear only when a consumer needs one.
   Return concrete types.
@@ -73,4 +73,4 @@ Write code a reviewer can understand one piece at a time.
   shape in the same step (e.g. a method that no longer uses its receiver, a
   function that now returns a constant, a parameter every caller passes the
   same value for, or an interface left with one implementation).
-- Finishing a refactor is part of the task, not an extra improvement.
+- Finishing a refactor is part of the task.

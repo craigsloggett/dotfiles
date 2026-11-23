@@ -55,10 +55,10 @@ Existing descriptions, tagged with their topics:
    the vocabulary only if the user explicitly types them.
 5. Propose a one-sentence description in the style of the corpus samples whose
    topics overlap the proposed ones; show the samples used so the user can
-   sanity-check. Empty is allowed but discouraged.
-6. Create the repo. Use the REST generate endpoint, not
-   `gh repo create --template`: that command's GraphQL clone fails for a
-   fine-grained PAT when the template's owner differs from the new repo's owner;
+   sanity-check. Allow an empty description but discourage it.
+6. Create the repo with the REST generate endpoint. Do not use
+   `gh repo create --template`, because its GraphQL clone fails for a
+   fine-grained PAT when the template's owner differs from the new repo's owner.
    `/generate` works with read access.
 
    ```
@@ -115,6 +115,6 @@ Existing descriptions, tagged with their topics:
 
 ## Rules
 
-- Never modify or push to the template repo; it is read-only here.
+- Never change or push to the template repo. Treat it as read-only.
 - The new repo's owner and the template's owner are independent. Never reuse the
   template's owner for the new repo unless the user asks.

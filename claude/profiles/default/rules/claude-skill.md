@@ -9,10 +9,10 @@ paths:
 | Field                      | Use                                                                          |
 | -------------------------- | ---------------------------------------------------------------------------- |
 | `name`                     | Required. kebab-case, action-oriented (verb-noun).                           |
-| `description`              | Required. When to invoke, not what it does; what Claude reads for relevance. |
+| `description`              | Required. When to invoke; Claude reads it for relevance. Omit what it does.  |
 | `arguments`                | Positional argument names (string or list) enabling `$name` substitution.    |
 | `disable-model-invocation` | `true` for side-effecting skills only; leave off read-only ones to auto-run. |
-| `allowed-tools`            | The minimum set the skill needs.                                             |
+| `allowed-tools`            | The smallest set the skill needs.                                            |
 
 Example:
 
@@ -30,8 +30,8 @@ description: Use when ...
 ## Scope
 
 - One job per skill. Multi-purpose skills branch internally and balloon.
-- A skill earns its existence from gotchas. If there are no gotchas to capture,
-  do not write it.
+- A skill earns its existence from gotchas. Without gotchas to capture, do not
+  write it.
 
 ## Body
 
@@ -41,11 +41,11 @@ description: Use when ...
   describing the shape.
 - Inline shell with `!` injects real state. Prefer `!git diff HEAD` over "look
   at the current diff". Only pin `!command` for ambient state available at load
-  time (auth user, current repo, current branch). Values the user passes as
-  arguments cannot be substituted into a `!` command, so reference them inside a
+  time (auth user, current repo, current branch). A `!` command cannot
+  substitute values the user passes as arguments, so reference them inside a
   step instead (e.g. `git -C $source log` in step 2).
-- Be opinionated about terminology. Pick one term, name the rejected
-  alternatives, move on.
+- Commit to terminology. Pick one term, name the rejected alternatives, move
+  on.
 - Check, do not guess. If the skill can verify a file exists or a command is on
   PATH, have it verify.
 
@@ -54,9 +54,9 @@ description: Use when ...
 - Default to a single `SKILL.md` inside a folder named after the skill. The
   folder lets you add `templates/`, `examples/`, or reference docs later without
   restructuring.
-- Split a section into its own file only when it is a standalone format spec, or
-  when the file would otherwise sprawl past ~150 lines. Otherwise keep it
-  inline.
+- Split a section into its own file only when the section is a standalone
+  format spec, or when the file would otherwise sprawl past ~150 lines.
+  Otherwise keep it inline.
 - Create supporting files lazily, only when you have something to write.
 
 ## Prose
@@ -66,4 +66,4 @@ description: Use when ...
 - No hedging or meta. No "I'll help you", no "this skill will".
 - Do not restate what tool output already shows. If `!git status` runs, do not
   also describe its output shape.
-- Headers earn their place. A header over two lines of content is wasted.
+- Headers earn their place. A header over two lines of content wastes space.

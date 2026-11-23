@@ -28,6 +28,7 @@ followed by what to write instead. Real before and after pairs for each are in
   descriptions, Markdown files, commit subjects, and comments in the branch
   diff.
 
+<!-- vale off -->
 ### Wording to Fix
 
 - Stock vocabulary such as delve, leverage, robust, seamless, crucial, pivotal,
@@ -44,9 +45,10 @@ followed by what to write instead. Real before and after pairs for each are in
 - An action verb followed by "no", "nothing", or "none of", as in "registers no
   routes" or "uses none of the backoff". Write the plain negative ("doesn't
   register any routes") or the positive ("takes effect without a restart").
-- "Only" after a verb to imply what is left out, as in "would be using the
-  library only to send the request". Say what it does and what it leaves out
-  ("would keep its own retries and share the code that sends the request").
+- "Only" after a verb to imply what the subject leaves out, as in "would be
+  using the library only to send the request". Say what it does and what it
+  leaves out ("would keep its own retries and share the code that sends the
+  request").
 - A made-up label for something that has a name, as in "the kind of account"
   for a field called `userIdentityType`. Use the name the code or the API uses.
 
@@ -93,6 +95,7 @@ followed by what to write instead. Real before and after pairs for each are in
   the table's content as prose or a list.
 - History of how the branch got here, and the names of people, in a PR
   description. Describe what the branch introduces as it stands.
+<!-- vale on -->
 
 ### Steps
 
@@ -119,6 +122,8 @@ followed by what to write instead. Real before and after pairs for each are in
    claim shifted and each hit you kept, with the reason, and give the path to
    the saved original.
 
+<!-- vale Global.VerbNo = NO -->
+<!-- vale Global.NotClause = NO -->
 ### Gotchas
 
 - Do not replace a removed pattern with its nearest equivalent. Colon-led lists
@@ -132,16 +137,15 @@ followed by what to write instead. Real before and after pairs for each are in
 - An "only" that states a condition is information, as in "tries again only if
   the failure is retryable". Keep it.
 - If a fix needs a fact the text doesn't give, leave the sentence and flag it.
-- Check later edits against the patterns, not against the text they changed.
-  An edit to cleaned-up prose brings patterns back, and using the old text as
-  the baseline misses them.
+- Check later edits against the patterns. An edit to cleaned-up prose brings
+  patterns back, and using the old text as the baseline misses them.
 - New text has to match its neighbours. A table cell twice as long as the
   others, a bullet three times the length of its siblings, a colon gloss in one
   cell, or an undefined shorthand reads as added later.
-- Before changing a heading, find the template the text was written from, such
-  as the repo's PR template or an RFC template, and compare. A heading that
-  comes from the template stays as it is, as in "Risk and how to revert" in a
-  PR description or "Why this matters to the customer" in an RFC.
+- Before changing a heading, find the template the text came from, such as the
+  repo's PR template or an RFC template, and compare. A heading that comes from
+  the template stays unchanged, as in "Risk and how to revert" in a PR
+  description or "Why this matters to the customer" in an RFC.
 - Fixing a commit subject rewrites history. Propose the new subjects and wait
   for approval before rebasing or force-pushing.
 - Code comments follow their language's doc conventions first, such as a Go
@@ -149,3 +153,5 @@ followed by what to write instead. Real before and after pairs for each are in
   `conventions:reduce-comments`.
 - The report is prose too. Write it in plain sentences, without bold-label
   bullets.
+<!-- vale Global.VerbNo = YES -->
+<!-- vale Global.NotClause = YES -->

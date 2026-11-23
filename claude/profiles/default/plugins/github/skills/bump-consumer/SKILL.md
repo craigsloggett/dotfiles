@@ -10,11 +10,11 @@ arguments:
 
 Positional and optional. Invoke as `/bump-consumer <consumer> <upstreams>`.
 
-- `consumer`: path to the consumer repo whose dependency references should be
-  bumped. Blank asks.
+- `consumer`: path to the consumer repo whose dependency references this skill
+  bumps. Blank asks.
 - `upstreams`: list of upstreams at their new versions, each
   `{owner/repo, new_tag, tag_sha}`. Supplied by the cascade-change hand-off, or
-  listed by the user when the releases were cut elsewhere. Blank asks.
+  listed by the user when the releases came from elsewhere. Blank asks.
 
 ## Workflow
 

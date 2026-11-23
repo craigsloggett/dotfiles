@@ -1,8 +1,8 @@
 ---
 name: correct-speakers
 description: >-
-  Use when the user wants the speakers of a Hark conversation fixed: an unnamed
-  or extra speaker, turns given to the wrong person, several people merged into
+  Use when the user wants the speakers of a Hark conversation fixed, such as an
+  unnamed or extra speaker, turns given to the wrong person, people merged into
   one voice, or a voiceprint to clean up.
 arguments:
   - conversation
@@ -30,11 +30,12 @@ Recent conversations:
 
 ### Workflow
 
-`<conversation>` is `$conversation`: a start time (`08:00` means today's), an id
-prefix, or a folder name. Blank means the one the user described.
+`<conversation>` is `$conversation`, given as a start time (`08:00` means
+today's), an id prefix, or a folder name. Blank means the one the user
+described.
 
-1. Read the transcript with `hark show <conversation>`. Note who is addressed by
-   name, who introduces themselves, and which questions get answered.
+1. Read the transcript with `hark show <conversation>`. Note who the speakers
+   address by name, who introduces themselves, and which questions get answered.
 2. Gather the evidence with `hark evidence <conversation>`. The first run embeds
    the audio, about a minute for a 40-minute conversation.
 3. Decide every `Undecided` and `Possible` line, and read the `low` proposals
@@ -58,7 +59,7 @@ prefix, or a folder name. Blank means the one the user described.
 | ------------ | -------------------------------------------------------------- |
 | `moves`      | Line ids, or `from` and `to` in seconds, and their `speaker`   |
 | `keep`       | Ids of proposals to reject                                     |
-| `name`       | A label and the person it is, or `null` to refuse a suggestion |
+| `name`       | A label and its person, or `null` to refuse a suggestion       |
 | `add_people` | Names missing from Hark's people, spelled by the user          |
 
 A `speaker` is a person's name, a label such as `S3`, or `new:<tag>` for someone
@@ -73,16 +74,16 @@ nobody can name yet. A person with no voice in the conversation gets one.
   what it continues into, what it answers, and who it addresses.
 - Scores under 0.35 for everyone mean the audio cannot tell you who spoke. Do
   not read meaning into which low score is highest.
-- A reply belongs to the person addressed or to whoever asked the question, not
-  to the speaker of the turn it was folded into.
-- A burst of greetings or goodbyes is several people. Split it where the words
-  let you and leave the rest; never give the whole burst to one speaker.
+- A reply belongs to the person addressed or to whoever asked the question,
+  even when Hark folded it into another speaker's turn.
+- A burst of greetings or goodbyes comes from more than one person. Split it
+  where the words let you and leave the rest; never give the whole burst to one
+  speaker.
 - Two people who sound alike score alike, so a `MERGED` voice can hide a third
-  person the scores never separate.
-  Look for the name being addressed.
+  person the scores never separate. Look for the name the speakers address.
 - The recognizer spells names by ear. Ask the user for the
   spelling before using `add_people`, and never invent a person.
-- Leave a line where it is when nothing settles it, and tell the user you did.
+- Leave a line in place when nothing settles it, and tell the user you did.
 
 ### Rules
 
@@ -95,9 +96,9 @@ nobody can name yet. A person with no voice in the conversation gets one.
   voiceprints the user sees are Hark's own.
 - `install` appends its corrections after the user's own and leaves theirs in
   order.
-- A plan is tied to the files it read. After the user edits anything in Hark,
+- A plan depends on the files it read. After the user edits anything in Hark,
   gather the evidence again; `plan` and `install` refuse stale work.
-- `hark check` failing means Hark's rules changed since this skill was checked
+- `hark check` failing means Hark's rules changed since this skill's last check
   against them. Stop planning, run `hark selftest`, and follow
   `reference/hark-rebuild.md`.
 - `hark restore <conversation>` puts back the files the last install or rebuild

@@ -25,5 +25,5 @@ paths:
 - Inline snippets follow the POSIX compliance, quoting, and error-handling rules
   in `shell.md`. File-level rules (shebang, `set -euf`, `main()`, file-wide
   shfmt/shellcheck) do not apply to a snippet.
-- Pass `${{ }}` expression values into shell through `env:`, never spliced into
-  the command text, so a value cannot break out of the command.
+- Pass `${{ }}` expression values into shell through `env:` so a value cannot
+  break out of the command. Never splice them into the command text.

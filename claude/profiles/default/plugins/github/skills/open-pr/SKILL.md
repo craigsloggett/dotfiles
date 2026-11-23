@@ -21,8 +21,8 @@ Positional and optional. Invoke as `/open-pr <dir> <branch> <title>`.
 
 Work in `<dir>` (the local clone; blank means the current directory).
 
-1. If `git -C <dir> status --porcelain` is empty, report there is nothing to
-   open and stop.
+1. If `git -C <dir> status --porcelain` is empty, report that the working tree
+   is clean and stop.
 2. Branch: `git -C <dir> checkout -b <branch>` (carries the uncommitted changes
    onto it).
 3. Stage and commit signed: `git -C <dir> add -A` then
@@ -42,5 +42,5 @@ Work in `<dir>` (the local clone; blank means the current directory).
 - The PR title and body should not have anything that doesn't declaratively
   state what is functionally changing in this branch.
 - If the reader looks at the PR, they should be able to understand at the
-  highest level what is being added, but they can review the code for technical
-  details.
+  highest level what the branch adds, but they can review the code for
+  technical details.

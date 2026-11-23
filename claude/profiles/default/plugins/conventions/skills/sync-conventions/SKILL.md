@@ -15,30 +15,31 @@ Positional and optional. Invoke as `/sync-conventions <source>`.
 
 1. The source is `$source`; the target is the current working directory.
 2. Explore both directories. Launch Explore agents in parallel:
-   - Source: read the directory structure, key configuration files, and recent
-     Git history (`git -C $source log --oneline -20`) to understand what has
-     changed recently.
-   - Target: read the directory structure and the same categories of files to
-     understand the current state.
+   - In the source, read the directory structure, key configuration files, and
+     recent Git history (`git -C $source log --oneline -20`) to understand what
+     has changed recently.
+   - In the target, read the directory structure and the same categories of
+     files to understand the current state.
 
 3. Compare across categories. For each category present in both projects, diff
    the approach:
-   - Shell scripts: shebang and dialect (POSIX `sh` vs Bash), strict-mode flags
-     (`set -ef`), `main()` entrypoint pattern, function style (subshell `()` for
-     resource-owning scopes with their own `trap EXIT INT TERM HUP`, brace `{}`
-     for plain helpers that never set EXIT traps), session-scoped
-     `TMPDIR_SESSION` handling, reconciler/idempotency patterns,
-     atomic-rename-from-staging for file writes, and `shellcheck -s sh`
-     directives.
-   - Infrastructure code: resource patterns, naming, variable structure,
-     provider versions, module usage.
-   - CI/CD: workflow definitions, pipeline stages, job configuration.
-   - Linting and formatting: config files (`.yamllint`, `.tflint.hcl`,
-     `.golangci.yml`, etc.) and their rule sets.
-   - Documentation: README structure, inline comments style, terraform-docs
+   - In shell scripts, compare the shebang and dialect (POSIX `sh` vs Bash),
+     strict-mode flags (`set -ef`), `main()` entrypoint pattern, function style
+     (subshell `()` for resource-owning scopes with their own
+     `trap EXIT INT TERM HUP`, brace `{}` for plain helpers that never set EXIT
+     traps), session-scoped `TMPDIR_SESSION` handling, reconciler/idempotency
+     patterns, atomic-rename-from-staging for file writes, and
+     `shellcheck -s sh` directives.
+   - In infrastructure code, compare resource patterns, naming, variable
+     structure, provider versions, and module usage.
+   - In CI/CD, compare workflow definitions, pipeline stages, and job
      configuration.
-   - Project configuration: Makefiles, `.editorconfig`, `.gitignore`, pre-commit
-     hooks.
+   - In linting and formatting, compare config files (`.yamllint`,
+     `.tflint.hcl`, `.golangci.yml`, etc.) and their rule sets.
+   - In documentation, compare README structure, inline comments style, and
+     terraform-docs configuration.
+   - In project configuration, compare Makefiles, `.editorconfig`,
+     `.gitignore`, and pre-commit hooks.
 
 4. Filter to meaningful differences. Ignore differences that are intentional
    per-project customization (different resource names, different variable
@@ -64,7 +65,7 @@ Positional and optional. Invoke as `/sync-conventions <source>`.
 ## Rules
 
 - Respect CLAUDE.md and project-level conventions. The source informs what to
-  change, not how to write code.
+  change, and those conventions decide how to write the code.
 - Do not copy files wholesale. Adapt patterns to fit the target project's
   structure.
 - If the source and target are different project types, account for the

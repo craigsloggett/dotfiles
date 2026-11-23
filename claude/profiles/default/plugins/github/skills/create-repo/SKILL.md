@@ -43,7 +43,7 @@ Existing descriptions, tagged with their topics:
    the vocabulary only if the user explicitly types them.
 4. Propose a one-sentence description in the style of the corpus samples whose
    topics overlap the proposed ones; show the samples used so the user can
-   sanity-check. Empty is allowed but discouraged.
+   sanity-check. Allow an empty description but discourage it.
 5. Create the repo with an initial commit so the default branch exists (the
    ruleset, and any later release, need a branch to target):
 
@@ -101,4 +101,4 @@ Existing descriptions, tagged with their topics:
 ## Rules
 
 - `--add-readme` seeds an initial commit so the default branch exists; without
-  it the ruleset POST has no branch to target.
+  it the ruleset POST doesn't have a branch to target.

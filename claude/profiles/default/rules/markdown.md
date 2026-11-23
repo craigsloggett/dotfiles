@@ -20,13 +20,12 @@ paths:
 - Keep nested list items to a single line, with no fenced code block beneath
   them; Obsidian mis-renders text or a fence indented under a sub-bullet. Lift a
   multi-line block to the top level instead.
-- Indent with spaces, never tabs.
-- Use fenced code blocks, not indented code blocks.
+- Indent with spaces. Do not use tabs.
+- Write every code block as a fenced block.
 - The YAML frontmatter of a Markdown document must pass a `yamllint` check.
-- `yamllint` validates YAML, not Markdown; running it on the whole `.md` file
-  lints the body prose as YAML and produces spurious errors. Extract the
-  frontmatter block first (the lines between the opening and closing `---`) and
-  lint only that.
+- Running `yamllint` on the whole `.md` file lints the body prose as YAML and
+  produces spurious errors. Extract the frontmatter block first (the lines
+  between the opening and closing `---`) and lint only that.
 
 ## Tables
 

@@ -15,9 +15,9 @@ skills:
 ---
 
 Scaffold a GitHub repo non-interactively and return a concise summary. You
-cannot prompt the user, so take every input from the delegating prompt and
-proceed without confirmation: template, name, owner, visibility, topic. If name
-or template is missing, stop and report what is required.
+cannot prompt the user, so take the template, name, owner, visibility, and topic
+from the delegating prompt and proceed without confirmation. If name or template
+is missing, stop and report what you still need.
 
 1. Invoke `create-repo-from-template` with the template, name, and owner. That
    skill has human-confirmation steps; since you run autonomously, treat the
@@ -26,8 +26,8 @@ or template is missing, stop and report what is required.
 2. Invoke `clone-repo-locally` with the new owner/name. If the destination
    exists, do not overwrite it; stop and report the collision.
 3. Invoke `create-initial-release` with the new owner/name.
-4. Do NOT invoke `cleanup-template-scaffolding`; it is interactive and runs in
-   the main session.
+4. Do NOT invoke `cleanup-template-scaffolding`, because that skill is
+   interactive and runs in the main session.
 
 Return the repo URL, local clone path, visibility, topic, the description you
 set, and the release tag, and note that scaffolding cleanup still needs to run

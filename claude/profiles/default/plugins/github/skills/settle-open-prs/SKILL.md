@@ -32,5 +32,5 @@ Work in `<dir>` (the local clone; blank means the current directory).
 
 ## Rules
 
-- Dependabot opens PRs asynchronously after a repo is created, so this settles
-  whatever is open now and does not wait. If one appears later, run it again.
+- Dependabot opens PRs asynchronously on a new repo, so this settles whatever
+  is open now and does not wait. If one appears later, run it again.

@@ -7,14 +7,14 @@ paths:
 ## HCL Conventions
 
 - Use `snake_case` for all resource names, variable names, and output names.
-- Use descriptive names: `aws_s3_bucket.application_logs`, not
-  `aws_s3_bucket.bucket1`.
+- Use descriptive names, as in `aws_s3_bucket.application_logs`. Avoid names
+  like `aws_s3_bucket.bucket1`.
 - Don't include the resource type in a resource name; the address already
-  carries it (`aws_instance.web_api`, not `aws_instance.web_api_instance`).
+  carries it (`aws_instance.web_api_instance` becomes `aws_instance.web_api`).
 - Define resources and data sources after what they reference so the code builds
   on itself; place a data source before the resource that uses it.
-- Order resource parameters: `count`/`for_each` first, then non-block arguments,
-  then nested blocks, then `lifecycle`, then `depends_on`.
+- Order resource parameters with `count`/`for_each` first, then non-block
+  arguments, then nested blocks, then `lifecycle`, then `depends_on`.
 - Group related arguments logically.
 - Separate argument groups with blank lines.
 - Use `#` comments sparingly. The code should be self-documenting.
@@ -52,14 +52,14 @@ paths:
   attributes the module uses, so either a resource or a data source satisfies
   it.
 - Declare provider configurations only in the root module; reusable modules must
-  not contain `provider` blocks, which would break `count`, `for_each`, and
+  not contain `provider` blocks, because they break `count`, `for_each`, and
   `depends_on` on the module block.
 - Pass providers to child modules implicitly by inheritance, or explicitly with
   the `providers` argument when a module needs a non-default or aliased
   configuration.
 - Have every module declare its own provider requirements in a
   `required_providers` block (source and version), even though the configuration
-  itself is shared from the root.
+  itself comes from the root.
 - Always include a default provider configuration (a `provider` block with no
   `alias`), and define the default before any aliased providers.
 - Give a non-default provider its `alias` as the block's first argument.
@@ -70,14 +70,15 @@ paths:
 - Always include a `description` for every variable.
 - Use `type` constraints. Prefer specific types over `any`.
 - Set sensible `default` values where appropriate.
-- Give required variables no `default`.
+- Leave `default` unset on required variables.
 - Use `sensitive = true` for secrets.
-- Order variable parameters: type, description, default, sensitive, validation.
+- Order variable parameters as type, description, default, sensitive, then
+  validation.
 
 ## Outputs
 
 - Include a `type` and `description` for every output.
-- Order output parameters: type, description, value, sensitive.
+- Order output parameters as type, description, value, then sensitive.
 
 ## Local Values
 
@@ -95,17 +96,16 @@ paths:
 
 ## Formatting and Validation
 
-- Run `terraform fmt` before committing. Code must be formatted.
+- Run `terraform fmt` before committing.
 - Run `terraform validate` to catch syntax and configuration errors.
-- Use `tflint` for additional linting rules.
+- Use `tflint` for extra linting rules.
 - Review `terraform plan` output carefully before applying.
 
 ## Patterns
 
 - Use `count` for simple conditional resources.
 - Use `for_each` for collections.
-- Avoid `depends_on` unless absolutely necessary. Implicit dependencies are
-  preferred.
+- Avoid `depends_on` unless necessary. Prefer implicit dependencies.
 - Use `moved` blocks for resource renames to avoid destroy/recreate.
 - Root modules: pin provider versions to an exact version (`5.0.0`).
 - Pin to the latest version available.

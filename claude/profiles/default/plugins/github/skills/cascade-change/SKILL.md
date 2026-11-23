@@ -19,18 +19,18 @@ Positional and optional. Invoke as
 - `change`: description of the change to apply to each upstream repo. Blank
   asks.
 - `consumer`: path to a consumer repo to re-pin after release. Blank stops after
-  aggregation and reports the new tags.
+  collecting the results and reports the new tags.
 
 ## Workflow
 
 1. Resolve the upstream list.
    - If `$repos` is an explicit list, use it as-is.
-   - If it is a discovery description, identify the scope (e.g. a parent
-     directory), then use `grep`, `find`, or repo contents to find the locally
+   - If `$repos` is a discovery description, identify the scope (e.g. a parent
+     directory), then use `grep`, `find`, or repo contents to locate the locally
      cloned Git repos matching the predicate. Do not invent repos.
    - Present the resolved list with file paths and confirm before fanning out.
-     Stop and ask on zero matches, or a suspicious count (the description
-     implied "a few" but matched dozens).
+     Stop and ask on zero matches, or a suspicious count (dozens of matches
+     where the description implied two or three).
 2. Preview the change on one canonical repo from the list.
    - Sync main: `git checkout main && git pull && git gone`. Refuse if the
      working tree is dirty.
@@ -42,8 +42,8 @@ Positional and optional. Invoke as
      clean main, like every other repo.
 3. Fan out one subagent per repo in a single tool-call batch so they run in
    parallel. Each subagent is self-contained (its prompt carries the full repo
-   path, the change description, the branch slug, and the commit subject), never
-   prompts the user, and runs this pipeline end-to-end:
+   path, the change description, the branch slug, and the commit subject) and
+   runs this pipeline end-to-end without prompting the user:
    - Sync main: `git checkout main && git pull && git gone`. Abort if the
      working tree is dirty.
    - Apply the change: the same semantic edit as the canonical preview.
@@ -62,19 +62,18 @@ Positional and optional. Invoke as
    - Watch the release run:
      `gh run list --branch main --workflow <file> --limit 5` to find the run
      from the merge commit, then `gh run watch <run-id>`.
-   - Capture the new tag: `git fetch --tags`, find the newest tag on the merge
-     commit, and record `<tag>` and `git rev-parse <tag>`.
+   - Capture the new tag. Run `git fetch --tags`, find the newest tag on the
+     merge commit, and record `<tag>` and `git rev-parse <tag>`.
    - Return `{repo, pr_number, merge_sha, new_tag, tag_sha}` on success, or
-     `{repo, step, error_summary}` on any blocking ambiguity (multiple plausible
-     release workflows, GPG signing failure, dirty tree).
-4. Aggregate the results into the `{repo, new_tag, tag_sha}` list from the
-   successes. Halt on any failure: surface the failed repos, the step each
+     `{repo, step, error_summary}` on any blocking ambiguity (more than one
+     plausible release workflow, GPG signing failure, dirty tree).
+4. Collect the results into the `{repo, new_tag, tag_sha}` list from the
+   successes. Halt on any failure and surface the failed repos, the step each
    failed at, and the error excerpt. Do not hand off until the user resolves
    them.
-5. Hand off. If `$consumer` was provided, invoke `bump-consumer` with
+5. Hand off. If the user gave `$consumer`, invoke `bump-consumer` with
    `$consumer` and the `{repo, new_tag, tag_sha}` list to re-pin the references.
-   If it was omitted, report the list and stop; the user can run `bump-consumer`
-   later.
+   Without it, report the list and stop; the user can run `bump-consumer` later.
 
 ## Rules
 
