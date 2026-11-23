@@ -124,6 +124,7 @@ followed by what to write instead. Real before and after pairs for each are in
 
 <!-- vale Global.VerbNo = NO -->
 <!-- vale Global.NotClause = NO -->
+<!-- vale Global.Semicolon = NO -->
 ### Gotchas
 
 - Do not replace a removed pattern with its nearest equivalent. Colon-led lists
@@ -155,3 +156,4 @@ followed by what to write instead. Real before and after pairs for each are in
   bullets.
 <!-- vale Global.VerbNo = YES -->
 <!-- vale Global.NotClause = YES -->
+<!-- vale Global.Semicolon = YES -->
