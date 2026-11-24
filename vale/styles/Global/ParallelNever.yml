@@ -1,5 +1,6 @@
 extends: repetition
 message: Two never clauses in '%s'. Vary the structure.
+level: warning
 ignorecase: true
 tokens:
   - never

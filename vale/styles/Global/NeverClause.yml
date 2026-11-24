@@ -1,5 +1,6 @@
 extends: existence
 message: Trailing never clause in '%s'. State the prohibition in its own sentence.
+level: warning
 vocab: false
 raw:
   - ',\s+never\b'

@@ -1,4 +1,5 @@
 extends: write-good.Weasel
+level: warning
 tokens+:
   - absolutely
   - definitely

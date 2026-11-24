@@ -1,5 +1,6 @@
 extends: existence
 message: A colon introduces an inline list. Write it as a sentence.
+level: warning
 raw:
   - ':'
   - (?=\s+(?:[^.:!?,]*,){2})

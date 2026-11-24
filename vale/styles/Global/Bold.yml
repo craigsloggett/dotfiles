@@ -1,5 +1,6 @@
 extends: existence
 message: Bold on '%s'. Remove the bold.
+level: warning
 nonword: true
 scope: strong
 tokens:

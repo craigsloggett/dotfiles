@@ -1,5 +1,6 @@
 extends: existence
 message: Check '%s' for a contrast nobody claimed. State the point directly.
+level: warning
 vocab: false
 raw:
   - ',\s+not\b'

@@ -1,5 +1,6 @@
 extends: existence
 message: Verb and negative in '%s'. Write the plain negative or the positive.
+level: warning
 ignorecase: true
 vocab: false
 raw:

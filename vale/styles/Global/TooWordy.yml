@@ -1,4 +1,5 @@
 extends: write-good.TooWordy
+level: warning
 tokens-:
   - equivalent
   - implement
