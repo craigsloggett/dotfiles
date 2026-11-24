@@ -15,26 +15,38 @@ raw:
 tokens:
   - actionlint
   - awk
+  - bazelisk
   - gawk
   - gh
+  - gocognit
   - gofmt
+  - gofumpt
   - golangci-lint
   - gopls
+  - goreleaser
+  - gotestsum
   - govulncheck
+  - gowrap
   - gpg
   - grep
   - jq
+  - kubebuilder
   - kubectl
+  - kustomize
   - mawk
+  - nfpm
   - npm
   - nvim
+  - protoc
   - python3
   - rg
   - rumdl
   - sed
+  - semgrep
   - shellcheck
   - shfmt
   - ssh
+  - staticcheck
   - swiftformat
   - swiftlint
   - tflint
