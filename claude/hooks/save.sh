@@ -17,9 +17,11 @@ root="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 cd "${root}"
 
 changed="$({
-  git diff --name-only HEAD
-  git ls-files -o --exclude-standard
-})"
+  git diff --name-only -z HEAD
+  git ls-files -z -o --exclude-standard
+} | tr '\0' '\n')"
+
+[ -n "${changed}" ] || exit 0
 
 status=0
 for type in \
@@ -31,6 +33,6 @@ for type in \
   swift \
   terraform \
   yaml; do
-  printf '%s\n' "${changed}" | xargs "${0%/*}/${type}.sh" || status=2
+  printf '%s\n' "${changed}" | tr '\n' '\0' | xargs -0 "${0%/*}/${type}.sh" || status=2
 done
 exit "${status}"

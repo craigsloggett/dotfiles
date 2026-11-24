@@ -16,5 +16,5 @@ files="$(shfmt -f --apply-ignore "$@" 2>/dev/null || :)"
 
 [ -n "${files}" ] || exit 0
 
-printf '%s\n' "${files}" | xargs shfmt -w >&2 || exit 2
-printf '%s\n' "${files}" | xargs shellcheck -x >&2 || exit 2
+printf '%s\n' "${files}" | tr '\n' '\0' | xargs -0 shfmt -w >&2 || exit 2
+printf '%s\n' "${files}" | tr '\n' '\0' | xargs -0 shellcheck -x >&2 || exit 2

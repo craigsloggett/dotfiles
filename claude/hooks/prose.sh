@@ -9,8 +9,9 @@ set -euf
 
 command -v vale >/dev/null 2>&1 || exit 0
 
-files=""
 for file in "$@"; do
+  shift
+
   case ${file} in
     *.md | *.go) ;;
     *) continue ;;
@@ -18,10 +19,9 @@ for file in "$@"; do
 
   [ -f "${file}" ] || continue
 
-  files="${files}${file}
-"
+  set -- "$@" "${file}"
 done
 
-[ -n "${files}" ] || exit 0
+[ "$#" -gt 0 ] || exit 0
 
-printf '%s' "${files}" | xargs vale --output=line --minAlertLevel=error >&2 || exit 2
+vale --output=line --minAlertLevel=error "$@" >&2 || exit 2

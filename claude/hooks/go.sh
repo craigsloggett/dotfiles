@@ -8,8 +8,9 @@ set -euf
 
 command -v golangci-lint >/dev/null 2>&1 || exit 0
 
-files=""
 for file in "$@"; do
+  shift
+
   case ${file} in
     *.go) ;;
     *) continue ;;
@@ -17,15 +18,17 @@ for file in "$@"; do
 
   [ -f "${file}" ] || continue
 
-  files="${files}${file}
-"
+  set -- "$@" "${file}"
 done
 
-[ -n "${files}" ] || exit 0
+[ "$#" -gt 0 ] || exit 0
 
-printf '%s' "${files}" | xargs golangci-lint fmt >&2 || exit 2
+golangci-lint fmt "$@" >&2 || exit 2
 
-directories="$(printf '%s' "${files}" | xargs -n1 dirname | sort -u)"
+directories="$(for file in "$@"; do dirname "${file}"; done | sort -u)"
+
+IFS='
+'
 
 status=0
 for directory in ${directories}; do

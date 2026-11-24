@@ -8,8 +8,9 @@ set -euf
 
 command -v rumdl >/dev/null 2>&1 || exit 0
 
-files=""
 for file in "$@"; do
+  shift
+
   case ${file} in
     *.md) ;;
     *) continue ;;
@@ -17,11 +18,10 @@ for file in "$@"; do
 
   [ -f "${file}" ] || continue
 
-  files="${files}${file}
-"
+  set -- "$@" "${file}"
 done
 
-[ -n "${files}" ] || exit 0
+[ "$#" -gt 0 ] || exit 0
 
-printf '%s' "${files}" | xargs rumdl fmt >&2 || exit 2
-printf '%s' "${files}" | xargs rumdl check >&2 || exit 2
+rumdl fmt "$@" >&2 || exit 2
+rumdl check "$@" >&2 || exit 2
