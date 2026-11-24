@@ -1,6 +1,6 @@
 extends: existence
 message: Em dash. Use a comma, parentheses, or two sentences.
-level: warning
+level: error
 nonword: true
 tokens:
   - —

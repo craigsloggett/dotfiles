@@ -1,6 +1,6 @@
 extends: existence
 message: Semicolon. Use two sentences or a conjunction.
-level: warning
+level: error
 nonword: true
 tokens:
   - ;
