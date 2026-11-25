@@ -1,6 +1,7 @@
 extends: write-good.TooWordy
 level: warning
 tokens-:
+  - authorize
   - equivalent
   - implement
   - it is
