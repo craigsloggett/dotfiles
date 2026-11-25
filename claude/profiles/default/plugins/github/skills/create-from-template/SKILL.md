@@ -1,6 +1,11 @@
 ---
 name: create-from-template
-description: Use when the user wants the full from-template flow (create the repo, clone, release, settle PRs, clean up, open a PR). For the repo alone, use create-repo-from-template.
+description: >-
+  Run the full from-template flow (create the repo, clone, release, settle PRs,
+  clean up, open a PR).
+when_to_use: >-
+  Use when the user wants a new repo set up end to end from a template. For the
+  repo alone, use create-repo-from-template.
 arguments:
   - template
   - name

@@ -1,6 +1,10 @@
 ---
 name: update-pr-description
-description: Use when the user asks to write or update a pull request description, or to make one declarative (what the PR introduces) rather than a history of the commits or the work done.
+description: >-
+  Write or update a pull request description so it is declarative (what the PR
+  introduces) rather than a history of the commits or the work done.
+when_to_use: >-
+  Use when the user asks to write, update, or fix a pull request description.
 ---
 
 ## Workflow

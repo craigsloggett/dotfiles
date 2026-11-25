@@ -1,6 +1,11 @@
 ---
 name: sync-conventions
-description: Use when the user asks to compare the current project against a source directory and align conventions, patterns, or configuration.
+description: >-
+  Compare the current project against a source directory and align its
+  conventions, patterns, and configuration.
+when_to_use: >-
+  Use when the user asks to sync or align the current project with another
+  directory.
 arguments:
   - source
 ---

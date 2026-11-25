@@ -1,6 +1,12 @@
 ---
 name: cascade-change
-description: Use when the user wants to apply a change concurrently across versioned upstream repos via auto-merging PRs and release each. Hands off to bump-consumer to pin the new versions in a consumer repo.
+description: >-
+  Apply a change concurrently across versioned upstream repos via auto-merging
+  PRs and release each, then hand off to bump-consumer to pin the new versions
+  in a consumer repo.
+when_to_use: >-
+  Use when the user wants the same change rolled out across upstream repos and
+  released.
 arguments:
   - repos
   - change

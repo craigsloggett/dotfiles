@@ -9,7 +9,7 @@ description: >
 tools: Read, Grep, Glob, Bash
 maxTurns: 40
 model: opus
-effort: xhigh
+effort: high
 ---
 
 ## Design Reviewer

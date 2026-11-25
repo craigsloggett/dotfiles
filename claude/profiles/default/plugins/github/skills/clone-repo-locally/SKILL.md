@@ -1,6 +1,10 @@
 ---
 name: clone-repo-locally
-description: Use when the user wants to clone a GitHub repo into the standard local location at ~/Developer/GitHub/<owner>/<name>.
+description: >-
+  Clone a GitHub repo into the standard local location at
+  ~/Developer/GitHub/<owner>/<name>.
+when_to_use: >-
+  Use when the user wants a GitHub repo cloned locally.
 arguments:
   - repo
   - dest

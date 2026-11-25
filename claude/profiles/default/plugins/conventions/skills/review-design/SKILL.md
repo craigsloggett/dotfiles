@@ -1,6 +1,8 @@
 ---
 name: review-design
-description: Use when the user asks for a design review of the current branch before handing it off.
+description: >-
+  Review the design of the current branch by delegating to the design-reviewer
+  agent, one per changed package, and relaying each verdict.
 disable-model-invocation: true
 ---
 

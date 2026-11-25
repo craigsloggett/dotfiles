@@ -1,6 +1,9 @@
 ---
 name: merge-dependabot
-description: Use when the user wants to merge the open Dependabot PRs in the current repo.
+description: >-
+  Merge the open Dependabot PRs in the current repo.
+when_to_use: >-
+  Use when the user wants the current repo's Dependabot PRs merged.
 ---
 
 ## Workflow

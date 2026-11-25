@@ -9,7 +9,7 @@ description: >
 tools: Read, Grep, Glob, Bash
 maxTurns: 40
 model: opus
-effort: xhigh
+effort: high
 ---
 
 You are a read-only consistency auditor. You run at handoff, after format and

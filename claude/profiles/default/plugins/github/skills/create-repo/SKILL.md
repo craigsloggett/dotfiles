@@ -1,6 +1,11 @@
 ---
 name: create-repo
-description: Use when the user wants to create and configure a new empty GitHub repo (not from a template), without cloning it locally or cutting a release.
+description: >-
+  Create and configure a new empty GitHub repo (not from a template), without
+  cloning it locally or cutting a release.
+when_to_use: >-
+  Use when the user wants only an empty repo created. For the full flow, use
+  create-from-scratch.
 arguments:
   - name
   - owner

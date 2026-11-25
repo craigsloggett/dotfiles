@@ -1,6 +1,11 @@
 ---
 name: tidy-pr-commits
-description: Use when the user wants the current PR branch's commit messages stripped to their subject lines, rewriting the branch history and force-pushing so the squash-merge body on main stays clean.
+description: >-
+  Strip the current PR branch's commit messages to their subject lines,
+  rewriting the branch history and force-pushing so the squash-merge body on
+  main stays clean.
+when_to_use: >-
+  Use when the user wants commit bodies removed from the current PR branch.
 ---
 
 ## Background

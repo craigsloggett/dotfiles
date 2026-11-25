@@ -1,10 +1,13 @@
 ---
 name: review-prose
 description: >-
+  Edit prose so it reads like a careful human expert wrote it, removing LLM-isms
+  while preserving every fact.
+when_to_use: >-
   Use when the user asks to check writing for LLM-isms or to make it sound less
   machine-written, whether a named file, a PR description, or the prose this
-  session wrote, and before posting a PR description or document you drafted
-  for them.
+  session wrote, and before posting a PR description or document you drafted for
+  them.
 ---
 
 ## Review Prose

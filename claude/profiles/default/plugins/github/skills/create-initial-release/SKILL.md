@@ -1,6 +1,9 @@
 ---
 name: create-initial-release
-description: Use when the user wants to cut the first release of a repo, defaulting to a v0.0.1 prerelease.
+description: >-
+  Cut the first release of a repo, defaulting to a v0.0.1 prerelease.
+when_to_use: >-
+  Use when the user wants a repo's first release created.
 arguments:
   - repo
   - tag

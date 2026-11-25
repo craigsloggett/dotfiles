@@ -1,6 +1,11 @@
 ---
 name: bump-consumer
-description: Use when the user wants to re-pin a consumer repo's references to new upstream versions, whether supplied by the cascade-change hand-off or listed by the user directly.
+description: >-
+  Re-pin a consumer repo's references to new upstream versions.
+when_to_use: >-
+  Use when the user wants a consumer repo bumped to new upstream releases,
+  whether supplied by the cascade-change hand-off or listed by the user
+  directly.
 arguments:
   - consumer
   - upstreams

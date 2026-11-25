@@ -6,23 +6,26 @@ paths:
 
 ## Frontmatter
 
-| Field             | Use                                                                       |
-| ----------------- | ------------------------------------------------------------------------- |
-| `name`            | Required. Lowercase and hyphens. A noun you address.                      |
-| `description`     | Required. When to delegate to this agent. Omit what it does.              |
-| `tools`           | Allowlist (bare tool names). Resolved after `disallowedTools`.            |
-| `disallowedTools` | Denylist, applied first. Ignores Bash. A `tools` allowlist is tighter.    |
-| `model`           | Alias, full ID, or `inherit`. `opus` for high-stakes auditing.            |
-| `effort`          | Effort override. `high` for judgment work.                                |
-| `maxTurns`        | Turn ceiling. Set it on auditors so a misfire cannot loop forever.        |
-| `skills`          | Preload full skill content. No `disable-model-invocation: true` skills.   |
-| `hooks`           | Inline lifecycle hooks. Not the read-only mechanism. See Tools.           |
-| `isolation`       | `worktree` runs in a temp Git worktree, auto-cleaned if unchanged.        |
-| `mcpServers`      | MCP servers the agent may reach.                                          |
-| `memory`          | Persistent memory scope, one of `user`, `project`, or `local`.            |
-| `background`      | `true` runs the agent as a background task.                               |
-| `color`           | Display color.                                                            |
-| `initialPrompt`   | Auto-submitted first turn when the agent runs as a main session.          |
+| Field               | Use                                                                       |
+| ------------------- | ------------------------------------------------------------------------- |
+| `name`              | Required. Lowercase and hyphens. A noun you address.                      |
+| `description`       | Required. When to delegate to this agent. Omit what it does.              |
+| `tools`             | Allowlist (bare tool names). Resolved after `disallowedTools`.            |
+| `disallowedTools`   | Denylist, applied first. Ignores Bash. A `tools` allowlist is tighter.    |
+| `model`             | Alias, full ID, or `inherit`. `opus` for high-stakes auditing.            |
+| `effort`            | Effort override. `high` for judgment work.                                |
+| `maxTurns`          | Turn ceiling. Set it on auditors so a misfire cannot loop forever.        |
+| `skills`            | Preload full skill content. No `disable-model-invocation: true` skills.   |
+| `hooks`             | Inline lifecycle hooks. Not the read-only mechanism. Ignored in plugins.  |
+| `isolation`         | `worktree` runs in a temp Git worktree, auto-cleaned if unchanged.        |
+| `mcpServers`        | MCP servers the agent may reach. Ignored in plugins.                      |
+| `permissionMode`    | Permission mode override. Ignored in plugins.                             |
+| `memory`            | Persistent memory scope, one of `user`, `project`, or `local`.            |
+| `background`        | `true` runs the agent as a background task.                               |
+| `color`             | Display color.                                                            |
+| `initialPrompt`     | Auto-submitted first turn as a main session. Ignored in plugins.          |
+| `omitClaudeMd`      | `true` leaves CLAUDE.md out of the agent's context.                       |
+| `autoCompactWindow` | Token count that triggers auto-compaction. Integer, at least 100000.      |
 
 Example:
 

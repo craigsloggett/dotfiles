@@ -6,7 +6,6 @@ description: >
   configures the GitHub repo, clones it locally, and cuts the v0.0.1 prerelease,
   then returns a summary. Not for the interactive scaffolding cleanup.
 tools: Skill, Bash
-permissionMode: default
 maxTurns: 30
 skills:
   - create-repo-from-template

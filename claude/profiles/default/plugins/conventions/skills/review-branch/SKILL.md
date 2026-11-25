@@ -1,6 +1,8 @@
 ---
 name: review-branch
-description: Use when the user asks for a code review of the current branch before handing it off.
+description: >-
+  Review the current branch for defects by delegating to the code-reviewer agent
+  and relaying its verdict.
 disable-model-invocation: true
 ---
 

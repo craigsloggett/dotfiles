@@ -1,11 +1,12 @@
 ---
 name: posix-awk
-description: >
+description: >-
   Write strictly POSIX-conformant `awk` and flag `gawk`/`mawk` extensions
   (`gensub`, `asort`, `length(array)`, `systime`, `FIELDWIDTHS`, bitwise
-  functions). Invoke for any `awk` you write, edit, or review, including
-  one-liners in shell scripts, pipelines, Makefiles, or CI. If `awk` appears,
-  invoke this skill.
+  functions).
+when_to_use: >-
+  Invoke for any `awk` you write, edit, or review, including one-liners in shell
+  scripts, pipelines, Makefiles, or CI. If `awk` appears, invoke this skill.
 ---
 
 ## POSIX Awk

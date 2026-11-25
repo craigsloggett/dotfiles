@@ -9,17 +9,24 @@ paths:
 | Field                      | Use                                                                          |
 | -------------------------- | ---------------------------------------------------------------------------- |
 | `name`                     | Required. kebab-case, action-oriented (verb-noun).                           |
-| `description`              | Required. When to invoke. Claude reads it for relevance. Omit what it does.  |
+| `description`              | Required. What the skill does, in a sentence or two. Leave out the triggers. |
+| `when_to_use`              | When to invoke. Claude reads it for relevance. Omit if model invocation off. |
 | `arguments`                | Positional argument names (string or list) enabling `$name` substitution.    |
 | `disable-model-invocation` | `true` for side-effecting skills only. Leave off read-only ones to auto-run. |
 | `allowed-tools`            | The smallest set the skill needs.                                            |
+
+Write `description` and `when_to_use` as `>-` folded scalars wrapped at 80
+columns, whatever their length.
 
 Example:
 
 ```yaml
 ---
 name: kebab-case-name
-description: Use when ...
+description: >-
+  Verb the noun ...
+when_to_use: >-
+  Use when ...
 ---
 ```
 

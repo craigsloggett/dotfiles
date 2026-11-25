@@ -1,6 +1,10 @@
 ---
 name: settle-open-prs
-description: Use when the user wants to settle the open PRs on a freshly scaffolded repo, fixing Dependabot titles, merging the green ones, and pulling the default branch.
+description: >-
+  Settle the open PRs on a freshly scaffolded repo by fixing Dependabot titles,
+  merging the green ones, and pulling the default branch.
+when_to_use: >-
+  Use when the user wants a newly scaffolded repo's open PRs settled.
 arguments:
   - dir
 ---

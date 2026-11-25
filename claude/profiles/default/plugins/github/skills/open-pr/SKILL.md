@@ -1,6 +1,11 @@
 ---
 name: open-pr
-description: Use when the user wants to commit the current working-tree changes onto a new branch and open a pull request, for a repo whose default branch requires PRs.
+description: >-
+  Commit the current working-tree changes onto a new branch and open a pull
+  request.
+when_to_use: >-
+  Use when the user wants a PR opened from uncommitted changes, for a repo whose
+  default branch requires PRs.
 arguments:
   - dir
   - branch

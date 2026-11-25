@@ -1,6 +1,11 @@
 ---
 name: create-repo-from-template
-description: Use when the user wants to create and configure a new GitHub repo from a template, without cloning it locally or cutting a release.
+description: >-
+  Create and configure a new GitHub repo from a template, without cloning it
+  locally or cutting a release.
+when_to_use: >-
+  Use when the user wants only the repo created from a template. For the full
+  flow, use create-from-template.
 arguments:
   - template
   - name

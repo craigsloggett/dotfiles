@@ -1,6 +1,11 @@
 ---
 name: cleanup-template-scaffolding
-description: Use when the user asks to clean up a repo cloned from a template, replace placeholder values, or write a fresh README for a newly scaffolded project.
+description: >-
+  Clean up a repo cloned from a template by replacing placeholder values and
+  writing a fresh README.
+when_to_use: >-
+  Use when the user asks to clean up a newly scaffolded project, replace
+  template placeholders, or write its first README.
 ---
 
 ## Workflow

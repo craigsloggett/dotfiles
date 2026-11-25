@@ -1,6 +1,11 @@
 ---
 name: reduce-comments
-description: Use when the user wants comments removed or thinned, whether a specific quoted comment, named files, or the current branch's diff. Deletes by default. A comment survives only when removing it would cost the reader something the code cannot say.
+description: >-
+  Remove or thin code comments, deleting by default. A comment survives only
+  when removing it would cost the reader something the code cannot say.
+when_to_use: >-
+  Use when the user wants comments removed or thinned, whether a specific quoted
+  comment, named files, or the current branch's diff.
 ---
 
 ## The Bar

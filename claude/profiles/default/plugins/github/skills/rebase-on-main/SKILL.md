@@ -1,6 +1,11 @@
 ---
 name: rebase-on-main
-description: Use when the user wants to rebase the current feature branch on the freshly-updated default branch, resolve conflicts, force-push, and get the feature PR ready for review.
+description: >-
+  Rebase the current feature branch on the freshly-updated default branch,
+  resolve conflicts, force-push, and get the feature PR ready for review.
+when_to_use: >-
+  Use when the user wants the current feature branch brought up to date with the
+  default branch.
 ---
 
 ## Workflow

@@ -1,6 +1,9 @@
 ---
 name: create-composite-action
-description: Use when the user wants to create a new composite action repo from the standard template.
+description: >-
+  Create a new composite action repo from the standard template.
+when_to_use: >-
+  Use when the user wants a new composite action repo.
 arguments:
   - name
 ---

@@ -1,6 +1,11 @@
 ---
 name: create-from-scratch
-description: Use when the user wants the full from-scratch flow (create an empty repo, configure it, clone it locally). For the repo alone, use create-repo.
+description: >-
+  Run the full from-scratch flow (create an empty repo, configure it, clone it
+  locally).
+when_to_use: >-
+  Use when the user wants a new repo set up end to end without a template. For
+  the repo alone, use create-repo.
 arguments:
   - name
   - owner

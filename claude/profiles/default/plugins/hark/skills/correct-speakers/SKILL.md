@@ -1,6 +1,9 @@
 ---
 name: correct-speakers
 description: >-
+  Reassign the turns of a Hark conversation to the right speakers and write the
+  result as Hark corrections.
+when_to_use: >-
   Use when the user wants the speakers of a Hark conversation fixed, such as an
   unnamed or extra speaker, turns given to the wrong person, people merged into
   one voice, or a voiceprint to clean up.
