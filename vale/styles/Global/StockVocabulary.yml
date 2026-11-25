@@ -1,6 +1,6 @@
 extends: existence
 message: Stock vocabulary '%s'. Use the plain word.
-level: warning
+level: error
 ignorecase: true
 tokens:
   - comprehensive

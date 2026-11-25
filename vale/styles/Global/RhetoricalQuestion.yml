@@ -1,6 +1,6 @@
 extends: existence
 message: Question '%s' is answered at once. State the answer.
-level: warning
+level: error
 vocab: false
 raw:
   - \b[A-Z][a-z]+

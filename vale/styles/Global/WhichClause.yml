@@ -1,6 +1,6 @@
 extends: existence
 message: Split the ', which' clause into two sentences.
-level: warning
+level: error
 nonword: true
 tokens:
   - ', which\b'

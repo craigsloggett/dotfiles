@@ -1,6 +1,6 @@
 extends: existence
 message: Heading '%s' reads like a guide. Use a plain label.
-level: warning
+level: error
 ignorecase: true
 nonword: true
 scope:

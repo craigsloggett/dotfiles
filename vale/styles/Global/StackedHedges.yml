@@ -1,6 +1,6 @@
 extends: existence
 message: Stacked hedges in '%s'. Hedge once, where the uncertainty is real.
-level: warning
+level: error
 ignorecase: true
 raw:
   - \b(?:can|could|may|might)\s+

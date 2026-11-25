@@ -1,6 +1,6 @@
 extends: existence
 message: Throat-clearing '%s'. Delete it.
-level: warning
+level: error
 ignorecase: true
 tokens:
   - a few things that should help
