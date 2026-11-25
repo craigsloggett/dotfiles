@@ -5,7 +5,10 @@ exclude = ["**/.trash/**"]
 enable = [
   "MD001",
   "MD004",
+  "MD005",
+  "MD007",
   "MD009",
+  "MD010",
   "MD012",
   "MD013",
   "MD022",
@@ -24,14 +27,18 @@ enable = [
   "MD067",
   "MD069",
   "MD071",
-  "MD076"
+  "MD076",
+  "MD077"
 ]
 
 [per-file-ignores]
 "~/.local/share/obsidian/**/*.md" = ["MD013"]
 
 [MD004]
-style = "consistent"
+style = "dash"
+
+[MD007]
+indent = 2
 
 [MD009]
 br-spaces = 0
@@ -68,3 +75,6 @@ ignore-words = [
 
 [MD076]
 style = "tight"
+
+[MD077]
+style = "aligned"
