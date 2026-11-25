@@ -27,12 +27,16 @@ paths:
 | `omitClaudeMd`      | `true` leaves CLAUDE.md out of the agent's context.                       |
 | `autoCompactWindow` | Token count that triggers auto-compaction. Integer, at least 100000.      |
 
+Write `description` as a `>-` folded scalar wrapped at 80 columns, whatever its
+length.
+
 Example:
 
 ```yaml
 ---
 name: consistency-reviewer
-description: Use when a branch is ready for review to audit it against the rules.
+description: >-
+  Use when a branch is ready for review to audit it against the rules.
 ---
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: consistency-reviewer
-description: >
+description: >-
   Read-only auditor for the handoff gate, after format and lint are green and before
   you review. Delegate when a branch is ready for review to catch two things a linter
   cannot parse: violations of the path-gated rules in rules/*.md, and consistency gaps

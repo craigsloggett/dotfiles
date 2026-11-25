@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: >
+description: >-
   Read-only reviewer for a branch that is ready for review, after format and
   lint are green. Delegate to find defects such as wrong behavior, unhandled
   edge cases and error paths, races, broken contracts with callers, and tests

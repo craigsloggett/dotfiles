@@ -1,6 +1,6 @@
 ---
 name: repo-scaffolder
-description: >
+description: >-
   Delegate when scaffolding a new repo from a template should run without
   cluttering the main context. From inputs in the prompt it creates and
   configures the GitHub repo, clones it locally, and cuts the v0.0.1 prerelease,

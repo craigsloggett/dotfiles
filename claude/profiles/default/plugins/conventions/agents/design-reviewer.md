@@ -1,6 +1,6 @@
 ---
 name: design-reviewer
-description: >
+description: >-
   Read-only reviewer for a branch that is ready for review, after format and
   lint are green. Delegate to find where the change makes a reader keep more in
   mind than the problem needs, such as shallow modules, pass-through layers,
