@@ -1,6 +1,7 @@
 [global]
 flavor = "obsidian"
 line-length = 80
+exclude = ["**/.trash/**"]
 enable = [
   "MD001",
   "MD004",
