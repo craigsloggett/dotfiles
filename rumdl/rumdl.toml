@@ -38,7 +38,7 @@ enable = [
 style = "dash"
 
 [MD007]
-indent = 4
+indent = 2
 style = "fixed"
 
 [MD009]
