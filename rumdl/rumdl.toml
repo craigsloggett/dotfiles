@@ -56,24 +56,13 @@ style = "aligned"
 [MD063]
 style = "title-case"
 min-level = 2
+# Vale owns term casing, so this lists just the plain-lowercase
+# entries from vale/vocabularies/Global/accept.txt.
 ignore-words = [
-  "API",
-  "Auth0",
-  "GitHub",
-  "ID",
-  "JSON",
-  "JWT",
-  "JWT-SVID",
-  "LLM",
-  "MCP",
-  "mTLS",
-  "OIDC",
-  "RFC",
-  "SCIM",
-  "SPIFFE",
-  "SPIRE",
-  "SVID",
-  "X.509-SVID"
+  "cgo",
+  "gomock",
+  "synctest",
+  "testcontainers"
 ]
 
 [MD076]
