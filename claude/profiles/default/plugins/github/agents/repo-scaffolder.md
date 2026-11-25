@@ -5,7 +5,7 @@ description: >-
   cluttering the main context. From inputs in the prompt it creates and
   configures the GitHub repo, clones it locally, and cuts the v0.0.1 prerelease,
   then returns a summary. Not for the interactive scaffolding cleanup.
-tools: Skill, Bash
+tools: Bash
 maxTurns: 30
 skills:
   - create-repo-from-template
@@ -18,14 +18,14 @@ cannot prompt the user, so take the template, name, owner, visibility, and topic
 from the delegating prompt and proceed without confirmation. If name or template
 is missing, stop and report what you still need.
 
-1. Invoke `create-repo-from-template` with the template, name, and owner. That
+1. Follow `create-repo-from-template` with the template, name, and owner. That
    skill has human-confirmation steps. Since you run autonomously, treat the
    inputs as confirmed: apply the given topic and visibility, and write a
    house-style one-sentence description.
-2. Invoke `clone-repo-locally` with the new owner/name. If the destination
+2. Follow `clone-repo-locally` with the new owner/name. If the destination
    exists, do not overwrite it. Stop and report the collision.
-3. Invoke `create-initial-release` with the new owner/name.
-4. Do NOT invoke `cleanup-template-scaffolding`, because that skill is
+3. Follow `create-initial-release` with the new owner/name.
+4. Do NOT run `cleanup-template-scaffolding`, because that skill is
    interactive and runs in the main session.
 
 Return the repo URL, local clone path, visibility, topic, the description you
