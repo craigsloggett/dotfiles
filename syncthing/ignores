@@ -1,5 +1,6 @@
 (?d).DS_Store
 (?d)._*
+.git
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
 *.keyx
