@@ -5,7 +5,7 @@ description: >-
   it locally when the user wants a local copy.
 when_to_use: >-
   Use when the user wants a new repo without a template. For a repo from a
-  template, use create-from-template.
+  template, use create-repo-from-template.
 arguments:
   - name
   - owner
@@ -70,7 +70,7 @@ Authenticated GitHub user, for defaulting the owner:
 - A repo without a template doesn't start with scaffolding to clean up or
   initial Dependabot PRs, so this skill skips those steps. Scaffold content
   yourself in the local clone.
-- No release by default. Run `create-initial-release` only if the user asks for
-  one.
+- No release by default. If the user asks for one, run
+  `gh release create v0.0.1 --repo <owner>/<name> --prerelease --title v0.0.1 --notes "Initial release"`.
 - If the API rejects the ruleset's `bypass_actors`, surface the error rather
   than guessing another actor id.

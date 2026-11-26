@@ -1,5 +1,5 @@
 ---
-name: review-prose
+name: prose
 description: >-
   Edit prose so it reads like a careful human expert wrote it, removing LLM-isms
   while preserving every fact.
@@ -158,7 +158,7 @@ followed by what to write instead. Real before and after pairs for each are in
   for approval before rebasing or force-pushing.
 - Code comments follow their language's doc conventions first, such as a Go
   doc comment starting with the name. Trimming comments belongs to
-  `conventions:reduce-comments`.
+  `review:reduce-comments`.
 - The report is prose too. Write it in plain sentences, without bold-label
   bullets.
 <!-- vale Global.VerbNo = YES -->

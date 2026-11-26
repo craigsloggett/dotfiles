@@ -69,7 +69,7 @@ description: >-
 - Scope non-recognized read-only commands (`shellcheck`, `tflint`) in
   `.claude/settings.json` `permissions.allow` and keep them out of frontmatter.
   The allowlist is project-wide, so allowlist only read-only commands.
-- Preload reference skills with `skills: [posix-awk]` to inject their full
+- Preload reference skills with `skills: [<skill-name>]` to inject their full
   content at startup, skipping a discovery step.
 - An investigator may hold Bash and write tools, but an auditor holds neither
   Edit nor Write. If a read-only agent names them, refuse or switch the

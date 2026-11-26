@@ -1,11 +1,13 @@
 ---
 name: create-repo-from-template
 description: >-
-  Create and configure a new GitHub repo from a template, without cloning it
-  locally or cutting a release.
+  Create a new GitHub repo from a template and set it up end to end, from
+  configuring and cloning it to opening the PR that cleans up the template
+  scaffolding.
 when_to_use: >-
-  Use when the user wants only the repo created from a template. For the full
-  flow, use create-from-template.
+  Use when the user wants a new repo from a template, such as a new composite
+  action, Terraform module, or Go project. For a repo without a template, use
+  create-repo.
 arguments:
   - template
   - name
@@ -17,10 +19,21 @@ arguments:
 Positional and optional. Invoke as
 `/create-repo-from-template <template> <name> <owner>`.
 
-- `template`: owner/repo of the template. Blank lists accessible templates and
-  prompts.
+- `template`: owner/repo of the template, or a kind from the table below. Blank
+  lists accessible templates and prompts.
 - `name`: name for the new repo. Blank asks.
 - `owner`: owner for the new repo. Blank defaults to the authenticated user.
+
+## Templates
+
+| Kind                     | Template                                           |
+| ------------------------ | -------------------------------------------------- |
+| Composite action         | `craigsloggett-lab/composite-action-template`      |
+| Terraform module         | `craigsloggett-lab/terraform-module-template`      |
+| Terraform root module    | `craigsloggett-lab/terraform-root-module-template` |
+| Terraform provider       | `craigsloggett-lab/terraform-provider-template`    |
+| Go project               | `craigsloggett-lab/go-project-template`            |
+| HCP Terraform management | `craigsloggett/hcp-terraform-management-template`  |
 
 ## Workflow
 
@@ -33,7 +46,9 @@ Authenticated GitHub user, for defaulting the owner:
 1. Pre-flight. Run `gh auth status`. If it fails, hand back to the user to run
    `gh auth login`.
 2. Resolve the template into `<template>` (full `owner/repo`).
-   - If `$template` is non-empty, call
+   - If `$template` or the request names a kind in the table above, use its
+     template.
+   - If `$template` is an `owner/repo`, call
      `gh api repos/$template --jq '{is_template, full_name, description}'`.
      Abort if `is_template` is not `true`.
    - Otherwise, list the user's templates with
@@ -72,10 +87,31 @@ Authenticated GitHub user, for defaulting the owner:
    where `<topics>` is a comma-separated list (omit it when the list is empty).
    The script applies the settings, the squash-merge messages, the topics, and
    the default branch ruleset. If it fails, stop and surface its error.
-7. Report the created `<owner>/<name>`.
+7. Invoke `clone-repo-locally` with `<owner>/<name>`.
+8. Cut the first release, a prerelease of the pristine template:
+
+   ```sh
+   gh release create v0.0.1 \
+     --repo <owner>/<name> \
+     --prerelease \
+     --title v0.0.1 \
+     --notes "Initial release"
+   ```
+
+9. Invoke `merge-dependabot` in `~/Developer/GitHub/<owner>/<name>`.
+10. Invoke `cleanup-template-scaffolding` in the same directory.
+11. Invoke `open-pr` in the same directory with branch
+    `clean-up-template-scaffolding` and title
+    `chore: Clean up template scaffolding`.
+12. Report the repo URL, the local path, the release tag, and the cleanup PR
+    URL.
 
 ## Rules
 
+- Keep the order of steps 7 to 11. The release tags the pristine template
+  before cleanup, the Dependabot PRs merge before cleanup so it starts from the
+  merged default branch, and cleanup lands as its own PR because the ruleset
+  blocks direct pushes to the default branch.
 - Never change or push to the template repo. Treat it as read-only.
 - The new repo's owner and the template's owner are independent. Never reuse the
   template's owner for the new repo unless the user asks.
@@ -84,3 +120,5 @@ Authenticated GitHub user, for defaulting the owner:
   and `/generate` works with read access.
 - If the API rejects the ruleset's `bypass_actors`, surface the error rather
   than guessing another actor id.
+- Dependabot opens PRs asynchronously on a new repo, so step 9 merges whatever
+  is open at the time. Run `merge-dependabot` again if more appear later.

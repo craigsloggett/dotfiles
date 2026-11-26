@@ -1,12 +1,10 @@
 ---
-name: posix-awk
-description: >-
-  Write strictly POSIX-conformant `awk` and flag `gawk`/`mawk` extensions
-  (`gensub`, `asort`, `length(array)`, `systime`, `FIELDWIDTHS`, bitwise
-  functions).
-when_to_use: >-
-  Invoke for any `awk` you write, edit, or review, including one-liners in shell
-  scripts, pipelines, Makefiles, or CI. If `awk` appears, invoke this skill.
+paths:
+  - '**/*.sh'
+  - '**/*.awk'
+  - '**/Makefile'
+  - .github/workflows/**
+  - '**/action.yml'
 ---
 
 ## POSIX Awk
@@ -15,7 +13,7 @@ when_to_use: >-
 gawk-ism that runs locally can break or behave differently in CI. Write to POSIX
 `awk`, and reach for an extension only when you know the runtime is `gawk`.
 
-### POSIX Vs Gawk
+## POSIX Vs Gawk
 
 Non-POSIX features to avoid by default:
 
@@ -38,12 +36,12 @@ Non-POSIX features to avoid by default:
   `BINMODE`: gawk-only.
 - `\x` hex escapes: non-POSIX. Octal `\ddd` is POSIX.
 
-### Passing Shell Values
+## Passing Shell Values
 
 - Pass shell values in as data with `awk -v var="${value}"` and reference `var`
   inside the program. Never splice them into program text.
 
-### Regex Patterns
+## Regex Patterns
 
 - Embed constant regex as `/regex/` literals, and reserve `-v var=...` for
   dynamic values (user input, environment data).
@@ -68,7 +66,7 @@ Non-POSIX features to avoid by default:
 - Name parts and patterns for their meaning (`leading_indent`, `key_separator`,
   `key_line_pattern`). Avoid opaque abbreviations such as `keyre`.
 
-### Script Structure
+## Script Structure
 
 - Default to the "filter pattern": specific pattern-action blocks at the top, a
   trailing `{ print }` passthrough at the bottom to handle every line the blocks
@@ -84,19 +82,19 @@ Non-POSIX features to avoid by default:
   (`output = replacement`) before `sub`/`gsub`, so the input stays visible and
   reusable.
 
-### Variable Naming
+## Variable Naming
 
 - Use descriptive `snake_case` for `-v` variables (`pattern`, `replacement`,
   `version`, `output`). The shell-side casing need not match.
 
-### Comments
+## Comments
 
 - Keep trailing `#` comments to a short phrase, aligned to a consistent column
   within each block (at least two spaces past the block's longest code line).
 - When a comment needs more than a phrase (typically the "why" behind a
   non-obvious line), put it on its own line above the code.
 
-### Example
+## Example
 
 ```sh
 awk -v pattern="${LINE_MATCH}" -v replacement="${LINE_REPLACE}" -v version="${LATEST_VERSION}" '

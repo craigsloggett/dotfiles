@@ -36,7 +36,7 @@ The files this PR changes, against its base branch:
 4. Apply it with `gh pr edit <number> --body-file <file>`. Leave the title
    alone unless the user asks. Preserve any hand-written sections the user
    wants kept (a linked issue, a screenshot).
-5. Invoke `conventions:review-prose` on the PR, then report the URL.
+5. Invoke `review:prose` on the PR, then report the URL.
 
 ## Rules
 
