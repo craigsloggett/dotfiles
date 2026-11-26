@@ -4,9 +4,10 @@
 #
 # A PostToolUse hook that acts on files changed in the working tree.
 # The changed set comes from Git to catch changes from both Edit/Write
-# and Bash. Every change is passed to each handler script, which picks
-# out its own filetype. A failed check exits with status 2, the
-# "blocking error" status that Claude Code feeds back to the model.
+# and Bash. The hook passes every change to each handler script, and
+# each handler picks out its own file type. A failed check exits with
+# status 2, the "blocking error" status that Claude Code feeds back to
+# the model.
 
 set -euf
 
