@@ -32,12 +32,10 @@ directories="$(for file in "$@"; do dirname "${file}"; done | sort -u)"
 IFS='
 '
 
-status=0
 for directory in ${directories}; do
-  tflint --chdir "${directory}" --no-color >&2 || status=2
+  tflint --chdir "${directory}" --no-color >&2 || exit 2
 
   [ -d "${directory}/.terraform" ] || continue
 
-  terraform -chdir="${directory}" validate -no-color >&2 || status=2
+  terraform -chdir="${directory}" validate -no-color >&2 || exit 2
 done
-exit "${status}"

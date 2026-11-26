@@ -49,9 +49,11 @@ paths:
 - Fail fast across tool runs too. Run a sequence of tools as
   `tool "$@" || exit 2` (or `|| die "msg"`) so a formatter failure stops the
   linters that would repeat it.
-- Collect a status (`status=0`, `|| status=2`, `exit "${status}"`) only when
-  looping over independent units, such as one linter run per directory, so one
-  failure doesn't hide the next.
+- Fail fast inside loops as well. One linter run per file or directory ends in
+  `|| exit 2`, like any other tool run.
+- Collect a status (`status=0`, `|| status=2`, `exit "${status}"`) only in a
+  dispatcher that runs separate handlers, so one handler's failure doesn't skip
+  the formatting the others do.
 - Functions `return` a status so the caller decides what to do. That keeps them
   composable (`func || ...`) and sourceable by tests.
 - Only the top-level flow and `die()` use `exit`. Reserve it for aborting the

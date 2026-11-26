@@ -30,8 +30,6 @@ directories="$(for file in "$@"; do dirname "${file}"; done | sort -u)"
 IFS='
 '
 
-status=0
 for directory in ${directories}; do
-  (cd "${directory}" && golangci-lint run --path-mode=abs .) >&2 || status=2
+  (cd "${directory}" && golangci-lint run --path-mode=abs .) >&2 || exit 2
 done
-exit "${status}"
