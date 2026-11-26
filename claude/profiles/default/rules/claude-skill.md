@@ -70,7 +70,7 @@ when_to_use: >-
 
 - Imperative second person. "Run the tests," not "you should consider running
   the tests".
-- No hedging or meta. No "I'll help you", no "this skill will".
+- No hedging or meta, no "I'll help you", and no "this skill will".
 - Do not restate what tool output already shows. If `!git status` runs, do not
   also describe its output shape.
 - Headers earn their place. A header over two lines of content wastes space.
