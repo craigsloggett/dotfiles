@@ -150,6 +150,10 @@ followed by what to write instead. Real before and after pairs for each are in
   repo's PR template or an RFC template, and compare. A heading that comes from
   the template stays unchanged, as in "Risk and how to revert" in a PR
   description or "Why this matters to the customer" in an RFC.
+- A PR description gives each independent change its own bullet and describes
+  dependent changes in a paragraph, as `github:update-pr-description` writes
+  it. Keep those bullets, and convert only a list that splits one line of
+  reasoning.
 - Fixing a commit subject rewrites history. Propose the new subjects and wait
   for approval before rebasing or force-pushing.
 - Code comments follow their language's doc conventions first, such as a Go

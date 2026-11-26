@@ -49,4 +49,3 @@ below guide sweeps, but taste outranks them, so when in doubt, delete.
 3. Report removals and keepers as a short list, one line each.
 4. If the removals belong to an unmerged commit on the current PR branch, amend
    them into it rather than adding a cleanup commit, then force-push with lease.
-   Branch commits stay subject-only.

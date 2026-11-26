@@ -28,13 +28,7 @@ Authenticated GitHub user, for defaulting the owner:
 
 !`gh api user --jq .login`
 
-Existing topic vocabulary (count, name):
-
-!`gh repo list --json repositoryTopics -L 200 | jq -r '[.[].repositoryTopics[]?.name] | group_by(.) | map("\(length)\t\(.[0])") | sort | reverse | .[]'`
-
-Existing descriptions, tagged with their topics:
-
-!`gh repo list --json description,repositoryTopics -L 200 | jq -r '.[] | select(.description != null and .description != "") | "[\([.repositoryTopics[]?.name] | join(","))] \(.description)"'`
+!`${CLAUDE_SKILL_DIR}/../../scripts/repo-corpus.sh`
 
 1. Pre-flight. Run `gh auth status`. If it fails, hand back to the user to run
    `gh auth login`.
@@ -52,23 +46,11 @@ Existing descriptions, tagged with their topics:
    - Name `<name>`: `$name` if non-empty, else ask. Reject anything not matching
      `^[A-Za-z0-9._-]+$`.
    - Visibility: default public. Use private only when asked.
-4. Propose topics from the vocabulary above, matching the user's phrasing. Let
-   the user add, remove, or override. Accept topics outside the vocabulary only
-   if the user explicitly types them. Examples:
-   - "composite action" or "GitHub action" becomes `composite-action`
-   - "Terraform module/provider" becomes `terraform`
-   - A HashiCorp product also gets `hashicorp`
-   - "vault plugin" becomes `vault`
-   - "shell script" or "POSIX" becomes `shell`
-5. Propose a one-sentence description in the style of the corpus samples whose
-   topics overlap the proposed ones, and show the samples used so the user can
-   sanity-check. Allow an empty description but discourage it.
-6. Create the repo with the REST generate endpoint. Do not use
-   `gh repo create --template`, because its GraphQL clone fails for a
-   fine-grained PAT when the template's owner differs from the new repo's owner.
-   `/generate` works with read access.
+4. Propose topics and a description from the corpus above, following
+   `${CLAUDE_SKILL_DIR}/../../reference/repo-metadata.md`.
+5. Create the repo with the REST generate endpoint:
 
-   ```
+   ```sh
    gh api -X POST repos/<template>/generate \
      -f owner=<owner> \
      -f name=<name> \
@@ -77,51 +59,20 @@ Existing descriptions, tagged with their topics:
    ```
 
    Set `-F private=true` for private, and omit `-f description` if empty.
-7. Apply settings and topics:
-
-   ```
-   gh repo edit <owner>/<name> \
-     --enable-wiki=false \
-     --enable-projects=false \
-     --enable-merge-commit=false \
-     --enable-rebase-merge=false \
-     --allow-update-branch \
-     --delete-branch-on-merge \
-     --add-topic <topic1>,<topic2>,...
-   ```
-
-   `--add-topic` takes a comma-separated list. Omit it if no topics. If `gh`
-   rejects a flag, stop and surface the error.
-8. Create the default branch ruleset (every repo gets this). Write the body to a
-   temp file (`mktemp`) and post it with
-   `gh api -X POST repos/<owner>/<name>/rulesets --input <file>`:
-
-   ```json
-   {
-     "name": "default",
-     "target": "branch",
-     "enforcement": "active",
-     "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH"], "exclude": [] } },
-     "bypass_actors": [
-       { "actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "always" }
-     ],
-     "rules": [
-       { "type": "pull_request", "parameters": { "required_approving_review_count": 0, "dismiss_stale_reviews_on_push": false, "require_code_owner_review": false, "require_last_push_approval": false, "required_review_thread_resolution": false } },
-       { "type": "required_linear_history" },
-       { "type": "required_signatures" },
-       { "type": "deletion" },
-       { "type": "non_fast_forward" }
-     ]
-   }
-   ```
-
-   `actor_id` 5 is the Repository admin role, a well-known value GitHub does not
-   officially document. If the API rejects `bypass_actors`, surface the error
-   rather than guessing another id.
-9. Report the created `<owner>/<name>`.
+6. Configure it with
+   `${CLAUDE_SKILL_DIR}/../../scripts/configure-repo.sh <owner>/<name> <topics>`,
+   where `<topics>` is a comma-separated list (omit it when the list is empty).
+   The script applies the settings, the squash-merge messages, the topics, and
+   the default branch ruleset. If it fails, stop and surface its error.
+7. Report the created `<owner>/<name>`.
 
 ## Rules
 
 - Never change or push to the template repo. Treat it as read-only.
 - The new repo's owner and the template's owner are independent. Never reuse the
   template's owner for the new repo unless the user asks.
+- Do not use `gh repo create --template`. Its GraphQL clone fails for a
+  fine-grained PAT when the template's owner differs from the new repo's owner,
+  and `/generate` works with read access.
+- If the API rejects the ruleset's `bypass_actors`, surface the error rather
+  than guessing another actor id.

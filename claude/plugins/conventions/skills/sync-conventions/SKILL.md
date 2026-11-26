@@ -62,10 +62,10 @@ Positional and optional. Invoke as `/sync-conventions <source>`.
 
 6. Apply changes only after the user confirms. Do not batch unrelated changes
    into a single commit.
-7. Run the Consistency Reviewer subagent on the pending diff. It will
-   interrogate the result for patterns applied to one case but missed on a
-   sibling case (a file renamed in one place but not in another). Address any
-   findings before considering the sync complete.
+7. Delegate the pending diff to the `conventions:consistency-reviewer` agent.
+   It flags patterns applied to one case but missed on a sibling case (a file
+   renamed in one place but not in another). Address any findings before
+   considering the sync complete.
 
 ## Rules
 

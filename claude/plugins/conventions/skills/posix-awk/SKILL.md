@@ -100,12 +100,12 @@ Non-POSIX features to avoid by default:
 
 ```sh
 awk -v pattern="${LINE_MATCH}" -v replacement="${LINE_REPLACE}" -v version="${LATEST_VERSION}" '
-  $0 ~ pattern {                         # Match on the current line using the regex supplied in `pattern`.
-    output = replacement                 # Working copy of the replacement template.
-    gsub(/\{version\}/, version, output) # Substitute {version} with the latest version.
+  $0 ~ pattern {
+    output = replacement
+    gsub(/\{version\}/, version, output)
     print output
-    next                                 # Skip the passthrough block for this line.
+    next                                 # The passthrough would print the line again.
   }
-  { print }                              # Passthrough for non-matching lines.
+  { print }
 ' "${FILE}"
 ```
