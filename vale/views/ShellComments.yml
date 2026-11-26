@@ -1,0 +1,11 @@
+engine: textfsm
+template: |
+  Value List Comment (.*)
+
+  Start
+    ^\s*#\s+shellcheck\s
+    ^\s*#\s+${Comment}
+scopes:
+  - name: comment
+    expr: Comment
+    type: text

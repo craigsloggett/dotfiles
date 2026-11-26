@@ -10,7 +10,7 @@ require("lint").linters_by_ft = {
   go = { "golangcilint", "vale" },
   json = { "jq" },
   markdown = { "rumdl", "vale" },
-  sh = { "shellcheck" },
+  sh = { "shellcheck", "vale" },
   swift = { "swiftlint" },
   yaml = { "yamllint" }
 }

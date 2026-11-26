@@ -16,6 +16,7 @@ tokens:
   - actionlint
   - awk
   - bazelisk
+  - devtunnel
   - gawk
   - gh
   - gocognit

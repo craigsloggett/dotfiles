@@ -462,6 +462,7 @@ configure_vale() {
   symlink "${dotfiles}/vale" "${XDG_CONFIG_HOME}/vale"
   symlink "${dotfiles}/vale/vocabularies/Global" "${XDG_DATA_HOME}/vale/styles/config/vocabularies/Global"
   symlink "${dotfiles}/vale/styles/Global" "${XDG_DATA_HOME}/vale/styles/Global"
+  symlink "${dotfiles}/vale/views" "${XDG_DATA_HOME}/vale/styles/config/views"
   vale --config "${XDG_CONFIG_HOME}/vale/.vale.ini" sync >/dev/null 2>&1 ||
     conflict "Vale could not sync its packages, run install again when online."
 }
@@ -581,7 +582,6 @@ configure_bazelisk() {
 
 configure_devtunnel() {
   migrate "${HOME}/Library/Application Support/DevTunnels" "${DEVTUNNELS_USER_STATE_DIR}"
-  # devtunnel ignores DEVTUNNELS_USER_STATE_DIR unless the directory exists.
   make_dirs "${DEVTUNNELS_USER_STATE_DIR}"
   remove "${HOME}/.net/osx-arm64-devtunnel"
   remove_empty "${HOME}/.net"
