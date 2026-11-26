@@ -4,6 +4,7 @@ template: |
 
   Start
     ^\s*#\s+shellcheck\s
+    ^\s*#\s+[\w./-]+\.\w+\s*$$
     ^\s*#\s+${Comment}
 scopes:
   - name: comment
