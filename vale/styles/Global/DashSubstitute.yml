@@ -1,0 +1,7 @@
+extends: existence
+message: Dash '%s' stands in for an em dash. Use a comma, parentheses, or two sentences.
+level: error
+nonword: true
+tokens:
+  - (?<!\d)–(?!\d)
+  - (?<=[A-Za-z)]) --? (?=[A-Za-z(])
