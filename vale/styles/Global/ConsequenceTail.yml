@@ -1,0 +1,17 @@
+extends: existence
+message: Check '%s' for a tacked-on consequence. State the effect in its own sentence.
+level: warning
+vocab: false
+ignorecase: true
+raw:
+  - ',\s+(?:thereby\s+|thus\s+)?'
+tokens:
+  - allowing
+  - contributing to
+  - creating
+  - enabling
+  - ensuring
+  - leading to
+  - making
+  - providing
+  - resulting in

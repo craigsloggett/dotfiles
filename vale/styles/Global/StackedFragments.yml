@@ -1,0 +1,8 @@
+extends: existence
+message: Join the stacked fragments '%s' into one sentence.
+level: error
+vocab: false
+nonword: true
+tokens:
+  - \b(No|Not|Never|Just|Every|One)\s[^.!?]{1,40}[.!?]\s+\1\s[^.!?]{1,40}[.!?]
+  - (?:\b[A-Z][a-z'’-]*(?:\s[a-z'’-]+){0,2}\.\s+){2}[A-Z][a-z'’-]*(?:\s[a-z'’-]+){0,2}\.

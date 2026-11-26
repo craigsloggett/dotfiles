@@ -1,0 +1,17 @@
+extends: existence
+message: Participial tail '%s'. End the sentence and state the effect in its own sentence.
+level: error
+vocab: false
+ignorecase: true
+raw:
+  - ',\s+(?:thereby\s+|thus\s+)?'
+tokens:
+  - demonstrating
+  - emphasi[sz]ing
+  - highlighting
+  - illustrating
+  - reflecting
+  - reinforcing
+  - showcasing
+  - signall?ing
+  - underscoring

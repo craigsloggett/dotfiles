@@ -1,0 +1,16 @@
+extends: existence
+message: Stock transition '%s'. Delete it or use a plain conjunction.
+level: error
+vocab: false
+append: true
+raw:
+  - (?=,)
+tokens:
+  - Additionally
+  - Crucially
+  - Furthermore
+  - Importantly
+  - Interestingly
+  - Moreover
+  - Notably
+  - Ultimately

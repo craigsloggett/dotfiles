@@ -1,0 +1,10 @@
+extends: existence
+message: Check '%s' for a reflexive group of three. Keep the number of items the content has.
+level: warning
+vocab: false
+raw:
+  - '\b[A-Za-z]+s(?: [a-z]+){1,3}, [a-z]+s(?: [a-z]+){1,3},? and [a-z]+s(?: [a-z]+){1,3}\b'
+  - '|\b[A-Za-z]+ing(?: [a-z]+){1,3}, [a-z]+ing(?: [a-z]+){1,3},? and [a-z]+ing(?: [a-z]+){1,3}\b'
+  - '|\b[A-Za-z]+(?:ity|cy|ness|[st]ion|[ae]nce|ment)'
+  - ', [a-z]+(?:ity|cy|ness|[st]ion|[ae]nce|ment)'
+  - ',? and [a-z]+(?:ity|cy|ness|[st]ion|[ae]nce|ment)\b'
