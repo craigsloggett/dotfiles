@@ -46,8 +46,16 @@ Authenticated GitHub user, for defaulting the owner:
    - Name `<name>`: `$name` if non-empty, else ask. Reject anything not matching
      `^[A-Za-z0-9._-]+$`.
    - Visibility: default public. Use private only when asked.
-4. Propose topics and a description from the corpus above, following
-   `${CLAUDE_SKILL_DIR}/../../reference/repo-metadata.md`.
+4. Propose topics and a description from the corpus above.
+   - Topics come from the vocabulary, matched to the user's phrasing. Let the
+     user add, remove, or override them, and accept a topic outside the
+     vocabulary only if the user types it. "Composite action" or "GitHub
+     action" becomes `composite-action`, "Terraform module/provider" becomes
+     `terraform`, a HashiCorp product also gets `hashicorp`, "vault plugin"
+     becomes `vault`, and "shell script" or "POSIX" becomes `shell`.
+   - The description is one sentence in the style of the descriptions whose
+     topics overlap the proposed ones. Show the samples you used so the user
+     can check them. Allow an empty description but discourage it.
 5. Create the repo with the REST generate endpoint:
 
    ```sh
