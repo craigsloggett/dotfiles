@@ -29,6 +29,7 @@ for type in \
   json \
   markdown \
   prose \
+  python \
   shell \
   swift \
   terraform \

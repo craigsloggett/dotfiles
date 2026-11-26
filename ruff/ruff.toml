@@ -1,0 +1,60 @@
+[format]
+docstring-code-format = true
+
+[lint]
+select = [
+  "A",
+  "ANN",
+  "ARG",
+  "ASYNC",
+  "B",
+  "BLE",
+  "C4",
+  "C90",
+  "D",
+  "DTZ",
+  "E",
+  "ERA",
+  "EXE",
+  "F",
+  "FA",
+  "FBT",
+  "FLY",
+  "FURB",
+  "G",
+  "I",
+  "ISC",
+  "LOG",
+  "N",
+  "PERF",
+  "PGH",
+  "PIE",
+  "PL",
+  "PT",
+  "PTH",
+  "RET",
+  "RSE",
+  "RUF",
+  "SIM",
+  "SLF",
+  "T10",
+  "TID",
+  "TRY",
+  "UP",
+  "W",
+  "YTT"
+]
+ignore = [
+  "D1",
+  "PLR2004"
+]
+
+[lint.per-file-ignores]
+"test_*.py" = ["PLR0915"]
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.pylint]
+max-args = 5
+max-statements = 40

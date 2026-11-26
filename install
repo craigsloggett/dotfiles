@@ -413,6 +413,14 @@ configure_python3() {
   make_dirs "${PYTHON_HISTORY%/*}"
 }
 
+configure_ruff() {
+  symlink "${dotfiles}/ruff" "${XDG_CONFIG_HOME}/ruff"
+}
+
+configure_ty() {
+  symlink "${dotfiles}/ty" "${XDG_CONFIG_HOME}/ty"
+}
+
 configure_bundle() {
   migrate "${HOME}/.bundle/cache" "${BUNDLE_USER_CACHE}"
   migrate "${HOME}/.bundle/config" "${BUNDLE_USER_CONFIG}"
@@ -740,11 +748,13 @@ main() {
     nvim \
     pass \
     python3 \
+    ruff \
     rumdl \
     rustup \
     syncthing \
     terraform \
     tflint \
+    ty \
     vale \
     vim \
     yamlfmt \

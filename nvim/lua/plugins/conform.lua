@@ -10,6 +10,7 @@ require("conform").setup({
     go = { "golangci-lint" },
     json = { "jq" },
     markdown = { "rumdl" },
+    python = { "ruff_fix", "ruff_organize_imports", "ruff_format" },
     sh = { "shfmt" },
     swift = { "swiftformat" },
     yaml = { "yamlfmt" }
