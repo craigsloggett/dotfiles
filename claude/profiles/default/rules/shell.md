@@ -46,9 +46,12 @@ paths:
 - Use `cond || die "msg"` for single conditions and
   `if cond1 && cond2; then die "msg"; fi` for compound ones. Avoid
   `cond1 && cond2 && die "msg"`.
-- Aggregating output from independent tools (e.g. linter findings) is
-  reporting, so deferring it to the end is fine. The fail-fast rule governs
-  validation conditions only.
+- Fail fast across tool runs too. Run a sequence of tools as
+  `tool "$@" || exit 2` (or `|| die "msg"`) so a formatter failure stops the
+  linters that would repeat it.
+- Collect a status (`status=0`, `|| status=2`, `exit "${status}"`) only when
+  looping over independent units, such as one linter run per directory, so one
+  failure doesn't hide the next.
 - Functions `return` a status so the caller decides what to do. That keeps them
   composable (`func || ...`) and sourceable by tests.
 - Only the top-level flow and `die()` use `exit`. Reserve it for aborting the
