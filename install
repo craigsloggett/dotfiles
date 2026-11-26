@@ -484,11 +484,16 @@ configure_claude() (
   migrate "${HOME}/.claude" "${CLAUDE_CONFIG_DIR}"
   migrate "${HOME}/.claude.json" "${CLAUDE_CONFIG_DIR}/.claude.json"
 
-  for entry in "${CLAUDE_CONFIG_DIR}"/plugins/*; do
-    [ -e "${entry}" ] || continue
-    [ "${entry##*/}" != synced ] || continue
-    migrate "${entry}" "${CLAUDE_CODE_PLUGIN_CACHE_DIR}/${entry##*/}"
-  done
+  plugins="${CLAUDE_CONFIG_DIR}/plugins"
+
+  if [ -d "${plugins}" ] && [ ! -L "${plugins}" ]; then
+    find "${plugins}/." ! -name . -prune ! -name synced | while read -r entry; do
+      migrate "${plugins}/${entry##*/}" "${CLAUDE_CODE_PLUGIN_CACHE_DIR}/${entry##*/}"
+    done
+
+    rmdir "${plugins}" 2>/dev/null ||
+      conflict "Not linking ${plugins}, it still has entries after migrating."
+  fi
 
   for profile_dir in "${dotfiles}"/claude/profiles/*/; do
     profile="${profile_dir%/}"
@@ -500,7 +505,7 @@ configure_claude() (
 
     [ -L "${config_dir}/settings.json" ] ||
       remove "${config_dir}/settings.json"
-    for conf in settings.json CLAUDE.md statusline-command.sh hooks; do
+    for conf in settings.json CLAUDE.md statusline-command.sh hooks plugins; do
       symlink "${dotfiles}/claude/${conf}" "${config_dir}/${conf}"
     done
 

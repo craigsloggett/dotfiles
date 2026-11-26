@@ -14,6 +14,7 @@ claude() {
   options=(
     --mcp-config="${config_dir}/profile/mcp.json"
     --settings="${settings}"
+    --plugin-dir="${config_dir}/plugins"
     --plugin-dir="${config_dir}/profile/plugins"
     --setting-sources="${setting_sources}"
   )

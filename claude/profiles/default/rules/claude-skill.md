@@ -2,6 +2,7 @@
 paths:
   - '**/.claude/skills/**/*.md'
   - '**/claude/profiles/*/plugins/*/skills/**/*.md'
+  - '**/claude/plugins/*/skills/**/*.md'
 ---
 
 ## Frontmatter
