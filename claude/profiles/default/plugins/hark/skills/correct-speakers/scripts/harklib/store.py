@@ -7,19 +7,25 @@ import struct
 import subprocess
 import tempfile
 import time
+from pathlib import Path
+from typing import Any
 
-CONTAINER = os.path.expanduser(
-    "~/Library/Containers/com.craigsloggett.hark/Data/Library/Application Support"
+CONTAINER = (
+    Path.home()
+    / "Library/Containers/com.craigsloggett.hark/Data/Library/Application Support"
 )
-SUPPORT = os.environ.get("HARK_SUPPORT", CONTAINER)
-LIBRARY = os.path.join(SUPPORT, "Hark")
-CONVERSATIONS = os.path.join(LIBRARY, "Conversations")
-PEOPLE_FILE = os.path.join(LIBRARY, "people.jsonl")
-BACKUPS = os.path.join(SUPPORT, "Hark Backups")
-MODELS = os.path.join(CONTAINER, "FluidAudio", "Models", "speaker-diarization")
-CACHE = os.environ.get("HARK_CACHE", os.path.expanduser("~/Library/Caches/hark-correct-speakers"))
+SUPPORT = Path(os.environ.get("HARK_SUPPORT", CONTAINER))
+LIBRARY = SUPPORT / "Hark"
+CONVERSATIONS = LIBRARY / "Conversations"
+PEOPLE_FILE = LIBRARY / "people.jsonl"
+BACKUPS = SUPPORT / "Hark Backups"
+MODELS = CONTAINER / "FluidAudio" / "Models" / "speaker-diarization"
+CACHE = Path(
+    os.environ.get("HARK_CACHE", Path.home() / "Library/Caches/hark-correct-speakers")
+)
 
-# The schema each file must carry for this port to be valid (Hark's Storage/Schema.swift).
+# The schema each file must carry for this port to be valid (Hark's
+# Storage/Schema.swift).
 SCHEMAS = {
     "conversation": 4,
     "transcript": 10,
@@ -34,27 +40,37 @@ SCHEMAS = {
 class Float32(float):
     """A double holding a Float value, encoded the way Swift prints a Float."""
 
+    __slots__ = ()
 
-def float32(value):
+
+def float32(value: float) -> float:
     return struct.unpack("f", struct.pack("f", value))[0]
 
 
-def _float32_text(value):
+def _float32_text(value: float) -> str:
     for digits in range(1, 10):
-        text = "%.*g" % (digits, value)
+        text = f"{value:.{digits}g}"
         if float32(float(text)) == value:
             return text
     return repr(value)
 
 
-def encode(value):
-    """JSONEncoder with .sortedKeys: compact, slashes escaped, whole doubles as integers."""
+def encode(value: object) -> str:
+    """JSONEncoder with .sortedKeys: compact, escaped slashes, whole doubles as ints."""
     if isinstance(value, dict):
-        return "{" + ",".join(f"{encode(key)}:{encode(value[key])}" for key in sorted(value)) + "}"
+        return (
+            "{"
+            + ",".join(f"{encode(key)}:{encode(value[key])}" for key in sorted(value))
+            + "}"
+        )
     if isinstance(value, (list, tuple)):
         return "[" + ",".join(encode(item) for item in value) + "]"
     if isinstance(value, str):
         return json.dumps(value, ensure_ascii=False).replace("/", "\\/")
+    return _encode_scalar(value)
+
+
+def _encode_scalar(value: object) -> str:
     if isinstance(value, bool):
         return "true" if value else "false"
     if value is None:
@@ -64,71 +80,98 @@ def encode(value):
     if isinstance(value, Float32):
         return _float32_text(value)
     if isinstance(value, float):
-        return str(int(value)) if value.is_integer() and abs(value) < 1e15 else repr(value)
+        return (
+            str(int(value)) if value.is_integer() and abs(value) < 1e15 else repr(value)
+        )
     raise TypeError(type(value))
 
 
-class SchemaMismatch(Exception):
-    pass
+class SchemaMismatchError(Exception):
+    def __init__(self, file: Path, found: int, expected: int) -> None:
+        super().__init__(
+            f"{file} is schema {found}, this skill reads schema {expected}"
+        )
 
 
-def path_of(folder, layer):
-    return os.path.join(folder, f"{layer}.jsonl")
+class NoConversationError(LookupError):
+    def __init__(self, query: str) -> None:
+        super().__init__(f"No conversation matches {query!r}")
 
 
-def read(file, layer):
-    """The value under a file's schema line, refusing a schema this port was not checked against."""
-    with open(file, encoding="utf-8") as handle:
-        header, body = handle.read().split("\n", 1)
+class AmbiguousConversationError(LookupError):
+    def __init__(self, query: str, matches: list[str]) -> None:
+        super().__init__(
+            f"{query!r} matches {len(matches)} conversations: "
+            + ", ".join(matches[-6:])
+        )
+
+
+def path_of(folder: Path, layer: str) -> Path:
+    return folder / f"{layer}.jsonl"
+
+
+def read(file: Path, layer: str) -> dict[str, Any]:
+    """The value under a file's schema line, refusing a schema not checked against."""
+    header, body = file.read_text(encoding="utf-8").split("\n", 1)
     found = json.loads(header)["schema"]
     if found != SCHEMAS[layer]:
-        raise SchemaMismatch(f"{file} is schema {found}, this skill reads schema {SCHEMAS[layer]}")
+        raise SchemaMismatchError(file, found, SCHEMAS[layer])
     return json.loads(body)
 
 
-def text_of(layer, value):
-    return json.dumps({"schema": SCHEMAS[layer]}, separators=(",", ":")) + "\n" + encode(value) + "\n"
+def text_of(layer: str, value: object) -> str:
+    return (
+        json.dumps({"schema": SCHEMAS[layer]}, separators=(",", ":"))
+        + "\n"
+        + encode(value)
+        + "\n"
+    )
 
 
-def write(file, layer, value):
-    directory = os.path.dirname(file)
-    descriptor, temporary = tempfile.mkstemp(dir=directory, prefix=".hark-")
+def write(file: Path, layer: str, value: object) -> None:
+    descriptor, temporary = tempfile.mkstemp(dir=file.parent, prefix=".hark-")
     with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
         handle.write(text_of(layer, value))
-    os.replace(temporary, file)
+    Path(temporary).replace(file)
 
 
-def as_voiceprints(value):
-    return {"byVoice": {voice: [Float32(float32(x)) for x in print_] for voice, print_ in value["byVoice"].items()}}
+def as_voiceprints(value: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "byVoice": {
+            voice: [Float32(float32(x)) for x in print_]
+            for voice, print_ in value["byVoice"].items()
+        }
+    }
 
 
-def round_trips(file, layer):
-    with open(file, encoding="utf-8") as handle:
-        raw = handle.read()
+def round_trips(file: Path, layer: str) -> bool:
+    raw = file.read_text(encoding="utf-8")
     value = read(file, layer)
     if layer == "voiceprints":
         value = as_voiceprints(value)
     return text_of(layer, value) == raw
 
 
-def hark_is_running():
-    return subprocess.run(["pgrep", "-x", "Hark"], capture_output=True).returncode == 0
+def hark_is_running() -> bool:
+    found = subprocess.run(["pgrep", "-x", "Hark"], capture_output=True, check=False)
+    return found.returncode == 0
 
 
-def folders():
-    if not os.path.isdir(CONVERSATIONS):
+def folders() -> list[str]:
+    if not CONVERSATIONS.is_dir():
         return []
     return sorted(
-        name
-        for name in os.listdir(CONVERSATIONS)
-        if not name.startswith(".") and os.path.isdir(os.path.join(CONVERSATIONS, name))
+        entry.name
+        for entry in CONVERSATIONS.iterdir()
+        if not entry.name.startswith(".") and entry.is_dir()
     )
 
 
-def folder_matching(query):
-    """The one conversation a query names: a folder name, an id prefix, or a start time such as 08:00.
+def folder_matching(query: str) -> str:
+    """The one conversation a query names: a folder name, id prefix, or start time.
 
-    A time alone means today's conversation, else the latest one that started then.
+    A start time is written such as 08:00. A time alone means today's
+    conversation, else the latest one that started then.
     """
     names = folders()
     if query in names:
@@ -148,11 +191,11 @@ def folder_matching(query):
     if len(matches) == 1:
         return matches[0]
     if not matches:
-        raise LookupError(f"No conversation matches {query!r}")
-    raise LookupError(f"{query!r} matches {len(matches)} conversations: " + ", ".join(matches[-6:]))
+        raise NoConversationError(query)
+    raise AmbiguousConversationError(query, matches)
 
 
-def people():
-    if not os.path.exists(PEOPLE_FILE):
+def people() -> list[dict[str, Any]]:
+    if not PEOPLE_FILE.exists():
         return []
     return read(PEOPLE_FILE, "people")["people"]
