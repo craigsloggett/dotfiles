@@ -23,5 +23,5 @@ done
 
 [ "$#" -gt 0 ] || exit 0
 
-rumdl fmt "$@" >&2 || exit 2
+rumdl fmt --silent "$@" >&2 || exit 2
 rumdl check "$@" >&2 || exit 2
