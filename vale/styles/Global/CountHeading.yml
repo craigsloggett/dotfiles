@@ -1,0 +1,13 @@
+extends: existence
+message: Heading '%s' leads with a count. Name the topic.
+level: error
+vocab: false
+ignorecase: true
+scope:
+  - heading
+  - table.header
+  - strong
+raw:
+  - ^(?:\d+|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)
+  - \s+[a-z]+
+  - (?=\s+[a-z]+)

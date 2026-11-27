@@ -1,0 +1,13 @@
+extends: existence
+message: Heading '%s' makes an absolute claim. Name the topic.
+level: error
+vocab: false
+ignorecase: true
+scope:
+  - heading
+  - table.header
+  - strong
+raw:
+  - (?<![-\w])
+  - (?:all|always|every|everything|never)
+  - (?![-\w])

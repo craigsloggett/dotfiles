@@ -1,0 +1,12 @@
+extends: existence
+message: Heading '%s' addresses the reader. Use a plain label.
+level: error
+vocab: false
+ignorecase: true
+scope:
+  - heading
+  - table.header
+  - strong
+raw:
+  - ^(?:answers|lessons|takeaways|thoughts)\s(?:to|on|from)\s.*
+  - '|\b(?:we|you|your|our)\b'

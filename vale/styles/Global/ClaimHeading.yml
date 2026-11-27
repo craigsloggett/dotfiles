@@ -1,0 +1,10 @@
+extends: sequence
+message: Check heading '%s' for a claim. Use a noun phrase.
+level: warning
+scope:
+  - heading
+  - table.header
+  - strong
+tokens:
+  - tag: NN|NNS|NNP|NNPS
+  - tag: VBP|VBZ|VBD

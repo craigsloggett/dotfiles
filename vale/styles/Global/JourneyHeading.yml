@@ -1,0 +1,12 @@
+extends: existence
+message: Heading '%s' reads as a journey. Use a plain label.
+level: error
+vocab: false
+scope:
+  - heading
+  - table.header
+  - strong
+raw:
+  - ^(?!How\b)[A-Z]\S*
+  - (?:\s\S+){0,3}
+  - \sto\s[A-Z].*
