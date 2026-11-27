@@ -110,8 +110,8 @@ paths:
   where it sits in a larger flow. The "how" belongs in inline comments or is
   self-evident from the code.
 - Document each function with a complete sentence beginning with the function's
-  name, in a comment directly preceding the declaration with no intervening
-  blank line.
+  name in backticks, in a comment directly preceding the declaration with no
+  intervening blank line.
 - Scope function-local variables with a subshell body `func() ( ... )` rather
   than `_`-prefixed names. Use a plain `{ ... }` body when the function must set
   a variable for the caller to read.
